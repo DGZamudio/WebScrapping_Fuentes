@@ -1,5 +1,7 @@
+from scrappers.csupremjusticia import ScrapCorteSuprema
 from .constitucional import ScrapConstitucional
 
 SCRAPERS = {
-    "constitucional": ScrapConstitucional()
+    "corte suprema": ScrapCorteSuprema()
+    #"constitucional": ScrapConstitucional()
 }

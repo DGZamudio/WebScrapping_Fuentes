@@ -1,9 +1,12 @@
 from datetime import datetime
+import logging
 from downloader import Downloader
 from db.memory import Memory
 from scrappers import SCRAPERS
 from utils import make_doc_id
+from pathlib import Path
 
+Path("downloads").mkdir(exist_ok=True)
 
 db = Memory()
 dw = Downloader()
@@ -19,6 +22,6 @@ for key in SCRAPERS:
         doc_id = make_doc_id(doc["link"])
 
         if not db.seen(doc_id):
-            print(f"New doc: {doc['title']} - {doc['link']}")
+            logging.info(f"New doc: {doc['title']} - {doc['link']}")
             dw.download(doc)
             db.mark(doc_id, doc)

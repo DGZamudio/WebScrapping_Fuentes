@@ -1,4 +1,5 @@
 from datetime import datetime
+import logging
 import sqlite3
 from config.config import DB_PATH
 from models.models import RawDocModel
@@ -46,8 +47,9 @@ class Memory:
             ultima_fecha = cur.fetchone()
 
             if not ultima_fecha:
-                ultima_fecha = ["1992-01-01"]
+                hoy = datetime.now().strftime("%Y-%m-%d")
+                ultima_fecha = [hoy]
 
-            print("Empezando desde: ", ultima_fecha[0])
+            logging.info("Empezando desde: ", ultima_fecha[0])
 
             return ultima_fecha[0]

@@ -10,7 +10,7 @@ class ScrapConstitucional(BaseScrapper):
         self.source = "Corte Constitucional"
         self.url = None
         
-    def scrap(self, fini, ffin, q="", limit=100) -> List[RawDocModel]:
+    def scrap(self, fini, ffin, q="", limit=1000) -> List[RawDocModel]:
         self.url = CORTE_CONSTITUCIONAL_URL(fini, ffin, q, limit)
         response = requests.get(self.url)
 
@@ -23,13 +23,13 @@ class ScrapConstitucional(BaseScrapper):
             raw = item["_source"]
 
             link = f"{CORTE_CONSTITUCIONAL_DOWNLOAD_URL}{raw['rutahtml'].replace('.htm', '.rtf')}"
-            doc = {
-                "source": self.source,
-                "link": link,
-                "title": raw["prov_sentencia"],
-                "tipo": raw["prov_tipo"],
-                "f_public": raw["prov_f_public"]
-            }
+            doc = RawDocModel(
+                source= self.source,
+                link= link,
+                title= raw["prov_sentencia"],
+                tipo= raw["prov_tipo"],
+                f_public= raw["prov_f_public"]
+            )
 
             docs.append(doc)
 
