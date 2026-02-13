@@ -14,9 +14,10 @@ scraper = None
 
 for key in SCRAPERS:
     scraper = SCRAPERS[key]
+    logging.info(f"Scraping {scraper.source}...")
 
     hoy = datetime.now().strftime("%Y-%m-%d")
-    docs = scraper.scrap(fini=db.get_last_inserted(scraper.source), ffin=hoy)
+    docs = scraper.scrap(fini="2026-02-01", ffin=hoy) #db.get_last_inserted(scraper.source) prod
 
     for doc in docs:
         doc_id = make_doc_id(doc["link"])
