@@ -11,7 +11,7 @@ from selenium.webdriver.common.by import By
 
 class ScrapConsejoEstado(BaseScrapper):
     def __init__(self):
-        self.source = "Consejo de estado"
+        self.source = "CE"
         self.url = None
         
     def scrap(self, fini, ffin, q="", limit=1000) -> List[RawDocModel]:
@@ -64,13 +64,18 @@ class ScrapConsejoEstado(BaseScrapper):
                 if fecha_dt < fini_dt:
                     stop = True
                     break
+                
+                sala_desicion = soup_doc.find("span", id="ContentPlaceHolder1_InfoProcesoProvidencia1_InfoProceso1_LblSalaDecision").text.strip()
+                proceso = soup_doc.find("span", id="ContentPlaceHolder1_InfoProcesoProvidencia1_InfoProceso1_LblClaseProceso").text.strip()
+                fecha = fecha_dt.strftime("%Y-%m-%d")
 
                 doc = RawDocModel(
                     source=self.source,
                     link=link_descarga,
                     title=soup_doc.find("span", id="ContentPlaceHolder1_InfoProcesoProvidencia1_InfoProceso1_LblRadicado").text.strip(),
                     tipo=soup_doc.find("span", id="ContentPlaceHolder1_InfoProcesoProvidencia1_LblTIPOPROVIDENCIA").text.strip(),
-                    f_public=fecha_dt.strftime("%Y-%m-%d")
+                    f_public=fecha,
+                    save_path=f"downloads/{self.source}/{fecha[:4]}/{sala_desicion}/{proceso}/_(filename)_{''.join(palabra[0].upper() for palabra in proceso.split())}_(extension)"
                 )
                 docs.append(doc)
 

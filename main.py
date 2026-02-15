@@ -17,12 +17,16 @@ for key in SCRAPERS:
     logging.info(f"Scraping {scraper.source}...")
 
     hoy = datetime.now().strftime("%Y-%m-%d")
-    docs = scraper.scrap(fini="2026-02-01", ffin=hoy) #db.get_last_inserted(scraper.source) prod
+    
+    try:
+        docs = scraper.scrap(fini="2026-01-01", ffin=hoy) #db.get_last_inserted(scraper.source) prod
 
-    for doc in docs:
-        doc_id = make_doc_id(doc["link"])
+        for doc in docs:
+            doc_id = make_doc_id(doc["link"])
 
-        if not db.seen(doc_id):
-            logging.info(f"New doc: {doc['title']} - {doc['link']}")
-            dw.download(doc)
-            db.mark(doc_id, doc)
+            if not db.seen(doc_id):
+                logging.info(f"New doc: {doc['title']} - {doc['link']}")
+                dw.download(doc)
+                db.mark(doc_id, doc)
+    except Exception as e:
+        logging.error(f"Error scraping {scraper.source}: {e}")

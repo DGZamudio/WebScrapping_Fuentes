@@ -21,7 +21,7 @@ class Downloader:
             if not filename:
                 filename = extract_filename(disposition, content_type, doc["link"])
 
-            out_path = Path(f"downloads/{doc.f_public.replace('-', '')}/{doc.source}/{doc.tipo}/{filename}")
+            out_path = Path(f"{doc.save_path.replace('(filename)', filename['filename']).replace('(extension)', filename['extension'])}") if doc.save_path else Path(f"downloads/{doc.source}/{doc.f_public.replace('-', '')}/{doc.tipo}/{filename}")
             out_path.parent.mkdir(parents=True, exist_ok=True)
 
             with open(out_path, "wb") as f:

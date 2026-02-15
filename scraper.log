@@ -1,397 +1,74 @@
 INFO:WDM:====== WebDriver manager ======
 INFO:WDM:Get LATEST chromedriver version for google-chrome
 INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:There is no [win64] chromedriver "127.0.6533.119" for browser google-chrome "127.0.6533" in cache
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:WebDriver version 127.0.6533.119 selected
-INFO:WDM:Modern chrome version https://storage.googleapis.com/chrome-for-testing-public/127.0.6533.119/win32/chromedriver-win32.zip
-INFO:WDM:About to download new driver from https://storage.googleapis.com/chrome-for-testing-public/127.0.6533.119/win32/chromedriver-win32.zip
-INFO:WDM:Driver downloading response is 200
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver has been saved in cache [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119]
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:root:New doc: 11001032600020240016700 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032600020240016700/146_Autoquedispon_272223VF_0_20260210155839568.pdf?sv=2026-02-06&spr=https&se=2026-02-13T18%3A32%3A16Z&sr=b&sp=r&rscd=attachment%3B+filename%3D146_Autoquedispon_272223VF_0_20260210155839568.pdf&rsct=application%2Fpdf&sig=29RdaCBzwSSY0jg43IJ5V3Ud4xkiz2eNbf80cMfVHx8%3D
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:root:New doc: 11001032600020240016700 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032600020240016700/146_Autoquedispon_272223VF_0_20260210155839568.pdf?sv=2026-02-06&spr=https&se=2026-02-13T18%3A33%3A53Z&sr=b&sp=r&rscd=attachment%3B+filename%3D146_Autoquedispon_272223VF_0_20260210155839568.pdf&rsct=application%2Fpdf&sig=GVC%2FEk3k1VWDqXjls%2BoheGqLJqva0p0zvyI5JIVMiVY%3D
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:root:New doc: 11001032600020240016700 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032600020240016700/146_Autoquedispon_272223VF_0_20260210155839568.pdf?sv=2026-02-06&spr=https&se=2026-02-13T18%3A34%3A56Z&sr=b&sp=r&rscd=attachment%3B+filename%3D146_Autoquedispon_272223VF_0_20260210155839568.pdf&rsct=application%2Fpdf&sig=nbtwCW0guV3%2FToUf%2FPDQ%2Fd89JLX4CUwHU2tYCCtpL7E%3D
-INFO:root:New doc: 25000233600020230008901 - https://sacsjsamai1.blob.core.windows.net/1100103/25000233600020230008901/3_Autoquerechaz_73508Rechazaapelacio_0_20260209095037751.pdf?sv=2026-02-06&spr=https&se=2026-02-13T18%3A34%3A59Z&sr=b&sp=r&rscd=attachment%3B+filename%3D3_Autoquerechaz_73508Rechazaapelacio_0_20260209095037751.pdf&rsct=application%2Fpdf&sig=Z9%2FWxIvp9m2cs%2FIDP9MjHvoGB%2B2Jnae2ShOlr135gtw%3D
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:root:New doc: 11001032600020240016700 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032600020240016700/146_Autoquedispon_272223VF_0_20260210155839568.pdf?sv=2026-02-06&spr=https&se=2026-02-13T19%3A34%3A17Z&sr=b&sp=r&rscd=attachment%3B+filename%3D146_Autoquedispon_272223VF_0_20260210155839568.pdf&rsct=application%2Fpdf&sig=wFiPGs9BSVZ8qMt9fIP29KejGV60jXsk2mht40O3k%2Bw%3D
-INFO:root:New doc: 25000233600020230008901 - https://sacsjsamai1.blob.core.windows.net/1100103/25000233600020230008901/3_Autoquerechaz_73508Rechazaapelacio_0_20260209095037751.pdf?sv=2026-02-06&spr=https&se=2026-02-13T19%3A34%3A18Z&sr=b&sp=r&rscd=attachment%3B+filename%3D3_Autoquerechaz_73508Rechazaapelacio_0_20260209095037751.pdf&rsct=application%2Fpdf&sig=MpwL1BAqRjVwECMU0jkSxJrGkpYjAr7vUA7VbyGdvts%3D
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:root:Scraping Consejo de estado...
-INFO:root:New doc: 11001032600020240016700 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032600020240016700/146_Autoquedispon_272223VF_0_20260210155839568.pdf?sv=2026-02-06&spr=https&se=2026-02-13T19%3A35%3A50Z&sr=b&sp=r&rscd=attachment%3B+filename%3D146_Autoquedispon_272223VF_0_20260210155839568.pdf&rsct=application%2Fpdf&sig=iImjGhOBl2xbh8AIy9%2Fq7SWTVQHEHxoB%2BeIfQqGUgro%3D
-INFO:root:New doc: 25000233600020230008901 - https://sacsjsamai1.blob.core.windows.net/1100103/25000233600020230008901/3_Autoquerechaz_73508Rechazaapelacio_0_20260209095037751.pdf?sv=2026-02-06&spr=https&se=2026-02-13T19%3A35%3A50Z&sr=b&sp=r&rscd=attachment%3B+filename%3D3_Autoquerechaz_73508Rechazaapelacio_0_20260209095037751.pdf&rsct=application%2Fpdf&sig=r48kmrbNf2yduuhhwe9ee0E0HwoZEQHdvIRszN%2FBkLc%3D
+INFO:WDM:Driver [C:\Users\Mogz\.wdm\drivers\chromedriver\win64\145.0.7632.76\chromedriver-win32/chromedriver.exe] found in cache
+INFO:root:Scraping CSJ...
+ERROR:root:Error scraping CSJ: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
 INFO:root:Scraping Corte Constitucional...
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:root:Scraping Consejo de estado...
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:root:Scraping Consejo de estado...
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:root:Scraping Consejo de estado...
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:root:Scraping Consejo de estado...
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:root:Scraping Consejo de estado...
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:root:Scraping Consejo de estado...
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:root:Scraping Consejo de estado...
-INFO:root:New doc: 11001032600020240016700 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032600020240016700/146_Autoquedispon_272223VF_0_20260210155839568.pdf?sv=2026-02-06&spr=https&se=2026-02-13T19%3A55%3A12Z&sr=b&sp=r&rscd=attachment%3B+filename%3D146_Autoquedispon_272223VF_0_20260210155839568.pdf&rsct=application%2Fpdf&sig=%2BcFPM77jesvVxERzd3i5d6h%2FSgopVtH6U92AO18lLWM%3D
-INFO:root:New doc: 25000233600020230008901 - https://sacsjsamai1.blob.core.windows.net/1100103/25000233600020230008901/3_Autoquerechaz_73508Rechazaapelacio_0_20260209095037751.pdf?sv=2026-02-06&spr=https&se=2026-02-13T19%3A55%3A17Z&sr=b&sp=r&rscd=attachment%3B+filename%3D3_Autoquerechaz_73508Rechazaapelacio_0_20260209095037751.pdf&rsct=application%2Fpdf&sig=a3EH7OSMi%2BcgqlN%2FCJpHNpC3MnHAD%2FE6%2BJ8m7qvCJgs%3D
-INFO:root:New doc: 11001032600020250016800 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032600020250016800/5_Autoqueadmite_73837Fundacionparael_0_20260206113811919.pdf?sv=2026-02-06&spr=https&se=2026-02-13T19%3A55%3A19Z&sr=b&sp=r&rscd=attachment%3B+filename%3D5_Autoqueadmite_73837Fundacionparael_0_20260206113811919.pdf&rsct=application%2Fpdf&sig=YyX1rahWIwtQvzJauXWObNKGNh8iWLyAubxo46NDSxc%3D
-INFO:root:New doc: 70001233300020200024302 - https://sacsjsamai1.blob.core.windows.net/1100103/70001233300020200024302/3_Autoqueadmite_73498LiliaInesUribeG_0_20260206120127775.pdf?sv=2026-02-06&spr=https&se=2026-02-13T19%3A55%3A21Z&sr=b&sp=r&rscd=attachment%3B+filename%3D3_Autoqueadmite_73498LiliaInesUribeG_0_20260206120127775.pdf&rsct=application%2Fpdf&sig=E6p8JUgKs6c6kX54yUQF5RxynD9VxNBnr9WqyzQH4Cg%3D
-INFO:root:New doc: 11001032800020260001100 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032800020260001100/12_Autoqueinadmi_2026011Inadmisoriogo_0_20260205100132848.pdf?sv=2026-02-06&spr=https&se=2026-02-13T19%3A55%3A23Z&sr=b&sp=r&rscd=attachment%3B+filename%3D12_Autoqueinadmi_2026011Inadmisoriogo_0_20260205100132848.pdf&rsct=application%2Fpdf&sig=aLhOOxylRkIxAasBAwcTIYT3gtK3HJM69%2FOXkwyhx%2BY%3D
-INFO:root:New doc: 25000234100020240154001 - https://sacsjsamai1.blob.core.windows.net/1100103/25000234100020240154001/23_Autoqueresuel_202401540resuelvesol_0_20260205144511657.pdf?sv=2026-02-06&spr=https&se=2026-02-13T19%3A55%3A25Z&sr=b&sp=r&rscd=attachment%3B+filename%3D23_Autoqueresuel_202401540resuelvesol_0_20260205144511657.pdf&rsct=application%2Fpdf&sig=8p2br9mNfcIy2UF0RkspgTlrxTvuuvSSvxiGnMk%2Fs4c%3D
-INFO:root:New doc: 11001031500020260066300 - https://sacsjsamai1.blob.core.windows.net/1100103/11001031500020260066300/7_Autoquedeclar_20260066300HUMBERTOE_0_20260203142505928.pdf?sv=2026-02-06&spr=https&se=2026-02-13T19%3A55%3A27Z&sr=b&sp=r&rscd=attachment%3B+filename%3D7_Autoquedeclar_20260066300HUMBERTOE_0_20260203142505928.pdf&rsct=application%2Fpdf&sig=5RnZmnpCD7Nhr5Ml7vbcj%2BaBrIzGnGC3lyLS2SRLyCk%3D
-INFO:root:New doc: 11001032600020170007800 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032600020170007800/195_Autoqueresuel_59379RESUELVEIMPEDIM_0_20260203110119656.pdf?sv=2026-02-06&spr=https&se=2026-02-13T19%3A55%3A28Z&sr=b&sp=r&rscd=attachment%3B+filename%3D195_Autoqueresuel_59379RESUELVEIMPEDIM_0_20260203110119656.pdf&rsct=application%2Fpdf&sig=E6cS%2FP%2B3fNz5ZMxgMJ3Xu40UJxTwfDA5%2FPk9dW7fRzw%3D
-INFO:root:New doc: 11001032600020220013600 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032600020220013600/39_Autoqueresuel_68568Designacuradora_0_20260203151730052.pdf?sv=2026-02-06&spr=https&se=2026-02-13T19%3A55%3A29Z&sr=b&sp=r&rscd=attachment%3B+filename%3D39_Autoqueresuel_68568Designacuradora_0_20260203151730052.pdf&rsct=application%2Fpdf&sig=8M8Kf30FfC2%2F39%2FlE1e4MBm35nMbebARqXVPAN5hNsk%3D
-INFO:root:New doc: 11001032600020250006900 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032600020250006900/301_Autoqueaprueb_72982ApruebaLiquidac_0_20260203152103726.pdf?sv=2026-02-06&spr=https&se=2026-02-13T19%3A55%3A30Z&sr=b&sp=r&rscd=attachment%3B+filename%3D301_Autoqueaprueb_72982ApruebaLiquidac_0_20260203152103726.pdf&rsct=application%2Fpdf&sig=9YiTMzpdfus6PodnZbE9wc33YTXu0Zghy00TkEHh2Kk%3D
-INFO:root:New doc: 08001233100020100094301 - https://sacsjsamai1.blob.core.windows.net/1100103/08001233100020100094301/36_Autoqueresuel_63774Impulso_VF_0_20260202172438933.pdf?sv=2026-02-06&spr=https&se=2026-02-13T19%3A55%3A33Z&sr=b&sp=r&rscd=attachment%3B+filename%3D36_Autoqueresuel_63774Impulso_VF_0_20260202172438933.pdf&rsct=application%2Fpdf&sig=v%2B0wVDFURibYDmLHppL%2BU4kHAtdUuv0%2B%2BoljZLJajVY%3D
-INFO:root:New doc: 11001031500020250802900 - https://sacsjsamai1.blob.core.windows.net/1100103/11001031500020250802900/7_Autoquedeclar_APa2025802900DavidGe_0_20260202091900584.pdf?sv=2026-02-06&spr=https&se=2026-02-13T19%3A55%3A35Z&sr=b&sp=r&rscd=attachment%3B+filename%3D7_Autoquedeclar_APa2025802900DavidGe_0_20260202091900584.pdf&rsct=application%2Fpdf&sig=h5b%2FNAUlojKqcWb9eKF%2BH7O%2BTBgBHWGGr4VwvpzDqqM%3D
-INFO:root:New doc: 11001031500020260057900 - https://sacsjsamai1.blob.core.windows.net/1100103/11001031500020260057900/7_Autoquedeclar_Camila20250057900Mar_0_20260202173017812.pdf?sv=2026-02-06&spr=https&se=2026-02-13T19%3A55%3A37Z&sr=b&sp=r&rscd=attachment%3B+filename%3D7_Autoquedeclar_Camila20250057900Mar_0_20260202173017812.pdf&rsct=application%2Fpdf&sig=Z2TY4SiRtQD2ojGPSCXNUH%2F3UUSw1sdqKOdMHSdOEl0%3D
-INFO:root:New doc: 11001032500020130111700 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032500020130111700/51_Autoquedispon_PARASENT_CA26392013Autoordena_0_20260202141050090.pdf?sv=2026-02-06&spr=https&se=2026-02-13T19%3A55%3A41Z&sr=b&sp=r&rscd=attachment%3B+filename%3D51_Autoquedispon_PARASENT_CA26392013Autoordena_0_20260202141050090.pdf&rsct=application%2Fpdf&sig=tyS1d0XcU4rirGjkO9twLZQEBgyQPSMOy86jB6Pub0c%3D
-INFO:root:New doc: 11001032500020130114100 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032500020130114100/54_Autoquedispon_PARASENT_CA27392013Autoordena_0_20260202143002209.pdf?sv=2026-02-06&spr=https&se=2026-02-13T19%3A55%3A43Z&sr=b&sp=r&rscd=attachment%3B+filename%3D54_Autoquedispon_PARASENT_CA27392013Autoordena_0_20260202143002209.pdf&rsct=application%2Fpdf&sig=U0OSnOZ2d78CNCZ8QTUvnN3vTrceno%2F1pqpCEwdi1Xk%3D
-INFO:root:New doc: 11001032600020230014500 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032600020230014500/64_Autoquedecret_202300145_PruebasRER_0_20260202171857342.pdf?sv=2026-02-06&spr=https&se=2026-02-13T19%3A55%3A46Z&sr=b&sp=r&rscd=attachment%3B+filename%3D64_Autoquedecret_202300145_PruebasRER_0_20260202171857342.pdf&rsct=application%2Fpdf&sig=PhQDfPcueXKVfetnuuCq9o5puHTTDhaa1brJXfuMd30%3D
-INFO:root:New doc: 11001032600020250017000 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032600020250017000/36_Autoquedeclar_73840_0_20260204093237483.pdf?sv=2026-02-06&spr=https&se=2026-02-13T19%3A55%3A48Z&sr=b&sp=r&rscd=attachment%3B+filename%3D36_Autoquedeclar_73840_0_20260204093237483.pdf&rsct=application%2Fpdf&sig=ONFmXh8a1OrRsQYN3zP%2BP6cUof0AJv9kv%2FknA91%2BKGY%3D
-INFO:root:New doc: 11001032800020250013700 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032800020250013700/82_Autoqueresuel_20250013700Resulever_0_20260202173516043.pdf?sv=2026-02-06&spr=https&se=2026-02-13T19%3A55%3A50Z&sr=b&sp=r&rscd=attachment%3B+filename%3D82_Autoqueresuel_20250013700Resulever_0_20260202173516043.pdf&rsct=application%2Fpdf&sig=7KQboUalDtc6H7G2VW8zAQK5Ruzj3VpfpZ3Po2p%2BuwA%3D
-INFO:root:New doc: 68001233100020010222701 - https://sacsjsamai1.blob.core.windows.net/1100103/68001233100020010222701/31_Autoqueresuel_42342Impulso_VF_0_20260202172059785.pdf?sv=2026-02-06&spr=https&se=2026-02-13T19%3A55%3A52Z&sr=b&sp=r&rscd=attachment%3B+filename%3D31_Autoqueresuel_42342Impulso_VF_0_20260202172059785.pdf&rsct=application%2Fpdf&sig=g%2FB2pTf60BLOXwZ8RDsyS68DlIf4n4qdM%2Bo06U7CKHA%3D
-INFO:root:Scraping Corte Constitucional...
-INFO:root:New doc: T-019/26 - https://www.corteconstitucional.gov.co/sentencias/2026/T-019-26.rtf
-INFO:root:New doc: T-010/26 - https://www.corteconstitucional.gov.co/sentencias/2026/T-010-26.rtf
-INFO:root:New doc: T-012/26 - https://www.corteconstitucional.gov.co/sentencias/2026/T-012-26.rtf
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:root:Scraping Corte Suprema de justicia...
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:root:Scraping Consejo de estado...
-INFO:root:New doc: 11001032600020240016700 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032600020240016700/146_Autoquedispon_272223VF_0_20260210155839568.pdf?sv=2026-02-06&spr=https&se=2026-02-13T21%3A00%3A19Z&sr=b&sp=r&rscd=attachment%3B+filename%3D146_Autoquedispon_272223VF_0_20260210155839568.pdf&rsct=application%2Fpdf&sig=zrnuDakUZ5%2BSIs%2FKYPSf1dAnShrl9vXSviBYFWJKewE%3D
-INFO:root:New doc: 25000233600020230008901 - https://sacsjsamai1.blob.core.windows.net/1100103/25000233600020230008901/3_Autoquerechaz_73508Rechazaapelacio_0_20260209095037751.pdf?sv=2026-02-06&spr=https&se=2026-02-13T21%3A00%3A20Z&sr=b&sp=r&rscd=attachment%3B+filename%3D3_Autoquerechaz_73508Rechazaapelacio_0_20260209095037751.pdf&rsct=application%2Fpdf&sig=IManiP%2FOiOUwKeJLR9W4TFLjiCvOLitVxrxNSPm%2FSjg%3D
-INFO:root:New doc: 11001032600020250016800 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032600020250016800/5_Autoqueadmite_73837Fundacionparael_0_20260206113811919.pdf?sv=2026-02-06&spr=https&se=2026-02-13T21%3A00%3A22Z&sr=b&sp=r&rscd=attachment%3B+filename%3D5_Autoqueadmite_73837Fundacionparael_0_20260206113811919.pdf&rsct=application%2Fpdf&sig=8emkKj2yPb4UZWAaZvGfKHeN9aTdu2PTeeSRTTp%2Bf6w%3D
-INFO:root:New doc: 70001233300020200024302 - https://sacsjsamai1.blob.core.windows.net/1100103/70001233300020200024302/3_Autoqueadmite_73498LiliaInesUribeG_0_20260206120127775.pdf?sv=2026-02-06&spr=https&se=2026-02-13T21%3A00%3A22Z&sr=b&sp=r&rscd=attachment%3B+filename%3D3_Autoqueadmite_73498LiliaInesUribeG_0_20260206120127775.pdf&rsct=application%2Fpdf&sig=GoswWP8avkkXw9XLeOK5Vkrdj2elFtmG%2FCMZe7R1ABo%3D
-INFO:root:New doc: 11001032800020260001100 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032800020260001100/12_Autoqueinadmi_2026011Inadmisoriogo_0_20260205100132848.pdf?sv=2026-02-06&spr=https&se=2026-02-13T21%3A00%3A23Z&sr=b&sp=r&rscd=attachment%3B+filename%3D12_Autoqueinadmi_2026011Inadmisoriogo_0_20260205100132848.pdf&rsct=application%2Fpdf&sig=oG0cI3RPpUHjsTsJ6YGDrzdeZuooJTf7X018JyRyqx4%3D
-INFO:root:New doc: 25000234100020240154001 - https://sacsjsamai1.blob.core.windows.net/1100103/25000234100020240154001/23_Autoqueresuel_202401540resuelvesol_0_20260205144511657.pdf?sv=2026-02-06&spr=https&se=2026-02-13T21%3A00%3A23Z&sr=b&sp=r&rscd=attachment%3B+filename%3D23_Autoqueresuel_202401540resuelvesol_0_20260205144511657.pdf&rsct=application%2Fpdf&sig=aBJ9eYvBhTXnH9Ef1TIoOR9wIk%2FodPMt0mMERg4zFeo%3D
-INFO:root:New doc: 11001031500020260066300 - https://sacsjsamai1.blob.core.windows.net/1100103/11001031500020260066300/7_Autoquedeclar_20260066300HUMBERTOE_0_20260203142505928.pdf?sv=2026-02-06&spr=https&se=2026-02-13T21%3A00%3A25Z&sr=b&sp=r&rscd=attachment%3B+filename%3D7_Autoquedeclar_20260066300HUMBERTOE_0_20260203142505928.pdf&rsct=application%2Fpdf&sig=Eom2SE5ChrPi%2BHdGOwau3nvWT2BH%2Fc4HGdJO6MbVExM%3D
-INFO:root:New doc: 11001032600020170007800 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032600020170007800/195_Autoqueresuel_59379RESUELVEIMPEDIM_0_20260203110119656.pdf?sv=2026-02-06&spr=https&se=2026-02-13T21%3A00%3A25Z&sr=b&sp=r&rscd=attachment%3B+filename%3D195_Autoqueresuel_59379RESUELVEIMPEDIM_0_20260203110119656.pdf&rsct=application%2Fpdf&sig=M4WC0dpYYG4SoUAJzLt2DNvEZ%2Fm7GtTyQyVIOi42P0w%3D
-INFO:root:New doc: 11001032600020220013600 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032600020220013600/39_Autoqueresuel_68568Designacuradora_0_20260203151730052.pdf?sv=2026-02-06&spr=https&se=2026-02-13T21%3A00%3A25Z&sr=b&sp=r&rscd=attachment%3B+filename%3D39_Autoqueresuel_68568Designacuradora_0_20260203151730052.pdf&rsct=application%2Fpdf&sig=S0myVrBTrwR16LbwX6fSki20l5OU7hnsKXoO%2F2Iik%2BA%3D
-INFO:root:New doc: 11001032600020250006900 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032600020250006900/301_Autoqueaprueb_72982ApruebaLiquidac_0_20260203152103726.pdf?sv=2026-02-06&spr=https&se=2026-02-13T21%3A00%3A26Z&sr=b&sp=r&rscd=attachment%3B+filename%3D301_Autoqueaprueb_72982ApruebaLiquidac_0_20260203152103726.pdf&rsct=application%2Fpdf&sig=%2FeB%2BM2dP3ibl3qtQRpeBMqrSkbWR5iPKRx1cszy%2BrDM%3D
-INFO:root:New doc: 08001233100020100094301 - https://sacsjsamai1.blob.core.windows.net/1100103/08001233100020100094301/36_Autoqueresuel_63774Impulso_VF_0_20260202172438933.pdf?sv=2026-02-06&spr=https&se=2026-02-13T21%3A00%3A28Z&sr=b&sp=r&rscd=attachment%3B+filename%3D36_Autoqueresuel_63774Impulso_VF_0_20260202172438933.pdf&rsct=application%2Fpdf&sig=cslxugUIcHjnZTzVU%2FkuGXGEFlnEhPzaHU%2F8S8oHoV4%3D
-INFO:root:New doc: 11001031500020250802900 - https://sacsjsamai1.blob.core.windows.net/1100103/11001031500020250802900/7_Autoquedeclar_APa2025802900DavidGe_0_20260202091900584.pdf?sv=2026-02-06&spr=https&se=2026-02-13T21%3A00%3A30Z&sr=b&sp=r&rscd=attachment%3B+filename%3D7_Autoquedeclar_APa2025802900DavidGe_0_20260202091900584.pdf&rsct=application%2Fpdf&sig=bkrPnMT4u0uWS2TGU%2BZD2wkYIeSbHAvKiy6RS1eNRvk%3D
-INFO:root:New doc: 11001031500020260057900 - https://sacsjsamai1.blob.core.windows.net/1100103/11001031500020260057900/7_Autoquedeclar_Camila20250057900Mar_0_20260202173017812.pdf?sv=2026-02-06&spr=https&se=2026-02-13T21%3A00%3A30Z&sr=b&sp=r&rscd=attachment%3B+filename%3D7_Autoquedeclar_Camila20250057900Mar_0_20260202173017812.pdf&rsct=application%2Fpdf&sig=AFhhhDu66LZ7tRiUZJehXgced3qgA1kkQHYu95TqEsc%3D
-INFO:root:New doc: 11001032500020130111700 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032500020130111700/51_Autoquedispon_PARASENT_CA26392013Autoordena_0_20260202141050090.pdf?sv=2026-02-06&spr=https&se=2026-02-13T21%3A00%3A31Z&sr=b&sp=r&rscd=attachment%3B+filename%3D51_Autoquedispon_PARASENT_CA26392013Autoordena_0_20260202141050090.pdf&rsct=application%2Fpdf&sig=hpuQRxnRw2Q7GA%2F9083gHuAGNEo%2FlWsXBgNAZdhvjPo%3D
-INFO:root:New doc: 11001032500020130114100 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032500020130114100/54_Autoquedispon_PARASENT_CA27392013Autoordena_0_20260202143002209.pdf?sv=2026-02-06&spr=https&se=2026-02-13T21%3A00%3A31Z&sr=b&sp=r&rscd=attachment%3B+filename%3D54_Autoquedispon_PARASENT_CA27392013Autoordena_0_20260202143002209.pdf&rsct=application%2Fpdf&sig=uSr%2FVlLjXCLQMV6qEFnJqfdxRMKf3c8r6xVk4YEmH%2F0%3D
-INFO:root:New doc: 11001032600020230014500 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032600020230014500/64_Autoquedecret_202300145_PruebasRER_0_20260202171857342.pdf?sv=2026-02-06&spr=https&se=2026-02-13T21%3A00%3A32Z&sr=b&sp=r&rscd=attachment%3B+filename%3D64_Autoquedecret_202300145_PruebasRER_0_20260202171857342.pdf&rsct=application%2Fpdf&sig=Y1AP7ND0FgC9rRhz0gHiR66UtLunFgMzbZEylZzHwAU%3D
-INFO:root:New doc: 11001032600020250017000 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032600020250017000/36_Autoquedeclar_73840_0_20260204093237483.pdf?sv=2026-02-06&spr=https&se=2026-02-13T21%3A00%3A34Z&sr=b&sp=r&rscd=attachment%3B+filename%3D36_Autoquedeclar_73840_0_20260204093237483.pdf&rsct=application%2Fpdf&sig=DM0UQnoMAKXcywGgpAPLBuz8yy0cVvLwTvhI5HVwOPs%3D
-INFO:root:New doc: 11001032800020250013700 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032800020250013700/82_Autoqueresuel_20250013700Resulever_0_20260202173516043.pdf?sv=2026-02-06&spr=https&se=2026-02-13T21%3A00%3A35Z&sr=b&sp=r&rscd=attachment%3B+filename%3D82_Autoqueresuel_20250013700Resulever_0_20260202173516043.pdf&rsct=application%2Fpdf&sig=0eghdlG6y01wNBsA1zv%2FhMk6iWYwvpkxXr%2BVVt3q4eQ%3D
-INFO:root:New doc: 68001233100020010222701 - https://sacsjsamai1.blob.core.windows.net/1100103/68001233100020010222701/31_Autoqueresuel_42342Impulso_VF_0_20260202172059785.pdf?sv=2026-02-06&spr=https&se=2026-02-13T21%3A00%3A35Z&sr=b&sp=r&rscd=attachment%3B+filename%3D31_Autoqueresuel_42342Impulso_VF_0_20260202172059785.pdf&rsct=application%2Fpdf&sig=ny4dnubV928VmHXgLA489kO%2BtOjsk54YMOJWS6881WM%3D
-INFO:root:Scraping Corte Constitucional...
-INFO:WDM:====== WebDriver manager ======
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Get LATEST chromedriver version for google-chrome
-INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
-INFO:root:Scraping Consejo de estado...
-INFO:root:New doc: 11001032600020240016700 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032600020240016700/146_Autoquedispon_272223VF_0_20260210155839568.pdf?sv=2026-02-06&spr=https&se=2026-02-13T21%3A03%3A43Z&sr=b&sp=r&rscd=attachment%3B+filename%3D146_Autoquedispon_272223VF_0_20260210155839568.pdf&rsct=application%2Fpdf&sig=8oi61%2B3BuNJjs0s8Niack5HJOX7xZcS6YYyEsmOA4No%3D
-INFO:root:New doc: 25000233600020230008901 - https://sacsjsamai1.blob.core.windows.net/1100103/25000233600020230008901/3_Autoquerechaz_73508Rechazaapelacio_0_20260209095037751.pdf?sv=2026-02-06&spr=https&se=2026-02-13T21%3A03%3A44Z&sr=b&sp=r&rscd=attachment%3B+filename%3D3_Autoquerechaz_73508Rechazaapelacio_0_20260209095037751.pdf&rsct=application%2Fpdf&sig=iTL8ENBPsww0MiMjNJr5isO%2BT4asRZQUKnpnhhcjGwc%3D
-INFO:root:New doc: 11001032600020250016800 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032600020250016800/5_Autoqueadmite_73837Fundacionparael_0_20260206113811919.pdf?sv=2026-02-06&spr=https&se=2026-02-13T21%3A03%3A45Z&sr=b&sp=r&rscd=attachment%3B+filename%3D5_Autoqueadmite_73837Fundacionparael_0_20260206113811919.pdf&rsct=application%2Fpdf&sig=Xruwai7FB43Z8%2FXVCtvftl8LqFFss1CdPBFgfAiwINc%3D
-INFO:root:New doc: 70001233300020200024302 - https://sacsjsamai1.blob.core.windows.net/1100103/70001233300020200024302/3_Autoqueadmite_73498LiliaInesUribeG_0_20260206120127775.pdf?sv=2026-02-06&spr=https&se=2026-02-13T21%3A03%3A45Z&sr=b&sp=r&rscd=attachment%3B+filename%3D3_Autoqueadmite_73498LiliaInesUribeG_0_20260206120127775.pdf&rsct=application%2Fpdf&sig=VfZTpXVC1TtjoJeDLj5E5tnCKUQGH6bl0fbBS8lgjz8%3D
-INFO:root:New doc: 11001032800020260001100 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032800020260001100/12_Autoqueinadmi_2026011Inadmisoriogo_0_20260205100132848.pdf?sv=2026-02-06&spr=https&se=2026-02-13T21%3A03%3A46Z&sr=b&sp=r&rscd=attachment%3B+filename%3D12_Autoqueinadmi_2026011Inadmisoriogo_0_20260205100132848.pdf&rsct=application%2Fpdf&sig=OenFWGohb2ZB2CrU1NLIU3gdRF1fYk%2BjPMQR02eg608%3D
-INFO:root:New doc: 25000234100020240154001 - https://sacsjsamai1.blob.core.windows.net/1100103/25000234100020240154001/23_Autoqueresuel_202401540resuelvesol_0_20260205144511657.pdf?sv=2026-02-06&spr=https&se=2026-02-13T21%3A03%3A47Z&sr=b&sp=r&rscd=attachment%3B+filename%3D23_Autoqueresuel_202401540resuelvesol_0_20260205144511657.pdf&rsct=application%2Fpdf&sig=QqeAljADX%2FMf2M2gO00ehbWFcBt%2FOrKUsuGQLkkX%2Buk%3D
-INFO:root:New doc: 11001031500020260066300 - https://sacsjsamai1.blob.core.windows.net/1100103/11001031500020260066300/7_Autoquedeclar_20260066300HUMBERTOE_0_20260203142505928.pdf?sv=2026-02-06&spr=https&se=2026-02-13T21%3A03%3A48Z&sr=b&sp=r&rscd=attachment%3B+filename%3D7_Autoquedeclar_20260066300HUMBERTOE_0_20260203142505928.pdf&rsct=application%2Fpdf&sig=uBWx3usmO0wLHZqNcB5MYwwcy9n9mKCUiQkp6r5t2Yo%3D
-INFO:root:New doc: 11001032600020170007800 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032600020170007800/195_Autoqueresuel_59379RESUELVEIMPEDIM_0_20260203110119656.pdf?sv=2026-02-06&spr=https&se=2026-02-13T21%3A03%3A48Z&sr=b&sp=r&rscd=attachment%3B+filename%3D195_Autoqueresuel_59379RESUELVEIMPEDIM_0_20260203110119656.pdf&rsct=application%2Fpdf&sig=78RiT90ry64F53QNHxjFN66D%2Fhmjp4e2OryQ1VD%2Bb8g%3D
-INFO:root:New doc: 11001032600020220013600 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032600020220013600/39_Autoqueresuel_68568Designacuradora_0_20260203151730052.pdf?sv=2026-02-06&spr=https&se=2026-02-13T21%3A03%3A49Z&sr=b&sp=r&rscd=attachment%3B+filename%3D39_Autoqueresuel_68568Designacuradora_0_20260203151730052.pdf&rsct=application%2Fpdf&sig=9ODpXvVUBIqSkf67OVtFBUmmkbVJxdDBHlyeGXg0sH4%3D
-INFO:root:New doc: 11001032600020250006900 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032600020250006900/301_Autoqueaprueb_72982ApruebaLiquidac_0_20260203152103726.pdf?sv=2026-02-06&spr=https&se=2026-02-13T21%3A03%3A49Z&sr=b&sp=r&rscd=attachment%3B+filename%3D301_Autoqueaprueb_72982ApruebaLiquidac_0_20260203152103726.pdf&rsct=application%2Fpdf&sig=pso9s7g5agFaWDtoxcfgzLX6ckYxqx%2Bv2Ksdeo%2FJ7SI%3D
-INFO:root:New doc: 08001233100020100094301 - https://sacsjsamai1.blob.core.windows.net/1100103/08001233100020100094301/36_Autoqueresuel_63774Impulso_VF_0_20260202172438933.pdf?sv=2026-02-06&spr=https&se=2026-02-13T21%3A03%3A52Z&sr=b&sp=r&rscd=attachment%3B+filename%3D36_Autoqueresuel_63774Impulso_VF_0_20260202172438933.pdf&rsct=application%2Fpdf&sig=oY%2Bx6otNYZwFIPcOh7RDoodw7q2WGeLWIH7DPGLSyoU%3D
-INFO:root:New doc: 11001031500020250802900 - https://sacsjsamai1.blob.core.windows.net/1100103/11001031500020250802900/7_Autoquedeclar_APa2025802900DavidGe_0_20260202091900584.pdf?sv=2026-02-06&spr=https&se=2026-02-13T21%3A03%3A53Z&sr=b&sp=r&rscd=attachment%3B+filename%3D7_Autoquedeclar_APa2025802900DavidGe_0_20260202091900584.pdf&rsct=application%2Fpdf&sig=kW3OXX%2BxMLVycfZMp2twCY1UBIw1oc5p6SK1Du0QbOQ%3D
-INFO:root:New doc: 11001031500020260057900 - https://sacsjsamai1.blob.core.windows.net/1100103/11001031500020260057900/7_Autoquedeclar_Camila20250057900Mar_0_20260202173017812.pdf?sv=2026-02-06&spr=https&se=2026-02-13T21%3A03%3A54Z&sr=b&sp=r&rscd=attachment%3B+filename%3D7_Autoquedeclar_Camila20250057900Mar_0_20260202173017812.pdf&rsct=application%2Fpdf&sig=esh0VSJWRJEaYyOQgDAaHcUQKka%2Ba4pH4Swel%2BvPxTk%3D
-INFO:root:New doc: 11001032500020130111700 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032500020130111700/51_Autoquedispon_PARASENT_CA26392013Autoordena_0_20260202141050090.pdf?sv=2026-02-06&spr=https&se=2026-02-13T21%3A03%3A54Z&sr=b&sp=r&rscd=attachment%3B+filename%3D51_Autoquedispon_PARASENT_CA26392013Autoordena_0_20260202141050090.pdf&rsct=application%2Fpdf&sig=PCd%2Fy4MCOuosXfQfof9ZOT66CpaL%2BhAQMm63xM3Svhs%3D
-INFO:root:New doc: 11001032500020130114100 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032500020130114100/54_Autoquedispon_PARASENT_CA27392013Autoordena_0_20260202143002209.pdf?sv=2026-02-06&spr=https&se=2026-02-13T21%3A03%3A55Z&sr=b&sp=r&rscd=attachment%3B+filename%3D54_Autoquedispon_PARASENT_CA27392013Autoordena_0_20260202143002209.pdf&rsct=application%2Fpdf&sig=2A8d%2BUqSVHCix2GZE%2BaHnkLpKSxnm%2FcNI3txUFoC0rg%3D
-INFO:root:New doc: 11001032600020230014500 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032600020230014500/64_Autoquedecret_202300145_PruebasRER_0_20260202171857342.pdf?sv=2026-02-06&spr=https&se=2026-02-13T21%3A03%3A55Z&sr=b&sp=r&rscd=attachment%3B+filename%3D64_Autoquedecret_202300145_PruebasRER_0_20260202171857342.pdf&rsct=application%2Fpdf&sig=%2F50UxAdj7MbL8ejfQUfVGSYna8hjMPm2xyhqz%2BlyN5U%3D
-INFO:root:New doc: 11001032600020250017000 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032600020250017000/36_Autoquedeclar_73840_0_20260204093237483.pdf?sv=2026-02-06&spr=https&se=2026-02-13T21%3A03%3A56Z&sr=b&sp=r&rscd=attachment%3B+filename%3D36_Autoquedeclar_73840_0_20260204093237483.pdf&rsct=application%2Fpdf&sig=vfsBgz0hX2lsRCW997FB9YE%2FwkYhL7Nz5UDWSY4R96U%3D
-INFO:root:New doc: 11001032800020250013700 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032800020250013700/82_Autoqueresuel_20250013700Resulever_0_20260202173516043.pdf?sv=2026-02-06&spr=https&se=2026-02-13T21%3A03%3A57Z&sr=b&sp=r&rscd=attachment%3B+filename%3D82_Autoqueresuel_20250013700Resulever_0_20260202173516043.pdf&rsct=application%2Fpdf&sig=nETd3dfFshcBQkxnQSNWwfn9mmQZw6QRjo0sbmRChlg%3D
-INFO:root:New doc: 68001233100020010222701 - https://sacsjsamai1.blob.core.windows.net/1100103/68001233100020010222701/31_Autoqueresuel_42342Impulso_VF_0_20260202172059785.pdf?sv=2026-02-06&spr=https&se=2026-02-13T21%3A03%3A57Z&sr=b&sp=r&rscd=attachment%3B+filename%3D31_Autoqueresuel_42342Impulso_VF_0_20260202172059785.pdf&rsct=application%2Fpdf&sig=EaMdYcGC5Eg6YeRRo0lINBTlmNUGPV0eYsu1rdd9iYQ%3D
-INFO:root:Scraping Corte Constitucional...
-INFO:root:New doc: T-019/26 - https://www.corteconstitucional.gov.co/sentencias/2026/T-019-26.rtf
-INFO:root:New doc: T-010/26 - https://www.corteconstitucional.gov.co/sentencias/2026/T-010-26.rtf
-INFO:root:New doc: T-012/26 - https://www.corteconstitucional.gov.co/sentencias/2026/T-012-26.rtf
+ERROR:root:Error scraping Corte Constitucional: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+INFO:root:Scraping CE...
+INFO:root:New doc: 11001032600020240016700 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032600020240016700/146_Autoquedispon_272223VF_0_20260210155839568.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A32%3A32Z&sr=b&sp=r&rscd=attachment%3B+filename%3D146_Autoquedispon_272223VF_0_20260210155839568.pdf&rsct=application%2Fpdf&sig=9APXQ19OFxwVI5DtCvd7XX80wRJOW9ti7gmhrwq7Tsk%3D
+INFO:root:New doc: 25000233600020230008901 - https://sacsjsamai1.blob.core.windows.net/1100103/25000233600020230008901/3_Autoquerechaz_73508Rechazaapelacio_0_20260209095037751.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A32%3A33Z&sr=b&sp=r&rscd=attachment%3B+filename%3D3_Autoquerechaz_73508Rechazaapelacio_0_20260209095037751.pdf&rsct=application%2Fpdf&sig=KT9Ggcw%2BJZNNi%2BBt2YxXscSG1MzpkgO%2FbwIfEIRAryA%3D
+INFO:root:New doc: 11001032600020250016800 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032600020250016800/5_Autoqueadmite_73837Fundacionparael_0_20260206113811919.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A32%3A34Z&sr=b&sp=r&rscd=attachment%3B+filename%3D5_Autoqueadmite_73837Fundacionparael_0_20260206113811919.pdf&rsct=application%2Fpdf&sig=3SDtALNyC9I6U1zXKPYdNjqemBueyBloW9ouYI9nMJE%3D
+INFO:root:New doc: 70001233300020200024302 - https://sacsjsamai1.blob.core.windows.net/1100103/70001233300020200024302/3_Autoqueadmite_73498LiliaInesUribeG_0_20260206120127775.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A32%3A35Z&sr=b&sp=r&rscd=attachment%3B+filename%3D3_Autoqueadmite_73498LiliaInesUribeG_0_20260206120127775.pdf&rsct=application%2Fpdf&sig=rkV0AKc2yIaJMTYi82QI6VC1LastSxb%2BByaIVYdGEAU%3D
+INFO:root:New doc: 11001032800020260001100 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032800020260001100/12_Autoqueinadmi_2026011Inadmisoriogo_0_20260205100132848.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A32%3A36Z&sr=b&sp=r&rscd=attachment%3B+filename%3D12_Autoqueinadmi_2026011Inadmisoriogo_0_20260205100132848.pdf&rsct=application%2Fpdf&sig=dbpO03FU4x0%2FeaO4pinb%2BhfjNFA86myyGEyxS6rYeC4%3D
+INFO:root:New doc: 25000234100020240154001 - https://sacsjsamai1.blob.core.windows.net/1100103/25000234100020240154001/23_Autoqueresuel_202401540resuelvesol_0_20260205144511657.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A32%3A36Z&sr=b&sp=r&rscd=attachment%3B+filename%3D23_Autoqueresuel_202401540resuelvesol_0_20260205144511657.pdf&rsct=application%2Fpdf&sig=gptX28bLswd1zFzpKPUOvCKzLjuN3APo4Ak75OcRHu0%3D
+INFO:root:New doc: 11001031500020260066300 - https://sacsjsamai1.blob.core.windows.net/1100103/11001031500020260066300/7_Autoquedeclar_20260066300HUMBERTOE_0_20260203142505928.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A32%3A37Z&sr=b&sp=r&rscd=attachment%3B+filename%3D7_Autoquedeclar_20260066300HUMBERTOE_0_20260203142505928.pdf&rsct=application%2Fpdf&sig=lCcGZBnhN7%2BDfo7ozDrWCqyhoYP393a2A4WwLXcqccM%3D
+INFO:root:New doc: 11001032600020170007800 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032600020170007800/195_Autoqueresuel_59379RESUELVEIMPEDIM_0_20260203110119656.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A32%3A38Z&sr=b&sp=r&rscd=attachment%3B+filename%3D195_Autoqueresuel_59379RESUELVEIMPEDIM_0_20260203110119656.pdf&rsct=application%2Fpdf&sig=p1bGWbGdbpmPnlBJ2v12pTSPjSNvaVNJxmcetpBFWVU%3D
+INFO:root:New doc: 11001032600020220013600 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032600020220013600/39_Autoqueresuel_68568Designacuradora_0_20260203151730052.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A32%3A39Z&sr=b&sp=r&rscd=attachment%3B+filename%3D39_Autoqueresuel_68568Designacuradora_0_20260203151730052.pdf&rsct=application%2Fpdf&sig=3ekRV2zZFO23Be9VLViJ4s7aWndy145%2FanKodkmGhtc%3D
+INFO:root:New doc: 11001032600020250006900 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032600020250006900/301_Autoqueaprueb_72982ApruebaLiquidac_0_20260203152103726.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A32%3A39Z&sr=b&sp=r&rscd=attachment%3B+filename%3D301_Autoqueaprueb_72982ApruebaLiquidac_0_20260203152103726.pdf&rsct=application%2Fpdf&sig=m7kEIYAxgnUVn2a6d9q1wEeA8NytFDK3c3n2hehjDMo%3D
+INFO:root:New doc: 08001233100020100094301 - https://sacsjsamai1.blob.core.windows.net/1100103/08001233100020100094301/36_Autoqueresuel_63774Impulso_VF_0_20260202172438933.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A32%3A41Z&sr=b&sp=r&rscd=attachment%3B+filename%3D36_Autoqueresuel_63774Impulso_VF_0_20260202172438933.pdf&rsct=application%2Fpdf&sig=qpi9GT%2BAy6UffTgd6ICfL3Xv9mvh9nSTdZ1e6HDe9N4%3D
+INFO:root:New doc: 11001031500020250802900 - https://sacsjsamai1.blob.core.windows.net/1100103/11001031500020250802900/7_Autoquedeclar_APa2025802900DavidGe_0_20260202091900584.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A32%3A42Z&sr=b&sp=r&rscd=attachment%3B+filename%3D7_Autoquedeclar_APa2025802900DavidGe_0_20260202091900584.pdf&rsct=application%2Fpdf&sig=9PJcTcFPDx9Qa0%2BXfPAhTv1dG30DJ%2FtSMcg9p%2F795nU%3D
+INFO:root:New doc: 11001031500020260057900 - https://sacsjsamai1.blob.core.windows.net/1100103/11001031500020260057900/7_Autoquedeclar_Camila20250057900Mar_0_20260202173017812.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A32%3A43Z&sr=b&sp=r&rscd=attachment%3B+filename%3D7_Autoquedeclar_Camila20250057900Mar_0_20260202173017812.pdf&rsct=application%2Fpdf&sig=5%2B02l%2Bi6rWY9iQyL3CiHXBkuUioPPeBiHKnO7zxj8XA%3D
+INFO:root:New doc: 11001032500020130111700 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032500020130111700/51_Autoquedispon_PARASENT_CA26392013Autoordena_0_20260202141050090.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A32%3A44Z&sr=b&sp=r&rscd=attachment%3B+filename%3D51_Autoquedispon_PARASENT_CA26392013Autoordena_0_20260202141050090.pdf&rsct=application%2Fpdf&sig=R5sJPmpPDnbKNMt2xqay2aFymXC98iPNzS4T93YXerY%3D
+INFO:root:New doc: 11001032500020130114100 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032500020130114100/54_Autoquedispon_PARASENT_CA27392013Autoordena_0_20260202143002209.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A32%3A44Z&sr=b&sp=r&rscd=attachment%3B+filename%3D54_Autoquedispon_PARASENT_CA27392013Autoordena_0_20260202143002209.pdf&rsct=application%2Fpdf&sig=CEqjq%2BXQqryWkL4RcTTk8wFNrJleU4WKP72rkuDK3Ko%3D
+INFO:root:New doc: 11001032600020230014500 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032600020230014500/64_Autoquedecret_202300145_PruebasRER_0_20260202171857342.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A32%3A45Z&sr=b&sp=r&rscd=attachment%3B+filename%3D64_Autoquedecret_202300145_PruebasRER_0_20260202171857342.pdf&rsct=application%2Fpdf&sig=wL4RIrT4ZMiYmZcWaIQbyNtZN2e94BWhXZLJVMyJkEs%3D
+INFO:root:New doc: 11001032600020250017000 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032600020250017000/36_Autoquedeclar_73840_0_20260204093237483.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A32%3A46Z&sr=b&sp=r&rscd=attachment%3B+filename%3D36_Autoquedeclar_73840_0_20260204093237483.pdf&rsct=application%2Fpdf&sig=Yj76GLzKANn1Wvawc8rRaPqc9FmnL6O2Mg4NriD2viY%3D
+INFO:root:New doc: 11001032800020250013700 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032800020250013700/82_Autoqueresuel_20250013700Resulever_0_20260202173516043.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A32%3A47Z&sr=b&sp=r&rscd=attachment%3B+filename%3D82_Autoqueresuel_20250013700Resulever_0_20260202173516043.pdf&rsct=application%2Fpdf&sig=7jX1K%2B5KdAfE8fG%2FC31R%2FOeV2zCnrO6obX0OhGo9uw4%3D
+INFO:root:New doc: 68001233100020010222701 - https://sacsjsamai1.blob.core.windows.net/1100103/68001233100020010222701/31_Autoqueresuel_42342Impulso_VF_0_20260202172059785.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A32%3A48Z&sr=b&sp=r&rscd=attachment%3B+filename%3D31_Autoqueresuel_42342Impulso_VF_0_20260202172059785.pdf&rsct=application%2Fpdf&sig=95hyKX%2BxXImdg1Vr8zjCRAPDpFlK5Kk1yceWLS4iwbY%3D
+INFO:root:New doc: 05001233300020170151101 - https://sacsjsamai1.blob.core.windows.net/1100103/05001233300020170151101/49_Autoqueadmite_73824_AdmiteApelacio_0_20260202152236481.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A32%3A49Z&sr=b&sp=r&rscd=attachment%3B+filename%3D49_Autoqueadmite_73824_AdmiteApelacio_0_20260202152236481.pdf&rsct=application%2Fpdf&sig=hcM7sIBtiglO4%2FAqKgTfF%2FRAAh6ac6TjIl0Rlz5tk8A%3D
+INFO:root:New doc: 05001233300020240110002 - https://sacsjsamai1.blob.core.windows.net/1100103/05001233300020240110002/3_Autoqueresuel_AUTO73610VF_0_20260206113400614.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A32%3A51Z&sr=b&sp=r&rscd=attachment%3B+filename%3D3_Autoqueresuel_AUTO73610VF_0_20260206113400614.pdf&rsct=application%2Fpdf&sig=iTfSxYpv9Yy98pbIP%2FOzjAOYN468VnT92GmKxsF5YUU%3D
+INFO:root:New doc: 11001032600020180008300 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032600020180008300/54_Autoquedispon_47247Correcciondesen_0_20260204122123625.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A32%3A52Z&sr=b&sp=r&rscd=attachment%3B+filename%3D54_Autoquedispon_47247Correcciondesen_0_20260204122123625.pdf&rsct=application%2Fpdf&sig=mQEyOHSy7E5S2ivH4Pt2I6NvjZ9%2BhqDb6rXh6Pm21VM%3D
+INFO:root:New doc: 11001032600020250015200 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032600020250015200/6_Autoqueadmite_73697_AdmisionREUJ_V_0_20260202151033657.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A32%3A53Z&sr=b&sp=r&rscd=attachment%3B+filename%3D6_Autoqueadmite_73697_AdmisionREUJ_V_0_20260202151033657.pdf&rsct=application%2Fpdf&sig=G%2Ba51rqRNUS7nMGvR2LolDRDdEjvYmMJzE0AuPHeUVc%3D
+INFO:root:New doc: 11001032800020250022800 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032800020250022800/20_Autoquerechaz_Rechazo_20250022800Rechazade_0_20260130155849486.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A32%3A54Z&sr=b&sp=r&rscd=attachment%3B+filename%3D20_Autoquerechaz_Rechazo_20250022800Rechazade_0_20260130155849486.pdf&rsct=application%2Fpdf&sig=1YEGv3h04i1qCArDdT%2Brs%2F27zCa6LBvGJ8mdD%2BdXZsU%3D
+INFO:root:New doc: 18001234000020190018701 - https://sacsjsamai1.blob.core.windows.net/1100103/18001234000020190018701/20_Sentencia_72783vehiculoincauta_0_20260204115915640.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A32%3A54Z&sr=b&sp=r&rscd=attachment%3B+filename%3D20_Sentencia_72783vehiculoincauta_0_20260204115915640.pdf&rsct=application%2Fpdf&sig=lXY8DWSluUCugN2MN6cJ2nFFMr56YBwEYRnOq9h6090%3D
+INFO:root:New doc: 25000233600020180083201 - https://sacsjsamai1.blob.core.windows.net/1100103/25000233600020180083201/6_Autoqueadmite_73963_0_20260204092238690.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A32%3A55Z&sr=b&sp=r&rscd=attachment%3B+filename%3D6_Autoqueadmite_73963_0_20260204092238690.pdf&rsct=application%2Fpdf&sig=RwB0xTD0n8YZ7e1wOJxzGdShp0%2FG3Tn4evxJ0ELSEDs%3D
+INFO:root:New doc: 54001233300020130039902 - https://sacsjsamai1.blob.core.windows.net/1100103/54001233300020130039902/89_Autoqueresuel_692632_0_20260204112425788.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A32%3A56Z&sr=b&sp=r&rscd=attachment%3B+filename%3D89_Autoqueresuel_692632_0_20260204112425788.pdf&rsct=application%2Fpdf&sig=U3EBBI5ICyPSca%2Fi%2FDXGrtV%2BFA3wdDAcdAKoWi0ihh4%3D
+INFO:root:New doc: 76001233300020250075001 - https://sacsjsamai1.blob.core.windows.net/1100103/76001233300020250075001/3_Autoquedeclar_20250075001ApAutoMCj_0_20260130123503325.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A32%3A57Z&sr=b&sp=r&rscd=attachment%3B+filename%3D3_Autoquedeclar_20250075001ApAutoMCj_0_20260130123503325.pdf&rsct=application%2Fpdf&sig=5tLqV0L2xcakEpQIsFAY%2B5Bt63AFIUha%2B2krarvtL%2Fk%3D
+INFO:root:New doc: 11001031500020250773900 - https://sacsjsamai1.blob.core.windows.net/1100103/11001031500020250773900/16_Sentencia_DECLARAIM_20250773900Empresade_0_20260129154601812.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A32%3A58Z&sr=b&sp=r&rscd=attachment%3B+filename%3D16_Sentencia_DECLARAIM_20250773900Empresade_0_20260129154601812.pdf&rsct=application%2Fpdf&sig=sP5kCJVbvrL532LWkRc39X2sQQajgH%2B2DnX9hhr059E%3D
+INFO:root:New doc: 11001031500020260041800 - https://sacsjsamai1.blob.core.windows.net/1100103/11001031500020260041800/30_Autoqueadmite_20260041800Autoquead_0_20260129161929478.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A32%3A59Z&sr=b&sp=r&rscd=attachment%3B+filename%3D30_Autoqueadmite_20260041800Autoquead_0_20260129161929478.pdf&rsct=application%2Fpdf&sig=6UBvpD0ucRWekTu3yQgWI9zcBz47CtZ7WWRZocuuG9Y%3D
+INFO:root:New doc: 11001031500020250658801 - https://sacsjsamai1.blob.core.windows.net/1100103/11001031500020250658801/3_Sentencia_20250658801ICBFTvsTu_0_20260129170835088.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A33%3A01Z&sr=b&sp=r&rscd=attachment%3B+filename%3D3_Sentencia_20250658801ICBFTvsTu_0_20260129170835088.pdf&rsct=application%2Fpdf&sig=HuAit%2BENZfctp0uReAZST1sB7ZVr5hQsgHU2YEbrxA8%3D
+INFO:root:New doc: 11001031500020250695900 - https://sacsjsamai1.blob.core.windows.net/1100103/11001031500020250695900/36_Sentencia_4AB20250695900MariaL_0_20260129183124736.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A33%3A02Z&sr=b&sp=r&rscd=attachment%3B+filename%3D36_Sentencia_4AB20250695900MariaL_0_20260129183124736.pdf&rsct=application%2Fpdf&sig=FYKOrtgsqw9%2FUpzdmWcwjDWr%2FWdeaQ5XQgWLCWbRMh0%3D
+INFO:root:New doc: 11001031500020250723100 - https://sacsjsamai1.blob.core.windows.net/1100103/11001031500020250723100/70_Sentencia_20250723100Fallo_0_20260129172257429.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A33%3A03Z&sr=b&sp=r&rscd=attachment%3B+filename%3D70_Sentencia_20250723100Fallo_0_20260129172257429.pdf&rsct=application%2Fpdf&sig=ViR4ft7El4l%2FI%2BOpVs4eiz1GLcH4yb%2FCffjB8zQ8Lmw%3D
+INFO:root:New doc: 11001031500020250786100 - https://sacsjsamai1.blob.core.windows.net/1100103/11001031500020250786100/19_Sentencia_20250786100JAIDENLUI_0_20260129152716888.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A33%3A03Z&sr=b&sp=r&rscd=attachment%3B+filename%3D19_Sentencia_20250786100JAIDENLUI_0_20260129152716888.pdf&rsct=application%2Fpdf&sig=CkGGRA4Gm9eaIKrfmtIxOzGA%2FZY21K34tzaU%2FnYxIT0%3D
+INFO:root:New doc: 11001031500020250796100 - https://sacsjsamai1.blob.core.windows.net/1100103/11001031500020250796100/41_Sentencia_06110010315000202507_0_20260202084109829.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A33%3A04Z&sr=b&sp=r&rscd=attachment%3B+filename%3D41_Sentencia_06110010315000202507_0_20260202084109829.pdf&rsct=application%2Fpdf&sig=8ufsKHIJHU3muG3FPFuHDULmDKvhaCYEJ%2BV5i70gTw4%3D
+INFO:root:New doc: 11001031500020250808400 - https://sacsjsamai1.blob.core.windows.net/1100103/11001031500020250808400/16_Sentencia_08110010315000202508_0_20260202091348378.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A33%3A05Z&sr=b&sp=r&rscd=attachment%3B+filename%3D16_Sentencia_08110010315000202508_0_20260202091348378.pdf&rsct=application%2Fpdf&sig=99MjsOW4yt3o5wsH22D1t2zHVsMLUjBHRHIZcZ1FKFw%3D
+INFO:root:New doc: 11001032800020250021800 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032800020250021800/48_Autoqueresuel_Resuelve_20250021800Resuelvei_0_20260129161332875.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A33%3A06Z&sr=b&sp=r&rscd=attachment%3B+filename%3D48_Autoqueresuel_Resuelve_20250021800Resuelvei_0_20260129161332875.pdf&rsct=application%2Fpdf&sig=8QOAo5WrLBPmIWOw543ZyCX18a2%2FOqSKzldWTVyjI88%3D
+INFO:root:New doc: 19001233300020250020401 - https://sacsjsamai1.blob.core.windows.net/1100103/19001233300020250020401/9_Sentencia_REVOCA_20250020401JohnFreim_0_20260129154150377.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A33%3A07Z&sr=b&sp=r&rscd=attachment%3B+filename%3D9_Sentencia_REVOCA_20250020401JohnFreim_0_20260129154150377.pdf&rsct=application%2Fpdf&sig=ki%2FJwwlJ4SjqvsxA9zgvmPjoBaEMiyzYmujuGrAFLe0%3D
+INFO:root:New doc: 76001233300020250085201 - https://sacsjsamai1.blob.core.windows.net/1100103/76001233300020250085201/10_Sentencia_20250085201DIANAYANI_0_20260129162453769.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A33%3A08Z&sr=b&sp=r&rscd=attachment%3B+filename%3D10_Sentencia_20250085201DIANAYANI_0_20260129162453769.pdf&rsct=application%2Fpdf&sig=wextuhw0C6Ixctx%2Fdx31G0BED7vkbA14uTIH2L9vTlo%3D
+INFO:root:New doc: 85001233300020250010402 - https://sacsjsamai1.blob.core.windows.net/1100103/85001233300020250010402/8_Autoqueresuel_20250010402Autoresue_0_20260129155009959.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A33%3A10Z&sr=b&sp=r&rscd=attachment%3B+filename%3D8_Autoqueresuel_20250010402Autoresue_0_20260129155009959.pdf&rsct=application%2Fpdf&sig=zBRH6gCmrQ6E%2FYKGF%2F5qPdnJ5t1xckkVSplbM6Ahqys%3D
+INFO:root:New doc: 08001233300020250042201 - https://sacsjsamai1.blob.core.windows.net/1100103/08001233300020250042201/6_Autoqueresuel_01AutoconfirmanegMC2_0_20260129165917834.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A33%3A12Z&sr=b&sp=r&rscd=attachment%3B+filename%3D6_Autoqueresuel_01AutoconfirmanegMC2_0_20260129165917834.pdf&rsct=application%2Fpdf&sig=1ta%2FtyPZiMqvULA8yHdIKUz85Kpxd8C4%2FoSTkMqEDZ4%3D
+INFO:root:New doc: 11001031500020250747000 - https://sacsjsamai1.blob.core.windows.net/1100103/11001031500020250747000/20_Sentencia_2FLM20250747000INSTI_0_20260129161510299.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A33%3A13Z&sr=b&sp=r&rscd=attachment%3B+filename%3D20_Sentencia_2FLM20250747000INSTI_0_20260129161510299.pdf&rsct=application%2Fpdf&sig=7%2BgS5XhawMH4FjR2vNWoBCYAY1Zr3FrQ1Y37BIT8OT8%3D
+INFO:root:New doc: 11001031500020250772200 - https://sacsjsamai1.blob.core.windows.net/1100103/11001031500020250772200/23_Sentencia_20250772200PedroJuan_0_20260129153421491.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A33%3A14Z&sr=b&sp=r&rscd=attachment%3B+filename%3D23_Sentencia_20250772200PedroJuan_0_20260129153421491.pdf&rsct=application%2Fpdf&sig=fyvBlIgIkmkiJBt%2FHBGZQxTcGiU6lyhRDwfTstInAY8%3D
+INFO:root:New doc: 11001031500020250788300 - https://sacsjsamai1.blob.core.windows.net/1100103/11001031500020250788300/43_Sentencia_Fallo_20250788300JALRAINVE_0_20260129150505668.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A33%3A14Z&sr=b&sp=r&rscd=attachment%3B+filename%3D43_Sentencia_Fallo_20250788300JALRAINVE_0_20260129150505668.pdf&rsct=application%2Fpdf&sig=wmZ6bn7W9VR4kdmuHVTvwLC2SH2Sm1HNu%2BvW7A0CbJc%3D
+INFO:root:New doc: 11001031500020250811400 - https://sacsjsamai1.blob.core.windows.net/1100103/11001031500020250811400/20_Sentencia_2AB20250811400Emilda_0_20260129180659357.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A33%3A15Z&sr=b&sp=r&rscd=attachment%3B+filename%3D20_Sentencia_2AB20250811400Emilda_0_20260129180659357.pdf&rsct=application%2Fpdf&sig=nGu0s850HA7BEEXDaPxw3xNJVFFo4hCq1NHxnHLNam0%3D
+INFO:root:New doc: 11001032800020250014400 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032800020250014400/45_Autoqueresuel_2025144Resuelverecur_0_20260129123707355.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A33%3A16Z&sr=b&sp=r&rscd=attachment%3B+filename%3D45_Autoqueresuel_2025144Resuelverecur_0_20260129123707355.pdf&rsct=application%2Fpdf&sig=%2BBJ9NBc8XSseWc0%2BCsSX%2FiB%2BNt%2FWr9u2OlEN2huL1Yk%3D
+INFO:root:New doc: 11001032800020250023000 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032800020250023000/13_Autoquerechaz_20250023000RechazoDd_0_20260129184543405.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A33%3A16Z&sr=b&sp=r&rscd=attachment%3B+filename%3D13_Autoquerechaz_20250023000RechazoDd_0_20260129184543405.pdf&rsct=application%2Fpdf&sig=QSrxMfu0KyhHBhthf9z6D4PxENIo6T3nplZLl8VxajA%3D
+INFO:root:New doc: 11001032800020250023100 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032800020250023100/44_Autoquerechaz_20250023100RechazoDd_0_20260129184744832.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A33%3A17Z&sr=b&sp=r&rscd=attachment%3B+filename%3D44_Autoquerechaz_20250023100RechazoDd_0_20260129184744832.pdf&rsct=application%2Fpdf&sig=wukzCOtmstnIJUOPZlcg9FHMI5pE0R5WLAfHYXFA2Qo%3D
+INFO:root:New doc: 11001032800020250023700 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032800020250023700/36_Autoquerechaz_20250023700RechazoDd_0_20260129185151159.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A33%3A18Z&sr=b&sp=r&rscd=attachment%3B+filename%3D36_Autoquerechaz_20250023700RechazoDd_0_20260129185151159.pdf&rsct=application%2Fpdf&sig=mdK9VxAB%2BxrJk7nX1I3o94gJ1FIgcQx6owCA%2BKSAhLo%3D
+INFO:root:New doc: 70001233300020250015401 - https://sacsjsamai1.blob.core.windows.net/1100103/70001233300020250015401/29_Sentencia_ACLizeth20250015401C_0_20260129170330078.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A33%3A19Z&sr=b&sp=r&rscd=attachment%3B+filename%3D29_Sentencia_ACLizeth20250015401C_0_20260129170330078.pdf&rsct=application%2Fpdf&sig=kJ9unPmdCCW9cAFIBBiIDzFDgfbQtBNaAz6XuNfh6q0%3D
+INFO:root:New doc: 11001031500020250528801 - https://sacsjsamai1.blob.core.windows.net/1100103/11001031500020250528801/3_Sentencia_20250528801fallo_0_20260129172947419.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A33%3A23Z&sr=b&sp=r&rscd=attachment%3B+filename%3D3_Sentencia_20250528801fallo_0_20260129172947419.pdf&rsct=application%2Fpdf&sig=fQtQEjqvTvcTvY5Qb1m2oyTLn0860NXvHCDaLqkbzhU%3D
+INFO:root:New doc: 11001031500020250687600 - https://sacsjsamai1.blob.core.windows.net/1100103/11001031500020250687600/22_Sentencia_3AB2025687600CarlosJ_0_20260129181914576.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A33%3A24Z&sr=b&sp=r&rscd=attachment%3B+filename%3D22_Sentencia_3AB2025687600CarlosJ_0_20260129181914576.pdf&rsct=application%2Fpdf&sig=0Cmnos4U89mFBPXBuFbauo04rHWJ%2F1klNIy%2FQkuXB7Q%3D
+INFO:root:New doc: 11001032800020250023400 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032800020250023400/17_Autoquerechaz_Rechaza_20250023400Rechazade_0_20260129143330410.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A33%3A24Z&sr=b&sp=r&rscd=attachment%3B+filename%3D17_Autoquerechaz_Rechaza_20250023400Rechazade_0_20260129143330410.pdf&rsct=application%2Fpdf&sig=1L77J3UE%2FKxtUPZtK8DOhNzHmlTtMObWf%2BB184BuxSo%3D
+INFO:root:New doc: 11001032800020250023600 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032800020250023600/12_Autoquerechaz_20250023600RechazoDd_0_20260129185003229.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A33%3A25Z&sr=b&sp=r&rscd=attachment%3B+filename%3D12_Autoquerechaz_20250023600RechazoDd_0_20260129185003229.pdf&rsct=application%2Fpdf&sig=aGfK9FI3UWp6x25%2FPMdqds25STteEtjoTWIJyeXahH0%3D
+INFO:root:New doc: 11001032800020250024200 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032800020250024200/14_Autoquerechaz_20250024200RechazoDd_0_20260129185319484.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A33%3A26Z&sr=b&sp=r&rscd=attachment%3B+filename%3D14_Autoquerechaz_20250024200RechazoDd_0_20260129185319484.pdf&rsct=application%2Fpdf&sig=tWEvTyg7Usy1ByS8U9hLwZDHGk9haiwrG4uojQwVuYY%3D
+INFO:root:New doc: 11001032800020250024500 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032800020250024500/21_Autoquerechaz_Rechaza_20250024500Rechazapo_0_20260129143506805.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A33%3A26Z&sr=b&sp=r&rscd=attachment%3B+filename%3D21_Autoquerechaz_Rechaza_20250024500Rechazapo_0_20260129143506805.pdf&rsct=application%2Fpdf&sig=b%2BrNM0iNHsvujYexoHQIazFfjPqPV0M5XLxKfKEK02s%3D
+INFO:root:New doc: 25000234100020240053402 - https://sacsjsamai1.blob.core.windows.net/1100103/25000234100020240053402/21_Autoqueresuel_20240053402RESUELVEA_0_20260129161702575.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A33%3A27Z&sr=b&sp=r&rscd=attachment%3B+filename%3D21_Autoqueresuel_20240053402RESUELVEA_0_20260129161702575.pdf&rsct=application%2Fpdf&sig=5nfo4fIFj0epMsJByh9nVh0RpbkoQmsccWmi8rugaWY%3D
+INFO:root:New doc: 25000234100020240151001 - https://sacsjsamai1.blob.core.windows.net/1100103/25000234100020240151001/26_Autoqueresuel_Niega_20240151001Autoaclar_0_20260129164144618.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A33%3A28Z&sr=b&sp=r&rscd=attachment%3B+filename%3D26_Autoqueresuel_Niega_20240151001Autoaclar_0_20260129164144618.pdf&rsct=application%2Fpdf&sig=WZraK%2FeCcL5c5mKOx9YITL7SL6ry02oWsx6LmKq650A%3D
+INFO:root:New doc: 70001233300020250007901 - https://sacsjsamai1.blob.core.windows.net/1100103/70001233300020250007901/24_Autoqueresuel_2025079Resuelvesolic_0_20260129124331241.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A33%3A28Z&sr=b&sp=r&rscd=attachment%3B+filename%3D24_Autoqueresuel_2025079Resuelvesolic_0_20260129124331241.pdf&rsct=application%2Fpdf&sig=r%2BBHIV9vvTsswAm46C2bBWfTwSzbCblz5RZ%2BIk54zk0%3D
+INFO:root:New doc: 76001233300020220035201 - https://sacsjsamai1.blob.core.windows.net/1100103/76001233300020220035201/3_Autoquedeclar_73364EJECUTIVOREMITE_0_20260129162518222.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A33%3A29Z&sr=b&sp=r&rscd=attachment%3B+filename%3D3_Autoquedeclar_73364EJECUTIVOREMITE_0_20260129162518222.pdf&rsct=application%2Fpdf&sig=cTLN9g%2BFyinkLVbYWv2QDnvXze5QXVJUnF7%2FZB9XL6o%3D
+INFO:root:New doc: 11001031500020250753500 - https://sacsjsamai1.blob.core.windows.net/1100103/11001031500020250753500/24_Sentencia_1LMU20250753500IrmaS_0_20260129175704554.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A33%3A31Z&sr=b&sp=r&rscd=attachment%3B+filename%3D24_Sentencia_1LMU20250753500IrmaS_0_20260129175704554.pdf&rsct=application%2Fpdf&sig=%2BPE8GqZ40Y0iwzYO28W1sE9kdMLMJcngNSXsnWqU%2B8Y%3D
+INFO:root:New doc: 11001031500020250769100 - https://sacsjsamai1.blob.core.windows.net/1100103/11001031500020250769100/19_Sentencia_6FLE20250769100MARIA_0_20260129161945840.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A33%3A32Z&sr=b&sp=r&rscd=attachment%3B+filename%3D19_Sentencia_6FLE20250769100MARIA_0_20260129161945840.pdf&rsct=application%2Fpdf&sig=wIkzTt1XCm8iAx8%2BeWze9DN5x5mO2i6TJyMZi22Hyow%3D
+INFO:root:New doc: 11001031500020250785500 - https://sacsjsamai1.blob.core.windows.net/1100103/11001031500020250785500/31_Sentencia_Lizeth20250785500Tvs_0_20260129170733195.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A33%3A33Z&sr=b&sp=r&rscd=attachment%3B+filename%3D31_Sentencia_Lizeth20250785500Tvs_0_20260129170733195.pdf&rsct=application%2Fpdf&sig=OT8%2F%2BwNRFn74kG%2FQKDju1feBYykFyttCgPfxhTjxmdc%3D
+INFO:root:New doc: 11001031500020250795400 - https://sacsjsamai1.blob.core.windows.net/1100103/11001031500020250795400/21_Sentencia_05110010315000202507_0_20260202083738580.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A33%3A34Z&sr=b&sp=r&rscd=attachment%3B+filename%3D21_Sentencia_05110010315000202507_0_20260202083738580.pdf&rsct=application%2Fpdf&sig=sXIlOe9twKQMl%2BZGSV3EZM0J7NiK%2FfJF4CXDPZLxipg%3D
+INFO:root:New doc: 11001032800020250020600 - https://sacsjsamai1.blob.core.windows.net/1100103/11001032800020250020600/61_Autoqueresuel_20250020600Dignidady_0_20260129090953575.pdf?sv=2026-02-06&spr=https&se=2026-02-15T20%3A33%3A34Z&sr=b&sp=r&rscd=attachment%3B+filename%3D61_Autoqueresuel_20250020600Dignidady_0_20260129090953575.pdf&rsct=application%2Fpdf&sig=jeAU7mEmyptUWtheY3BrmuADT4XQ4KX8yF1RFmF3zoM%3D

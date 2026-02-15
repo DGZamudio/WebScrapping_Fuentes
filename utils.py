@@ -17,4 +17,4 @@ def extract_filename(disposition, content_type, url):
     else:
         ext = ""
 
-    return url.split("/")[-1] or f"document{ext}"
+    return {"filename":url.split("/")[-1] or "document", "extension":ext}
