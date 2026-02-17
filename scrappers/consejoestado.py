@@ -67,11 +67,11 @@ class ScrapConsejoEstado(BaseScrapper):
                 
                 sala_desicion = soup_doc.find("span", id="ContentPlaceHolder1_InfoProcesoProvidencia1_InfoProceso1_LblSalaDecision").text.strip()
                 proceso = soup_doc.find("span", id="ContentPlaceHolder1_InfoProcesoProvidencia1_InfoProceso1_LblClaseProceso").text.strip()
-                fecha = fecha_dt.strftime("%Y-%m-%d")
+                fecha = fecha_dt.strftime("%Y%m%d")
 
                 doc = RawDocModel(
                     source=self.source,
-                    link=link_descarga,
+                    link={"url":link_descarga, "method":"GET"},
                     title=soup_doc.find("span", id="ContentPlaceHolder1_InfoProcesoProvidencia1_InfoProceso1_LblRadicado").text.strip(),
                     tipo=soup_doc.find("span", id="ContentPlaceHolder1_InfoProcesoProvidencia1_LblTIPOPROVIDENCIA").text.strip(),
                     f_public=fecha,

@@ -3,7 +3,7 @@ from pydantic import BaseModel
 
 class RawDocModel(BaseModel):
     source    : str
-    link      : str
+    link      : dict
     title     : str
     tipo      : str
     f_public  : str

@@ -25,10 +25,11 @@ class ScrapConstitucional(BaseScrapper):
             link = f"{CORTE_CONSTITUCIONAL_DOWNLOAD_URL}{raw['rutahtml'].replace('.htm', '.rtf')}"
             doc = RawDocModel(
                 source= self.source,
-                link= link,
+                link= {"url":link, "method":"GET"},
                 title= raw["prov_sentencia"],
                 tipo= raw["prov_tipo"],
-                f_public= raw["prov_f_public"]
+                f_public= raw["prov_f_public"],
+                save_path=f"downloads/{self.source}/{raw['prov_f_public'].replace('-', '')}/{raw['prov_tipo']}/_(filename)_(extension)"
             )
 
             docs.append(doc)
