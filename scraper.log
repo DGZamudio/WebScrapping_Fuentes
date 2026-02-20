@@ -1981,3 +1981,43 @@ INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.11
 INFO:root:Empezando desde: 2026-02-17
 INFO:root:Scraping CSJ desde 2026-02-17 hasta 2026-02-20...
 INFO:root:Total de documentos descargados para CSJ: 0
+INFO:WDM:====== WebDriver manager ======
+INFO:WDM:Get LATEST chromedriver version for google-chrome
+INFO:WDM:Get LATEST chromedriver version for google-chrome
+INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
+INFO:root:Empezando desde: 2026-02-17
+INFO:WDM:====== WebDriver manager ======
+INFO:WDM:Get LATEST chromedriver version for google-chrome
+INFO:WDM:Get LATEST chromedriver version for google-chrome
+INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
+INFO:root:Empezando desde: 2026-02-17
+INFO:WDM:====== WebDriver manager ======
+INFO:WDM:Get LATEST chromedriver version for google-chrome
+INFO:WDM:Get LATEST chromedriver version for google-chrome
+INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
+INFO:root:Empezando desde: 2026-02-17
+INFO:WDM:====== WebDriver manager ======
+INFO:WDM:Get LATEST chromedriver version for google-chrome
+INFO:WDM:Get LATEST chromedriver version for google-chrome
+INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
+INFO:root:Empezando desde: 2026-02-17
+INFO:WDM:====== WebDriver manager ======
+INFO:WDM:Get LATEST chromedriver version for google-chrome
+INFO:WDM:Get LATEST chromedriver version for google-chrome
+INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
+INFO:root:Empezando desde: 2026-02-17
+INFO:WDM:====== WebDriver manager ======
+INFO:WDM:Get LATEST chromedriver version for google-chrome
+INFO:WDM:Get LATEST chromedriver version for google-chrome
+INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
+INFO:root:Empezando desde: 2026-02-17
+INFO:WDM:====== WebDriver manager ======
+INFO:WDM:Get LATEST chromedriver version for google-chrome
+INFO:WDM:Get LATEST chromedriver version for google-chrome
+INFO:WDM:Driver [C:\Users\AJ_dell1\.wdm\drivers\chromedriver\win64\127.0.6533.119\chromedriver-win32/chromedriver.exe] found in cache
+INFO:root:Empezando desde: 2026-02-17
+INFO:root:Scraping Corte Constitucional desde 2026-02-17 hasta 2026-02-20...
+INFO:root:Total de documentos descargados para Corte Constitucional: 0
+INFO:root:Scraping CSJ desde 2026-02-17 hasta 2026-02-20...
+INFO:root:Total de documentos descargados para CSJ: 0
+INFO:root:Scraping CE desde 2026-02-17 hasta 2026-02-20...

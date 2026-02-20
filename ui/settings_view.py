@@ -1,8 +1,12 @@
 import tkinter as tk
+from datetime import datetime
+from pathlib import Path
 from tkinter import ttk
+import json
 from db.memory import Memory
 from scrappers import SCRAPERS
 
+SETTINGS_PATH = Path("config") / "settings.json"
 
 class SettingsView(tk.Frame):
     """Example settings view - add your configuration options here."""
@@ -10,7 +14,9 @@ class SettingsView(tk.Frame):
     def __init__(self, parent, controller=None):
         super().__init__(parent)
         self.controller = controller
+        self.source_vars = {}
         self._build()
+        self.load_settings()
 
     def _build(self):
         title = tk.Label(self, text="Configuración", font=("Arial", 14, "bold"))
@@ -36,7 +42,6 @@ class SettingsView(tk.Frame):
         tk.Label(dates_frame, text="Fecha Fin (YYYY-MM-DD):").pack(anchor="w")
         self.end_date = tk.Entry(dates_frame, width=30)
         # default end to today
-        from datetime import datetime
         self.end_date.insert(0, datetime.now().strftime("%Y-%m-%d"))
         self.end_date.pack(fill="x")
 
@@ -45,17 +50,23 @@ class SettingsView(tk.Frame):
 
         sources_frame = tk.LabelFrame(self, text="Fuentes a Descargar", padx=10, pady=10)
         sources_frame.pack(fill="x", pady=10)
-        # store BooleanVar for each source so we can read selection later
-        self.source_vars = {}
+
         for source in SCRAPERS.keys():
             var = tk.BooleanVar(value=True)
             chk = tk.Checkbutton(sources_frame, text=source, variable=var)
             chk.pack(anchor="w")
             self.source_vars[source] = var
 
+        tk.Button(sources_frame, text="Guardar", command=self._on_save).pack(anchor="w", pady=(10, 0))
+
     def _on_save(self):
-        if self.controller:
-            self.controller.log(f"✓ Configuración guardada")
+        try:
+            self.save_settings()
+            if self.controller:
+                self.controller.log("✓ Configuración guardada")
+        except Exception as e:
+            if self.controller:
+                self.controller.log(f"Error guardando configuración: {e}")
 
     def get_dates(self):
         """Return the configured date range."""
@@ -70,3 +81,37 @@ class SettingsView(tk.Frame):
             return [k for k, v in self.source_vars.items() if v.get()]
         except Exception:
             return list(SCRAPERS.keys())
+        
+    def save_settings(self):
+        """Persist current settings to `config/settings.json`."""
+        SETTINGS_PATH.parent.mkdir(parents=True, exist_ok=True)
+        data = {
+            "start": self.start_date.get(),
+            "end": self.end_date.get(),
+            "enabled_sources": self.get_enabled_sources(),
+        }
+        with open(SETTINGS_PATH, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+
+    def load_settings(self):
+        """Load persisted settings (if present) and apply to widgets."""
+        try:
+            if SETTINGS_PATH.exists():
+                with open(SETTINGS_PATH, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                start = data.get("start")
+                end = data.get("end")
+                enabled = data.get("enabled_sources")
+
+                if start:
+                    self.start_date.delete(0, "end")
+                    self.start_date.insert(0, start)
+                if end:
+                    self.end_date.delete(0, "end")
+                    self.end_date.insert(0, end)
+                if enabled and isinstance(enabled, list):
+                    for k, var in self.source_vars.items():
+                        var.set(k in enabled)
+        except Exception:
+            # fail silently; UI should still work
+            pass
