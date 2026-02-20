@@ -8,7 +8,7 @@ class Downloader:
     def __init__(self):
         pass
 
-    def download(self, doc: RawDocModel, filename=None):
+    def download(self, doc: RawDocModel, filename=None, stop_event=None):
         headers = {
             "User-Agent": "Mozilla/5.0"
         }
@@ -36,6 +36,19 @@ class Downloader:
 
             with open(out_path, "wb") as f:
                 for chunk in r.iter_content(8192):
+                    # cooperative cancellation: check stop_event between chunks
+                    if stop_event is not None and getattr(stop_event, "is_set", lambda: False)():
+                        # remove partial file
+                        try:
+                            f.close()
+                        except Exception:
+                            pass
+                        try:
+                            out_path.unlink(missing_ok=True)
+                        except Exception:
+                            pass
+                        raise InterruptedError("Download cancelled")
+
                     if chunk:
                         f.write(chunk)
 

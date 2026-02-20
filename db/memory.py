@@ -35,14 +35,20 @@ class Memory:
                 (doc_id, doc['source'], doc["title"], doc["f_public"])
             )
 
-    def get_last_inserted(self, source):
+    def get_last_inserted(self, source=None):
         with self.get_conn() as conn:
             cur = conn.execute("""
-                SELECT f_public FROM 'downloaded'
-                WHERE source = ?
+                SELECT f_public FROM downloaded
                 ORDER BY f_public DESC
                 LIMIT 1
-            """, (source,))
+            """)
+            if source:
+                cur = conn.execute("""
+                    SELECT f_public FROM 'downloaded'
+                    WHERE source = ?
+                    ORDER BY f_public DESC
+                    LIMIT 1
+                """, (source,))
 
             ultima_fecha = cur.fetchone()
 
@@ -50,6 +56,15 @@ class Memory:
                 hoy = datetime.now().strftime("%Y-%m-%d")
                 ultima_fecha = [hoy]
 
-            logging.info("Empezando desde: ", ultima_fecha[0])
+            logging.info(f"Empezando desde: {ultima_fecha[0]}")
 
             return ultima_fecha[0]
+
+    def total_docs(self, source=None):
+        with self.get_conn() as conn:
+            if source:
+                cur = conn.execute("SELECT COUNT(*) FROM downloaded WHERE source = ?", (source,))
+            else:
+                cur = conn.execute("SELECT COUNT(*) FROM downloaded")
+            row = cur.fetchone()
+            return row[0] if row else 0
