@@ -35,6 +35,7 @@ class App(tk.Tk):
 
         # Crear y registrar las vistas principales
         self.dashboard = DashBoard(self.content_area, self)
+        self.dashboard.set_log_callback(self.log)
         self.register_view("dashboard", "Dashboard", self.dashboard)
 
         self.console = Console(self.content_area, self)
@@ -85,6 +86,7 @@ class App(tk.Tk):
     def set_run_callback(self, cb):
         self._run_callback = cb
         self.console.set_run_callback(cb)
+        self.dashboard.set_run_callback(cb)
 
     def set_running(self, running: bool):
         """Set the app running state; updates console buttons."""

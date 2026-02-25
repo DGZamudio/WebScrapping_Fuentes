@@ -15,4 +15,10 @@ __pycache__/
 # Project specific
 memory.db
 settings.json
+scraper.log
 downloads/
+
+# PyInstaller
+dist/
+build/
+*.spec

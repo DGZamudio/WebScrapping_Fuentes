@@ -59,7 +59,10 @@ class ScrapCorteSuprema(BaseScrapper):
                     }
 
                     response = requests.post(self.url, json=payload, headers=headers)
-                    response.raise_for_status()
+                    
+                    if response.status_code != 200:
+                        raise Exception(f"Error al obtener datos de {self.source}: {response.status_code} - {response.text} el sitio pudo haber cambiado su estructura o el formato de respuesta, informare al equipo de desarrollo para actualizar el scraper.")
+                    
                     data = response.json()
 
                     search_results = data.get("data", {}).get("getSearchResult", {}).get("searchResults", [])
@@ -77,10 +80,11 @@ class ScrapCorteSuprema(BaseScrapper):
                         anio = item["fechaCreacion"].replace('-', '')[:4]
                         fecha_obj = datetime.fromisoformat(item["fechaCreacion"].replace('Z', '+00:00'))
                         fecha = fecha_obj.strftime("%Y%m%d")
+                        titulo = item["title"].split(".")[-2].strip()
                         
                         doc = RawDocModel(
                             tipo=item.get("typeOfDocument") or "Desconocido",
-                            title=item["title"].split(".")[-2].strip(),
+                            title=titulo,
                             link={"url":"https://consultaprovidenciasbk.cortesuprema.gov.co/downloadFile/", "body":{"path": item["onlinePath"]}, "method":"POST"},
                             f_public=fecha,
                             source=self.source,

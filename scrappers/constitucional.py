@@ -1,4 +1,5 @@
 from typing import List
+from urllib import response
 import requests
 from config.config import CORTE_CONSTITUCIONAL_DOWNLOAD_URL, CORTE_CONSTITUCIONAL_URL
 from models.models import RawDocModel
@@ -15,6 +16,10 @@ class ScrapConstitucional(BaseScrapper):
         response = requests.get(self.url)
 
         results = response.json()
+        
+        if response.status_code != 200:
+            raise Exception(f"Error al obtener datos de {self.source}: {response.status_code} - {response.text} el sitio pudo haber cambiado su estructura o el formato de respuesta, informare al equipo de desarrollo para actualizar el scraper.")
+        
         data = results["data"]["hits"].get("hits", [])
 
         docs = []
@@ -25,7 +30,7 @@ class ScrapConstitucional(BaseScrapper):
             link = f"{CORTE_CONSTITUCIONAL_DOWNLOAD_URL}{raw['rutahtml'].replace('.htm', '.rtf')}"
             doc = RawDocModel(
                 source= self.source,
-                link= {"url":link, "method":"GET"},
+                link= {"url":link, "method":"GET", "body": {"path": raw["prov_sentencia"]}},
                 title= raw["prov_sentencia"],
                 tipo= raw["prov_tipo"],
                 f_public= raw["prov_f_public"],

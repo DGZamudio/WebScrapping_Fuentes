@@ -47,37 +47,56 @@ class ScrapConsejoEstado(BaseScrapper):
             botones_ver_documentos = soup.find_all("a", id=lambda x: x and x.startswith("MainContent_ResultadoBusqueda1_TitulacionesRepeater_documentlink_"))
 
             for i, boton in enumerate(botones_ver_documentos):
-                boton_ver_doc = driver.find_element(By.ID, f"MainContent_ResultadoBusqueda1_TitulacionesRepeater_documentlink_{i}")
-                url_doc = boton_ver_doc.get_attribute("onclick").split("'")[1] #Extraer URL del documento del atributo onclick
+                try:
+                    boton_ver_doc = driver.find_element(By.ID, f"MainContent_ResultadoBusqueda1_TitulacionesRepeater_documentlink_{i}")
+                    url_doc = boton_ver_doc.get_attribute("onclick").split("'")[1] #Extraer URL del documento del atributo onclick
 
-                session = requests.Session()
-                for cookie in driver.get_cookies():
-                    session.cookies.set(cookie['name'], cookie['value'])
+                    session = requests.Session()
+                    for cookie in driver.get_cookies():
+                        session.cookies.set(cookie['name'], cookie['value'])
 
-                response = session.get(url_doc)
-                soup_doc = BeautifulSoup(response.text, "html.parser")
+                    response = session.get(url_doc)
+                    
+                    if response.status_code != 200:
+                        raise Exception(f"Error al obtener datos de {self.source}: {response.status_code} - {response.text} el sitio pudo haber cambiado su estructura o el formato de respuesta, informare al equipo de desarrollo para actualizar el scraper.")
+                    
+                    soup_doc = BeautifulSoup(response.text, "html.parser")
 
-                link_descarga = soup_doc.find("a", id="ContentPlaceHolder1_VerProvidencia1_DescargarProvideciaLinkButton").get("href", '') #Extraer link de descarga
-                fecha_str = soup_doc.find("span", id="ContentPlaceHolder1_InfoProcesoProvidencia1_LblFECHAPROV").text.split(",")[1].strip()
-                fecha_dt = datetime.strptime(fecha_str, "%d de %B de %Y")
+                    # Verificar que los elementos esperados existan
+                    download_elem = soup_doc.find("a", id="ContentPlaceHolder1_VerProvidencia1_DescargarProvideciaLinkButton")
+                    if not download_elem:
+                        raise Exception(f"Error al obtener datos de {self.source}: No se encontró el elemento de descarga. El sitio pudo haber cambiado su estructura o el formato de respuesta, informare al equipo de desarrollo para actualizar el scraper.")
+                    
+                    link_descarga = download_elem.get("href", '')
+                    
+                    fecha_elem = soup_doc.find("span", id="ContentPlaceHolder1_InfoProcesoProvidencia1_LblFECHAPROV")
+                    if not fecha_elem:
+                        raise Exception(f"Error al obtener datos de {self.source}: No se encontró el elemento de fecha. El sitio pudo haber cambiado su estructura o el formato de respuesta, informare al equipo de desarrollo para actualizar el scraper.")
+                    
+                    fecha_str = fecha_elem.text.split(",")[1].strip()
+                    fecha_dt = datetime.strptime(fecha_str, "%d de %B de %Y")
 
-                if fecha_dt < fini_dt:
-                    stop = True
-                    break
-                
-                sala_desicion = soup_doc.find("span", id="ContentPlaceHolder1_InfoProcesoProvidencia1_InfoProceso1_LblSalaDecision").text.strip()
-                proceso = soup_doc.find("span", id="ContentPlaceHolder1_InfoProcesoProvidencia1_InfoProceso1_LblClaseProceso").text.strip()
-                fecha = fecha_dt.strftime("%Y%m%d")
+                    if fecha_dt < fini_dt:
+                        stop = True
+                        break
+                    
+                    sala_desicion = soup_doc.find("span", id="ContentPlaceHolder1_InfoProcesoProvidencia1_InfoProceso1_LblSalaDecision").text.strip()
+                    proceso = soup_doc.find("span", id="ContentPlaceHolder1_InfoProcesoProvidencia1_InfoProceso1_LblClaseProceso").text.strip()
+                    fecha = fecha_dt.strftime("%Y%m%d")
+                    radicado = soup_doc.find("span", id="ContentPlaceHolder1_InfoProcesoProvidencia1_InfoProceso1_LblRadicado").text.strip()
 
-                doc = RawDocModel(
-                    source=self.source,
-                    link={"url":link_descarga, "method":"GET"},
-                    title=soup_doc.find("span", id="ContentPlaceHolder1_InfoProcesoProvidencia1_InfoProceso1_LblRadicado").text.strip(),
-                    tipo=soup_doc.find("span", id="ContentPlaceHolder1_InfoProcesoProvidencia1_LblTIPOPROVIDENCIA").text.strip(),
-                    f_public=fecha,
-                    save_path=f"downloads/{self.source}/{fecha[:4]}/{sala_desicion}/{proceso}/_(filename)_{''.join(palabra[0].upper() for palabra in proceso.split())}_(extension)"
-                )
-                docs.append(doc)
+                    doc = RawDocModel(
+                        source=self.source,
+                        link={"url":link_descarga, "method":"GET", "body": {"path": radicado}},
+                        title=radicado,
+                        tipo=soup_doc.find("span", id="ContentPlaceHolder1_InfoProcesoProvidencia1_LblTIPOPROVIDENCIA").text.strip(),
+                        f_public=fecha,
+                        save_path=f"downloads/{self.source}/{fecha[:4]}/{sala_desicion}/{proceso}/_(filename)_{''.join(palabra[0].upper() for palabra in proceso.split())}_(extension)"
+                    )
+                    docs.append(doc)
+                except Exception as e:
+                    print(f"Error procesando documento {i}: {str(e)}")
+                    continue
 
             #Pasar de pagina
             boton_siguiente = driver.find_element(By.ID, f"MainContent_ResultadoBusqueda1_PaginaSiguienteLinkButton")
@@ -89,7 +108,5 @@ class ScrapConsejoEstado(BaseScrapper):
 
             #Actualizar el soup con la nueva pagina
             soup = BeautifulSoup(driver.page_source, "html.parser")
-
-        driver.quit()
 
         return docs
