@@ -1,8 +1,12 @@
 import tkinter as tk
+from tkinter import filedialog
 from datetime import datetime, timedelta
 import threading
 import time
 import logging
+
+from db.memory import Memory
+from utils import generate_pdf_report
 
 logger = logging.getLogger(__name__)
 
@@ -96,6 +100,22 @@ class DashBoard(tk.Frame):
         )
         self.btn_stop_scheduler.pack(side=tk.LEFT, padx=5)
 
+        # Inventario Fast Access
+        frame_inventario = tk.LabelFrame(self, text="Inventario", width=250, padx=10, pady=10)
+        frame_inventario.grid(row=4, columnspan=3, padx=10, pady=10, sticky="ew")
+        
+        # Start button
+        self.btn_download_report = tk.Button(
+            frame_inventario,
+            text="Descargar inventario",
+            command=self._on_start_downloads,
+            bg="#534CAF",
+            fg="white",
+            padx=10,
+            pady=5
+        )
+        self.btn_download_report.pack(side=tk.LEFT, padx=5)
+
     def update_total(self, count: int):
         """Update the displayed total documents count."""
         self.total_docs_label.config(text=str(count))
@@ -127,7 +147,48 @@ class DashBoard(tk.Frame):
         except ValueError as e:
             self._log(f"[Error] {e}")
             self.timer_label.config(text=f"Error: {e}", fg="#F44336")
-    
+
+    def _on_start_downloads(self):
+        """Handle start downloads button click."""
+        try:
+            self.start_inv_downloads()
+        except ValueError as e:
+            self._log(f"[Error] {e}")
+
+    def start_inv_downloads(self):
+        """Generate a PDF report with all downloaded documents."""
+        # Load entries from the database
+        entries = Memory().get_all_downloaded()
+        if not entries:
+            self._log("[Inventario] No hay documentos descargados para generar un informe.")
+            return
+
+        # Ask user where to save the PDF
+        now = datetime.now().strftime("%Y-%m-%d_%H%M%S")
+        default_name = f"inventario_{now}.pdf"
+        file_path = filedialog.asksaveasfilename(
+            defaultextension=".pdf",
+            filetypes=[("PDF", "*.pdf")],
+            initialfile=default_name,
+            title="Guardar inventario como..."
+        )
+        if not file_path:
+            return
+
+        self.btn_download_report.config(state=tk.DISABLED)
+        self._log(f"[Inventario] Generando reporte en {file_path}...")
+
+        def worker():
+            try:
+                generate_pdf_report(file_path, entries, title="Inventario de documentos descargados")
+                self._log(f"[Inventario] Reporte guardado en {file_path}")
+            except Exception as e:
+                self._log(f"[Inventario] Error al generar PDF: {e}")
+            finally:
+                self.after(0, lambda: self.btn_download_report.config(state=tk.NORMAL))
+
+        threading.Thread(target=worker, daemon=True).start()
+
     def start_scheduler(self, interval: int = 3600):
         """Start the automatic scheduler with given interval in seconds."""
         if self.scheduler_active:

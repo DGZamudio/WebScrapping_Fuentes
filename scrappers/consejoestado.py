@@ -84,6 +84,8 @@ class ScrapConsejoEstado(BaseScrapper):
                     proceso = soup_doc.find("span", id="ContentPlaceHolder1_InfoProcesoProvidencia1_InfoProceso1_LblClaseProceso").text.strip()
                     fecha = fecha_dt.strftime("%Y%m%d")
                     radicado = soup_doc.find("span", id="ContentPlaceHolder1_InfoProcesoProvidencia1_InfoProceso1_LblRadicado").text.strip()
+                    radicado_formateado = f"{radicado[:5]}-{radicado[5:7]}-{radicado[7:9]}-{radicado[9:12]}-{radicado[12:16]}-{radicado[16:21]}-{radicado[21:]}"
+                    interno = soup_doc.find("span", id="ContentPlaceHolder1_InfoProcesoProvidencia1_InfoProceso1_LblInterno").text.strip()
 
                     doc = RawDocModel(
                         source=self.source,
@@ -91,7 +93,7 @@ class ScrapConsejoEstado(BaseScrapper):
                         title=radicado,
                         tipo=soup_doc.find("span", id="ContentPlaceHolder1_InfoProcesoProvidencia1_LblTIPOPROVIDENCIA").text.strip(),
                         f_public=fecha,
-                        save_path=f"downloads/{self.source}/{fecha[:4]}/{sala_desicion}/{proceso}/_(filename)_{''.join(palabra[0].upper() for palabra in proceso.split())}_(extension)"
+                        save_path=f"downloads/{self.source}/{fecha[:5]}/{sala_desicion}/{proceso}/{radicado_formateado}{'('+interno+')' if interno else None}(extension)"
                     )
                     docs.append(doc)
                 except Exception as e:

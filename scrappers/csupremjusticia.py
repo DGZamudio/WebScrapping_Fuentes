@@ -77,7 +77,6 @@ class ScrapCorteSuprema(BaseScrapper):
                             stop = True
                             break
                         
-                        anio = item["fechaCreacion"].replace('-', '')[:4]
                         fecha_obj = datetime.fromisoformat(item["fechaCreacion"].replace('Z', '+00:00'))
                         fecha = fecha_obj.strftime("%Y%m%d")
                         titulo = item["title"].split(".")[-2].strip()
@@ -88,7 +87,7 @@ class ScrapCorteSuprema(BaseScrapper):
                             link={"url":"https://consultaprovidenciasbk.cortesuprema.gov.co/downloadFile/", "body":{"path": item["onlinePath"]}, "method":"POST"},
                             f_public=fecha,
                             source=self.source,
-                            save_path=f"downloads/{self.source}/{fecha}/CSJ_{self.tipos[tipo]}_(filename)_{anio}(extension)"
+                            save_path=f"downloads/{self.source}/{self.tipos[tipo]}/(filename)(extension)"
                         )
                         docs.append(doc)
                         

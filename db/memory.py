@@ -68,3 +68,28 @@ class Memory:
                 cur = conn.execute("SELECT COUNT(*) FROM downloaded")
             row = cur.fetchone()
             return row[0] if row else 0
+
+    def get_all_downloaded(self, source=None):
+        """Return all downloaded documents from the database."""
+        with self.get_conn() as conn:
+            if source:
+                cur = conn.execute(
+                    "SELECT doc_id, source, title, f_public, downloaded_at FROM downloaded WHERE source = ? ORDER BY downloaded_at DESC",
+                    (source,),
+                )
+            else:
+                cur = conn.execute(
+                    "SELECT doc_id, source, title, f_public, downloaded_at FROM downloaded ORDER BY downloaded_at DESC"
+                )
+            rows = cur.fetchall()
+
+        return [
+            {
+                "doc_id": r[0],
+                "source": r[1],
+                "title": r[2],
+                "f_public": r[3],
+                "downloaded_at": r[4],
+            }
+            for r in rows
+        ]
