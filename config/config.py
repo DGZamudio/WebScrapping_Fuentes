@@ -24,8 +24,10 @@ driver = webdriver.Chrome(
 )
 
 wait = WebDriverWait(driver, 20)
-
-locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')
+try:
+    locale.setlocale(locale.LC_TIME, 'Spanish_Colombia')
+except Exception as e:
+    logging.error("Error al obtener locale")
 
 #Entidades#
 

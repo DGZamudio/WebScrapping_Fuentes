@@ -15,6 +15,9 @@ class ScrapCorteSuprema(BaseScrapper):
 
     def scrap(self, fini, ffin, q="", limit=1000):
         docs = []
+
+        fecha_inicio = datetime.fromisoformat(fini).date()
+        fecha_fin = datetime.fromisoformat(ffin).date()
                     
         for tipo in self.tipos:
             stop = False
@@ -73,11 +76,14 @@ class ScrapCorteSuprema(BaseScrapper):
                         break
 
                     for item in search_results:
-                        if item["fechaCreacion"] < fini or item["fechaCreacion"] > ffin:
+                        fecha_obj = datetime.fromisoformat(item["fechaCreacion"].replace('Z', '+00:00'))
+                        
+                        if fecha_obj.date() > fecha_fin:
+                            continue
+                        elif fecha_obj.date() < fecha_inicio:
                             stop = True
                             break
                         
-                        fecha_obj = datetime.fromisoformat(item["fechaCreacion"].replace('Z', '+00:00'))
                         fecha = fecha_obj.strftime("%Y%m%d")
                         titulo = item["title"].split(".")[-2].strip()
                         
@@ -90,6 +96,10 @@ class ScrapCorteSuprema(BaseScrapper):
                             save_path=f"downloads/{self.source}/{self.tipos[tipo]}/(filename)(extension)"
                         )
                         docs.append(doc)
+                        
+                        if len(docs) >= limit:
+                            stop = True
+                            break
                         
                     start += 10
                 
