@@ -1,3 +1,4 @@
+import os
 from typing import List
 from urllib import response
 import requests
@@ -28,13 +29,22 @@ class ScrapConstitucional(BaseScrapper):
             raw = item["_source"]
 
             link = f"{CORTE_CONSTITUCIONAL_DOWNLOAD_URL}{raw['rutahtml'].replace('.htm', '.rtf')}"
+
+            tipo = raw['prov_tipo'] if raw['prov_tipo'] == "Auto" else ""
+            path = os.path.join(
+                "downloads",
+                self.source,
+                tipo,
+                raw['prov_f_public'].replace('-', '')[:4],
+                "(filename)"
+            )
             doc = RawDocModel(
                 source= self.source,
                 link= {"url":link, "method":"GET", "body": {"path": raw["prov_sentencia"]}},
                 title= raw["prov_sentencia"],
                 tipo= raw["prov_tipo"],
                 f_public= raw["prov_f_public"],
-                save_path=f"downloads/{self.source}/{raw['prov_f_public'].replace('-', '')}/{raw['prov_tipo']}/_(filename)_(extension)"
+                save_path=path
             )
 
             docs.append(doc)

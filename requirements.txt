@@ -4,3 +4,4 @@ beautifulsoup4
 selenium
 webdriver-manager
 fpdf2
+scrapy
