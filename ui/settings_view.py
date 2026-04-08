@@ -4,7 +4,7 @@ from pathlib import Path
 from tkinter import ttk
 import json
 from db.memory import Memory
-from scrappers import SCRAPERS
+from scrappers import SCRAPERS, discover_tribunales
 
 SETTINGS_PATH = Path("config") / "settings.json"
 
@@ -50,6 +50,12 @@ class SettingsView(tk.Frame):
 
         sources_frame = tk.LabelFrame(self, text="Fuentes a Descargar", padx=10, pady=10)
         sources_frame.pack(fill="x", pady=10)
+
+        # Discover all available tribunales before showing sources
+        try:
+            discover_tribunales()
+        except Exception as e:
+            print(f"Error discovering tribunales: {e}")
 
         for source in SCRAPERS.keys():
             var = tk.BooleanVar(value=True)

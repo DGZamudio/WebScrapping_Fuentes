@@ -6,7 +6,7 @@ import time
 import logging
 
 from db.memory import Memory
-from utils import generate_pdf_report
+from utils import generate_excel_report
 
 logger = logging.getLogger(__name__)
 
@@ -165,10 +165,10 @@ class DashBoard(tk.Frame):
 
         # Ask user where to save the PDF
         now = datetime.now().strftime("%Y-%m-%d_%H%M%S")
-        default_name = f"inventario_{now}.pdf"
+        default_name = f"inventario_{now}.xlsx"
         file_path = filedialog.asksaveasfilename(
-            defaultextension=".pdf",
-            filetypes=[("PDF", "*.pdf")],
+            defaultextension=".xlsx",
+            filetypes=[("Excel", "*.xlsx")],
             initialfile=default_name,
             title="Guardar inventario como..."
         )
@@ -180,10 +180,10 @@ class DashBoard(tk.Frame):
 
         def worker():
             try:
-                generate_pdf_report(file_path, entries, title="Inventario de documentos descargados")
+                generate_excel_report(file_path, entries, title="Inventario de documentos descargados")
                 self._log(f"[Inventario] Reporte guardado en {file_path}")
             except Exception as e:
-                self._log(f"[Inventario] Error al generar PDF: {e}")
+                self._log(f"[Inventario] Error al generar reporte: {e}")
             finally:
                 self.after(0, lambda: self.btn_download_report.config(state=tk.NORMAL))
 

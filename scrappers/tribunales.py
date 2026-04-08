@@ -1,83 +1,126 @@
+import re
 from typing import List
 from datetime import datetime, timedelta
 import requests
-from config.config import CONSEJO_ESTADO_URL, driver, wait
+from config.config import CONSEJO_ESTADO_URL
 from models.models import RawDocModel
 from scrappers.base import BaseScrapper
 from bs4 import BeautifulSoup
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.by import By
+
+from utils import get_asp_data, parse_ajax_response
 
 
 class ScrapTribunales(BaseScrapper):
-    def __init__(self):
-        self.source = "Tribunales"
+    def __init__(self, tribunal_name=None, tribunal_index=None):
+        """
+        Initialize ScrapTribunales.
+        
+        Args:
+            tribunal_name: Name of specific tribunal to scrap (e.g., "Tribunal Superior")
+            tribunal_index: Index of tribunal button to scrap (1-based, excluding index 0)
+                           If None, scraps all tribunales
+        """
+        self.tribunal_name = tribunal_name
+        self.tribunal_index = tribunal_index
+        self.source = tribunal_name if tribunal_name else "Tribunales"
         self.url = None
         
     def scrap(self, fini, ffin, q="", limit=1000) -> List[RawDocModel]:
         self.url = CONSEJO_ESTADO_URL
-        driver.get(self.url)
+        session = requests.Session()
         docs = []
 
-        wait.until(EC.element_to_be_clickable(
-            (By.XPATH, "//button[contains(., 'búsqueda avanzada')]")
-        ))
+        # GET inicial para obtener cookies y VS base
+        res = session.get(self.url)
+        soup = BeautifulSoup(res.text, "html.parser")
+        headers = {
+            "X-Requested-With": "XMLHttpRequest",
+            "X-MicrosoftAjax": "Delta=true",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36...",
+            "Referer": self.url
+        }
 
-        botones_tribunales = driver.find_elements(By.CSS_SELECTOR, "#MainContent_CorporacionesTitulanDataList input[type='submit']")
+        botones_tribunales = soup.select("#MainContent_CorporacionesTitulanDataList input[type='submit']")
 
-        for i in range(1, len(botones_tribunales)):
-            wait.until(EC.presence_of_all_elements_located(
-                (By.CSS_SELECTOR, "#MainContent_CorporacionesTitulanDataList input[type='submit']")
-            ))
+        # Determine which tribunales to scrap
+        indices_to_scrap = [self.tribunal_index] if self.tribunal_index is not None else range(1, len(botones_tribunales))
 
-            botones_tribunales_local = driver.find_elements(By.CSS_SELECTOR, "#MainContent_CorporacionesTitulanDataList input[type='submit']")
-            boton_local = botones_tribunales_local[i]
-            tipo_tribunal = boton_local.get_attribute("title")
-            driver.execute_script("arguments[0].click();", boton_local) # cambiar de tribunal
+        for i in indices_to_scrap:
+            asp_data = get_asp_data(soup)
+            boton_local = botones_tribunales[i]
+            name_tribunal = boton_local.get("name")
+            tipo_tribunal = boton_local.get("title")
+            value_tribunal = boton_local.get("value")
+            print(tipo_tribunal)
 
-            wait.until(EC.element_to_be_clickable(
-                (By.XPATH, "//button[contains(., 'búsqueda avanzada')]")
-            ))
+            data = {
+                **asp_data,
+                "__ASYNCPOST": "true",
+                "ctl00$MainContent$ScriptManager1": f"ctl00$MainContent$PanelUpdate|{name_tribunal}",
+                name_tribunal: value_tribunal
+            }
 
-            btn_avanzada = driver.find_element(
-                By.XPATH,
-                "//button[contains(., 'búsqueda avanzada')]"
-            )
+            # POST 1: Seleccionar Tribunal
+            res2 = session.post(self.url, data=data, headers=headers)
+            html_update, asp_data = parse_ajax_response(res2.text)
+            localsoup = BeautifulSoup(html_update, "html.parser")
 
-            driver.execute_script("arguments[0].click();", btn_avanzada) #Clickear boton 1
+            # POST 2: Apartado de filtros y ver resultados
 
-            #Definir fecha inicial
+            # Settear fecha inicio y fin
+            boton_fechas = localsoup.find("a", id="MainContent_OQueContengaFechaLinkButton")
+            postback_str = boton_fechas.get("href")
+            valores = re.findall(r'["\'](.*?)["\']', postback_str)
+            data = {
+                **asp_data,
+                "__ASYNCPOST": "true",
+                "__EVENTTARGET": valores[0],
+                "__EVENTARGUMENT": valores[1] if len(valores) > 1 else "",
+                "ctl00$MainContent$ScriptManager1": "ctl00$MainContent$PanelUpdate|ctl00$MainContent$OQueContengaFechaLinkButton",
+                "ctl00$MainContent$FechaDesdeTextBox": fini,
+                "ctl00$MainContent$FechaHastaTextBox": ffin
+            }
+            resf = session.post(self.url, data=data, headers=headers)
+            html_update, asp_data = parse_ajax_response(resf.text)
+            localsoup = BeautifulSoup(html_update, "html.parser")
+
+            # Buscar botón de "Ver resultados"
+            boton_busqueda = localsoup.find("a", id="MainContent_BuscarProvidenciasLinkButton")
+            if not boton_busqueda: continue
+            
+            postback_str = boton_busqueda.get("href")
+            valores = re.findall(r"'(.*?)'", postback_str)
+            
+            data = {
+                **asp_data,
+                "__ASYNCPOST": "true",
+                "__EVENTTARGET": valores[0],
+                "__EVENTARGUMENT": valores[1] if len(valores) > 1 else "",
+                "ctl00$MainContent$ScriptManager1": "ctl00$MainContent$PanelUpdate|MainContent_BuscarProvidenciasLinkButton"
+            }
+            
+            # Clic en "Ver resultados"
+            res3 = session.post(self.url, data=data, headers=headers)
+            html_update, asp_data = parse_ajax_response(res3.text)
+            localsoup = BeautifulSoup(html_update, "html.parser")
+
             fini_dt = datetime.strptime(fini, "%Y-%m-%d") - timedelta(days=1)
-
-            link = driver.find_element(By.ID, "MainContent_BuscarProvidenciasLinkButton")
-            driver.execute_script("arguments[0].click();", link) #Clickear boton 2 (Busqueda)
-            wait.until(EC.presence_of_element_located((By.CLASS_NAME, "bg-body")))  # Esperar a que la página cargue completamente
-
-            html = driver.page_source
-            soup = BeautifulSoup(html, "html.parser")
-
             stop = False
 
             while not stop:
-                botones_ver_documentos = soup.find_all("a", id=lambda x: x and x.startswith("MainContent_ResultadoBusqueda1_TitulacionesRepeater_documentlink_"))
+                # Buscar enlaces de documentos en la tabla de resultados
+                botones_ver_documentos = localsoup.find_all("a", id=re.compile(r"MainContent_ResultadoBusqueda1_TitulacionesRepeater_documentlink_"))
 
                 for j, boton in enumerate(botones_ver_documentos):
                     try:
-                        boton_ver_doc = driver.find_element(By.ID, f"MainContent_ResultadoBusqueda1_TitulacionesRepeater_documentlink_{j}")
-                        url_doc = boton_ver_doc.get_attribute("onclick").split("'")[1] #Extraer URL del documento del atributo onclick
+                        # Extraer URL del popup (onclick)
+                        url_doc_rel = boton.get("onclick").split("'")[1]
+                        url_doc = f"https://www.consejodeestado.gov.co{url_doc_rel}" if url_doc_rel.startswith("/") else url_doc_rel
 
-                        session = requests.Session()
-                        for cookie in driver.get_cookies():
-                            session.cookies.set(cookie['name'], cookie['value'])
+                        # GET al detalle del documento
+                        res_doc = session.get(url_doc)
+                        soup_doc = BeautifulSoup(res_doc.text, "html.parser")
 
-                        response = session.get(url_doc)
-                        
-                        if response.status_code != 200:
-                            raise Exception(f"Error al obtener datos de {self.source}: {response.status_code} - {response.text} el sitio pudo haber cambiado su estructura o el formato de respuesta, informare al equipo de desarrollo para actualizar el scraper.")
-                        
-                        soup_doc = BeautifulSoup(response.text, "html.parser")
-
-                        # Verificar que los elementos esperados existan
                         download_elem = soup_doc.find("a", id="ContentPlaceHolder1_VerProvidencia1_DescargarProvideciaLinkButton")
                         if not download_elem:
                             raise Exception(f"Error al obtener datos de {self.source}: No se encontró el elemento de descarga. El sitio pudo haber cambiado su estructura o el formato de respuesta, informare al equipo de desarrollo para actualizar el scraper.")
@@ -115,17 +158,29 @@ class ScrapTribunales(BaseScrapper):
                         print(f"Error procesando documento {j}: {str(e)}")
                         continue
 
-                #Pasar de pagina
-                boton_siguiente = driver.find_element(By.ID, f"MainContent_ResultadoBusqueda1_PaginaSiguienteLinkButton")
-                driver.execute_script("arguments[0].scrollIntoView(true);", boton_siguiente)
-                driver.execute_script("arguments[0].click();", boton_siguiente) #Clickear boton para ver documento
+                if stop: break
 
-                #Esperar a que cargue la nueva pagina
-                wait.until(EC.presence_of_element_located((By.CLASS_NAME, "bg-body")))
+                btn_sig = localsoup.find("a", id="MainContent_ResultadoBusqueda1_PaginaSiguienteLinkButton")
+                if not btn_sig: break # No hay más páginas
 
-                #Actualizar el soup con la nueva pagina
-                soup = BeautifulSoup(driver.page_source, "html.parser")
+                postback_sig = btn_sig.get("href")
+                v_sig = re.findall(r"'(.*?)'", postback_sig)
+                
+                data_pag = {
+                    **asp_data,
+                    "__ASYNCPOST": "true",
+                    "__EVENTTARGET": v_sig[0],
+                    "__EVENTARGUMENT": v_sig[1] if len(v_sig) > 1 else "",
+                    "ctl00$MainContent$ScriptManager1": f"ctl00$MainContent$PanelUpdate|{v_sig[0]}"
+                }
 
-            driver.get(self.url) # Volver a la seleccion de tribunal
+                res_pag = session.post(self.url, data=data_pag, headers=headers)
+                html_update, asp_data = parse_ajax_response(res_pag.text)
+                localsoup = BeautifulSoup(html_update, "html.parser")
+        
+            # Refrescar la página principal para el siguiente tribunal
+            res = session.get(self.url)
+            soup = BeautifulSoup(res.text, "html.parser")
+            botones_tribunales = soup.select("#MainContent_CorporacionesTitulanDataList input[type='submit']")
 
         return docs
