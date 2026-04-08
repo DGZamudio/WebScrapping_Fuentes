@@ -11,8 +11,18 @@ from utils import get_asp_data, parse_ajax_response
 
 
 class ScrapTribunales(BaseScrapper):
-    def __init__(self):
-        self.source = "Tribunales"
+    def __init__(self, tribunal_name=None, tribunal_index=None):
+        """
+        Initialize ScrapTribunales.
+        
+        Args:
+            tribunal_name: Name of specific tribunal to scrap (e.g., "Tribunal Superior")
+            tribunal_index: Index of tribunal button to scrap (1-based, excluding index 0)
+                           If None, scraps all tribunales
+        """
+        self.tribunal_name = tribunal_name
+        self.tribunal_index = tribunal_index
+        self.source = tribunal_name if tribunal_name else "Tribunales"
         self.url = None
         
     def scrap(self, fini, ffin, q="", limit=1000) -> List[RawDocModel]:
@@ -32,7 +42,10 @@ class ScrapTribunales(BaseScrapper):
 
         botones_tribunales = soup.select("#MainContent_CorporacionesTitulanDataList input[type='submit']")
 
-        for i in range(1, len(botones_tribunales)):
+        # Determine which tribunales to scrap
+        indices_to_scrap = [self.tribunal_index] if self.tribunal_index is not None else range(1, len(botones_tribunales))
+
+        for i in indices_to_scrap:
             asp_data = get_asp_data(soup)
             boton_local = botones_tribunales[i]
             name_tribunal = boton_local.get("name")
