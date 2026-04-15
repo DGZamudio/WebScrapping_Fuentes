@@ -60,9 +60,9 @@ def run_scrapers(fini=None, ffin=None, on_new_doc=None, on_progress=None, on_sta
                         on_progress("Cancelado por el usuario")
                     return results
                 if "body" in doc["link"] and doc["link"]["body"] and "path" in doc["link"]["body"]:
-                    doc_id = make_doc_id(doc["link"]["body"]["path"])
+                    doc_id = make_doc_id(doc["link"]["body"]["path"], doc["f_public"])
                 else:
-                    doc_id = make_doc_id(doc["link"]["url"])
+                    doc_id = make_doc_id(doc["link"]["url"], doc["f_public"])
 
                 if not db.seen(doc_id):
                     try:

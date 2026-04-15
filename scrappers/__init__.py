@@ -1,6 +1,8 @@
 from scrappers.consejoestado import ScrapConsejoEstado
 from scrappers.csupremjusticia import ScrapCorteSuprema
+from scrappers.jep import ScrapJEP
 from scrappers.tribunales import ScrapTribunales
+from scrappers.tribunales_superiores import ScrapTribunalesSuperiores
 from .constitucional import ScrapConstitucional
 import requests
 from bs4 import BeautifulSoup
@@ -9,7 +11,9 @@ from config.config import CONSEJO_ESTADO_URL
 SCRAPERS = {
     "Corte Constitucional": ScrapConstitucional(),
     "Corte Suprema": ScrapCorteSuprema(),
-    "Consejo de Estado": ScrapConsejoEstado(), # Tarea pesada
+    "Consejo de Estado": ScrapConsejoEstado(),
+    "JEP": ScrapJEP(),
+    # "Tribunales Superiores": ScrapTribunalesSuperiores()
 }
 
 _tribunales_discovered = False

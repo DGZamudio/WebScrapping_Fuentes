@@ -42,7 +42,7 @@ class ScrapTribunales(BaseScrapper):
 
         botones_tribunales = soup.select("#MainContent_CorporacionesTitulanDataList input[type='submit']")
 
-        # Determine which tribunales to scrap
+        # Determinar que tribunales scrapear según los parámetros
         indices_to_scrap = [self.tribunal_index] if self.tribunal_index is not None else range(1, len(botones_tribunales))
 
         for i in indices_to_scrap:

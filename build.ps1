@@ -25,7 +25,6 @@ $pyinstallerArgs = @(
     "--onefile",
     "--windowed",
     "--name", "WebScrapping",
-    "--collect-all", "selenium",
     "--add-data", "config;config",
     "--add-data", "scrappers;scrappers",
     "--add-data", "ui;ui",

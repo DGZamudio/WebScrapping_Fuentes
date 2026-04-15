@@ -1,12 +1,13 @@
+import re
 from typing import List
 from datetime import datetime, timedelta
 import requests
-from config.config import CONSEJO_ESTADO_URL, driver, wait
+from config.config import CONSEJO_ESTADO_URL
 from models.models import RawDocModel
 from scrappers.base import BaseScrapper
 from bs4 import BeautifulSoup
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.by import By
+
+from utils import get_asp_data, parse_ajax_response
 
 
 class ScrapConsejoEstado(BaseScrapper):
@@ -16,55 +17,83 @@ class ScrapConsejoEstado(BaseScrapper):
         
     def scrap(self, fini, ffin, q="", limit=1000) -> List[RawDocModel]:
         self.url = CONSEJO_ESTADO_URL
-        driver.get(self.url)
-
-        wait.until(EC.element_to_be_clickable(
-            (By.XPATH, "//button[contains(., 'búsqueda avanzada')]")
-        ))
-
-        btn_avanzada = driver.find_element(
-            By.XPATH,
-            "//button[contains(., 'búsqueda avanzada')]"
-        )
-
-        driver.execute_script("arguments[0].click();", btn_avanzada) #Clickear boton 1
-
-        #Definir fecha inicial
-        fini_dt = datetime.strptime(fini, "%Y-%m-%d") - timedelta(days=1)
-
-        link = driver.find_element(By.ID, "MainContent_BuscarProvidenciasLinkButton")
-        driver.execute_script("arguments[0].click();", link) #Clickear boton 2 (Busqueda)
-        wait.until(EC.presence_of_element_located((By.CLASS_NAME, "bg-body")))  # Esperar a que la página cargue completamente
-
-        html = driver.page_source
-        soup = BeautifulSoup(html, "html.parser")
-
+        session = requests.Session()
         docs = []
+        
+        # GET inicial para obtener cookies y VS base
+        res = session.get(self.url)
+        headers = {
+            "X-Requested-With": "XMLHttpRequest",
+            "X-MicrosoftAjax": "Delta=true",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36...",
+            "Referer": self.url
+        }
+        
+        # Primera respuesta es HTML completo, no AJAX
+        localsoup = BeautifulSoup(res.text, "html.parser")
+        asp_data = get_asp_data(localsoup)
+        
+        # Setear fechas
+        boton_fechas = localsoup.find("a", id="MainContent_OQueContengaFechaLinkButton")
+        if not boton_fechas:
+            raise Exception(f"Error: No se encontró el botón de fechas. La estructura del sitio puede haber cambiado.")
+        
+        postback_str = boton_fechas.get("href")
+        valores = re.findall(r'["\'](.*?)["\']', postback_str)
+        data = {
+            **asp_data,
+            "__ASYNCPOST": "true",
+            "__EVENTTARGET": valores[0],
+            "__EVENTARGUMENT": valores[1] if len(valores) > 1 else "",
+            "ctl00$MainContent$ScriptManager1": "ctl00$MainContent$PanelUpdate|ctl00$MainContent$OQueContengaFechaLinkButton",
+            "ctl00$MainContent$FechaDesdeTextBox": fini,
+            "ctl00$MainContent$FechaHastaTextBox": ffin
+        }
+        resf = session.post(self.url, data=data, headers=headers)
+        html_update, asp_data = parse_ajax_response(resf.text)
+        localsoup = BeautifulSoup(html_update, "html.parser")
+        
+        # Boton de búsqueda
+        boton_busqueda = localsoup.find("a", id="MainContent_BuscarProvidenciasLinkButton")
+        if not boton_busqueda:
+            raise Exception(f"Error: No se encontró el botón de búsqueda. Verificar respuesta AJAX.")
+        
+        postback_str = boton_busqueda.get("href")
+        valores = re.findall(r"'(.*?)'", postback_str)
+        
+        data = {
+            **asp_data,
+            "__ASYNCPOST": "true",
+            "__EVENTTARGET": valores[0],
+            "__EVENTARGUMENT": valores[1] if len(valores) > 1 else "",
+            "ctl00$MainContent$ScriptManager1": "ctl00$MainContent$PanelUpdate|MainContent_BuscarProvidenciasLinkButton"
+        }
+        
+        # Clic en "Ver resultados"
+        res3 = session.post(self.url, data=data, headers=headers)
+        html_update, asp_data = parse_ajax_response(res3.text)
+        localsoup = BeautifulSoup(html_update, "html.parser")
 
+        fini_dt = datetime.strptime(fini, "%Y-%m-%d") - timedelta(days=1)
         stop = False
+        
+        while not stop:
+            # Buscar enlaces de documentos en la tabla de resultados
+            botones_ver_documentos = localsoup.find_all("a", id=re.compile(r"MainContent_ResultadoBusqueda1_TitulacionesRepeater_documentlink_"))
 
-        while not stop and len(docs) < limit:
-            botones_ver_documentos = soup.find_all("a", id=lambda x: x and x.startswith("MainContent_ResultadoBusqueda1_TitulacionesRepeater_documentlink_"))
-
-            for i, boton in enumerate(botones_ver_documentos):
+            for j, boton in enumerate(botones_ver_documentos):
                 try:
-                    boton_ver_doc = driver.find_element(By.ID, f"MainContent_ResultadoBusqueda1_TitulacionesRepeater_documentlink_{i}")
-                    url_doc = boton_ver_doc.get_attribute("onclick").split("'")[1] #Extraer URL del documento del atributo onclick
+                    # Extraer URL del popup (onclick)
+                    url_doc_rel = boton.get("onclick").split("'")[1]
+                    url_doc = f"https://www.consejodeestado.gov.co{url_doc_rel}" if url_doc_rel.startswith("/") else url_doc_rel
 
-                    session = requests.Session()
-                    for cookie in driver.get_cookies():
-                        session.cookies.set(cookie['name'], cookie['value'])
+                    # GET al detalle del documento
+                    res_doc = session.get(url_doc)
+                    soup_doc = BeautifulSoup(res_doc.text, "html.parser")
 
-                    response = session.get(url_doc)
-                    
-                    if response.status_code != 200:
-                        raise Exception(f"Error al obtener datos de {self.source}: {response.status_code} - {response.text} el sitio pudo haber cambiado su estructura o el formato de respuesta, informare al equipo de desarrollo para actualizar el scraper.")
-                    
-                    soup_doc = BeautifulSoup(response.text, "html.parser")
-
-                    # Verificar que los elementos esperados existan
                     download_elem = soup_doc.find("a", id="ContentPlaceHolder1_VerProvidencia1_DescargarProvideciaLinkButton")
                     if not download_elem:
+                        print(soup_doc.prettify())
                         raise Exception(f"Error al obtener datos de {self.source}: No se encontró el elemento de descarga. El sitio pudo haber cambiado su estructura o el formato de respuesta, informare al equipo de desarrollo para actualizar el scraper.")
                     
                     link_descarga = download_elem.get("href", '')
@@ -95,20 +124,34 @@ class ScrapConsejoEstado(BaseScrapper):
                         f_public=fecha,
                         save_path=f"downloads/{self.source}/{fecha[:5]}/{sala_desicion}/{proceso}/{radicado_formateado}{'('+interno+')' if interno else None}(extension)"
                     )
+                    print(f"Documento procesado: {doc.title} - Fecha: {doc.f_public}")
                     docs.append(doc)
                 except Exception as e:
-                    print(f"Error procesando documento {i}: {str(e)}")
+                    print(f"Error procesando documento {j}: {str(e)}")
                     continue
 
-            #Pasar de pagina
-            boton_siguiente = driver.find_element(By.ID, f"MainContent_ResultadoBusqueda1_PaginaSiguienteLinkButton")
-            driver.execute_script("arguments[0].scrollIntoView(true);", boton_siguiente)
-            driver.execute_script("arguments[0].click();", boton_siguiente) #Clickear boton para ver documento
+            if stop: break
 
-            #Esperar a que cargue la nueva pagina
-            wait.until(EC.presence_of_element_located((By.CLASS_NAME, "bg-body")))
+            btn_sig = localsoup.find("a", id="MainContent_ResultadoBusqueda1_PaginaSiguienteLinkButton")
+            if not btn_sig: 
+                break # No hay más páginas
 
-            #Actualizar el soup con la nueva pagina
-            soup = BeautifulSoup(driver.page_source, "html.parser")
+            postback_sig = btn_sig.get("href")
+            if not postback_sig:
+                break
+            
+            v_sig = re.findall(r"'(.*?)'", postback_sig)
+            
+            data_pag = {
+                **asp_data,
+                "__ASYNCPOST": "true",
+                "__EVENTTARGET": v_sig[0],
+                "__EVENTARGUMENT": v_sig[1] if len(v_sig) > 1 else "",
+                "ctl00$MainContent$ScriptManager1": f"ctl00$MainContent$PanelUpdate|{v_sig[0]}"
+            }
+
+            res_pag = session.post(self.url, data=data_pag, headers=headers)
+            html_update, asp_data = parse_ajax_response(res_pag.text)
+            localsoup = BeautifulSoup(html_update, "html.parser")
 
         return docs

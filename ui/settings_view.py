@@ -49,7 +49,29 @@ class SettingsView(tk.Frame):
         tk.Button(dates_frame, text="Guardar", command=self._on_save).pack(anchor="w", pady=(10, 0))
 
         sources_frame = tk.LabelFrame(self, text="Fuentes a Descargar", padx=10, pady=10)
-        sources_frame.pack(fill="x", pady=10)
+        sources_frame.pack(fill="both", expand=True, pady=10)
+
+        # Create a Canvas with Scrollbar for scrollable sources
+        canvas = tk.Canvas(sources_frame, height=150, bg=sources_frame.cget("bg"), highlightthickness=0)
+        scrollbar = ttk.Scrollbar(sources_frame, orient="vertical", command=canvas.yview)
+        scrollable_frame = tk.Frame(canvas, bg=sources_frame.cget("bg"))
+
+        scrollable_frame.bind(
+            "<Configure>",
+            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+        )
+
+        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+        canvas.configure(yscrollcommand=scrollbar.set)
+
+        canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+
+        # Bind mousewheel scroll
+        def _on_mousewheel(event):
+            canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+
+        canvas.bind_all("<MouseWheel>", _on_mousewheel)
 
         # Discover all available tribunales before showing sources
         try:
@@ -59,11 +81,13 @@ class SettingsView(tk.Frame):
 
         for source in SCRAPERS.keys():
             var = tk.BooleanVar(value=True)
-            chk = tk.Checkbutton(sources_frame, text=source, variable=var)
+            chk = tk.Checkbutton(scrollable_frame, text=source, variable=var, bg=scrollable_frame.cget("bg"))
             chk.pack(anchor="w")
             self.source_vars[source] = var
 
-        tk.Button(sources_frame, text="Guardar", command=self._on_save).pack(anchor="w", pady=(10, 0))
+        button_frame = tk.Frame(sources_frame, bg=sources_frame.cget("bg"))
+        button_frame.pack(anchor="w", pady=(10, 0))
+        tk.Button(button_frame, text="Guardar", command=self._on_save).pack(anchor="w")
 
     def _on_save(self):
         try:

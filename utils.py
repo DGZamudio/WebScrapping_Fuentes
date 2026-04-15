@@ -9,8 +9,8 @@ except ImportError:  # pragma: no cover
     Workbook = None  # type: ignore
 
 
-def make_doc_id(title):
-    return hashlib.sha1(title.encode()).hexdigest()
+def make_doc_id(title, fecha_p):
+    return hashlib.sha1(f"{title}_{fecha_p}".encode()).hexdigest()
 
 def extract_filename(disposition, content_type, url, opt_title):
     if disposition:
