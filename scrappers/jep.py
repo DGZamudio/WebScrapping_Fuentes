@@ -50,8 +50,7 @@ class ScrapJEP(BaseScrapper):
             path = os.path.join(
                 "downloads",
                 self.source,
-                fecha_p,
-                f"(filename)-{radicado}"
+                f"{radicado}_{fecha_p}(extension)",
             )
             
             doc = RawDocModel(

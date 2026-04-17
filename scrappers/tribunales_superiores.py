@@ -21,9 +21,7 @@ class ScrapTribunalesSuperiores(BaseScrapper):
         max_pages = 10
         instance_id = None
 
-        url = "https://publicacionesprocesales.ramajudicial.gov.co/web/publicaciones-procesales/inicio"
-
-        html = requests.get(url).text
+        html = requests.get(self.url).text
 
         # Extraer id de navegacion de los tribunales superiores
         match = re.search(

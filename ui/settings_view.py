@@ -8,6 +8,45 @@ from scrappers import SCRAPERS, discover_tribunales
 
 SETTINGS_PATH = Path("config") / "settings.json"
 
+
+class CollapsibleFrame(tk.Frame):
+    """A collapsible frame widget that can expand/collapse its content."""
+
+    def __init__(self, parent, text="", *args, **kwargs):
+        super().__init__(parent, *args, **kwargs)
+
+        self.show = tk.BooleanVar(value=False)
+
+        # Header button
+        self.toggle_button = tk.Button(
+            self,
+            text=f"▶ {text}",
+            command=self.toggle,
+            relief="flat",
+            bg=self.cget("bg"),
+            fg="#466a80",
+            font=("Arial", 10, "bold"),
+            anchor="w",
+            padx=5
+        )
+        self.toggle_button.pack(fill="x")
+
+        # Content frame
+        self.content_frame = tk.Frame(self, bg=self.cget("bg"))
+        self.content_frame.pack(fill="x", expand=True)
+        self.content_frame.pack_forget()  # Hide initially
+
+    def toggle(self):
+        if self.show.get():
+            self.content_frame.pack_forget()
+            self.toggle_button.config(text=self.toggle_button.cget("text").replace("▼", "▶"))
+            self.show.set(False)
+        else:
+            self.content_frame.pack(fill="x", expand=True, after=self.toggle_button)
+            self.toggle_button.config(text=self.toggle_button.cget("text").replace("▶", "▼"))
+            self.show.set(True)
+
+
 class SettingsView(tk.Frame):
     """Example settings view - add your configuration options here."""
 
@@ -52,7 +91,7 @@ class SettingsView(tk.Frame):
         sources_frame.pack(fill="both", expand=True, pady=10)
 
         # Create a Canvas with Scrollbar for scrollable sources
-        canvas = tk.Canvas(sources_frame, height=150, bg=sources_frame.cget("bg"), highlightthickness=0)
+        canvas = tk.Canvas(sources_frame, height=200, bg=sources_frame.cget("bg"), highlightthickness=0)
         scrollbar = ttk.Scrollbar(sources_frame, orient="vertical", command=canvas.yview)
         scrollable_frame = tk.Frame(canvas, bg=sources_frame.cget("bg"))
 
@@ -79,11 +118,41 @@ class SettingsView(tk.Frame):
         except Exception as e:
             print(f"Error discovering tribunales: {e}")
 
+        # Separate tribunales from other sources
+        tribunales_sources = {}
+        other_sources = {}
+
         for source in SCRAPERS.keys():
+            if source.startswith("Tribunal"):
+                tribunales_sources[source] = SCRAPERS[source]
+            else:
+                other_sources[source] = SCRAPERS[source]
+
+        # Add non-tribunal sources first
+        for source in other_sources.keys():
             var = tk.BooleanVar(value=True)
             chk = tk.Checkbutton(scrollable_frame, text=source, variable=var, bg=scrollable_frame.cget("bg"))
             chk.pack(anchor="w")
             self.source_vars[source] = var
+
+        # Add collapsible tribunales section
+        if tribunales_sources:
+            separator = tk.Frame(scrollable_frame, bg="#b2b1b1", height=1)
+            separator.pack(fill="x", padx=4, pady=8)
+
+            tribunales_collapsible = CollapsibleFrame(scrollable_frame, text="Tribunales Administrativos", bg=scrollable_frame.cget("bg"))
+            tribunales_collapsible.pack(fill="x", pady=(0, 5))
+
+            for source in sorted(tribunales_sources.keys()):
+                var = tk.BooleanVar(value=True)
+                chk = tk.Checkbutton(
+                    tribunales_collapsible.content_frame,
+                    text=source.replace("Tribunal - ", ""),
+                    variable=var,
+                    bg=tribunales_collapsible.content_frame.cget("bg")
+                )
+                chk.pack(anchor="w", padx=(20, 0))  # Indent slightly
+                self.source_vars[source] = var
 
         button_frame = tk.Frame(sources_frame, bg=sources_frame.cget("bg"))
         button_frame.pack(anchor="w", pady=(10, 0))
