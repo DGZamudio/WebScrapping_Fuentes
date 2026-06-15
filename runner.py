@@ -9,7 +9,7 @@ from pathlib import Path
 Path("downloads").mkdir(exist_ok=True)
 
 
-def run_scrapers(fini=None, ffin=None, on_new_doc=None, on_progress=None, on_stats=None, stop_event=None, allowed_sources=None):
+def run_scrapers(fini=None, ffin=None, on_new_doc=None, on_progress=None, on_stats=None, stop_event=None, allowed_sources=None, source_options=None):
     # stop_event: optional threading.Event-like object; if set, the runner will stop cooperatively
     """Ejecuta todos los scrapers configurados y descarga documentos no vistos.
 
@@ -19,7 +19,6 @@ def run_scrapers(fini=None, ffin=None, on_new_doc=None, on_progress=None, on_sta
     """
     db = Memory()
     dw = Downloader()
-    # Emit initial stats before starting downloads
     try:
         if on_stats:
             on_stats(db.total_docs())
@@ -45,6 +44,9 @@ def run_scrapers(fini=None, ffin=None, on_new_doc=None, on_progress=None, on_sta
             fini = db.get_last_inserted(SCRAPERS[key].source)
 
         scraper = SCRAPERS[key]
+        opts = (source_options or {}).get(scraper.source, {})
+        if hasattr(scraper, "include_details") and "include_details" in opts:
+            scraper.include_details = opts["include_details"]
         msg = f"Scraping {scraper.source} desde {fini} hasta {ffin}..."
         logging.info(msg)
         if on_progress:
@@ -78,7 +80,10 @@ def run_scrapers(fini=None, ffin=None, on_new_doc=None, on_progress=None, on_sta
                         if on_new_doc:
                             on_new_doc(doc)
                     except Exception as download_error:
-                        logging.error(f"Error al descargar {doc['title']}: {download_error}")
+                        msg = f"Error al descargar {doc['title']}: {download_error}"
+                        logging.error(msg)
+                        if on_progress:
+                            on_progress(msg)
         except Exception as e:
             logging.error(f"Error scraping {scraper.source}: {e}")
             if on_progress:
@@ -89,11 +94,11 @@ def run_scrapers(fini=None, ffin=None, on_new_doc=None, on_progress=None, on_sta
         if on_progress:
             on_progress(msg)
         logging.info(msg)
-        # update stats after finishing each source
         try:
             if on_stats:
                 on_stats(db.total_docs())
         except Exception:
             pass
 
+    dw.close()
     return results

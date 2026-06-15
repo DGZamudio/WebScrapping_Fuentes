@@ -19,6 +19,11 @@ def start_scrape_thread(app: App, stop_event: "threading.Event"):
     except Exception:
         allowed = None
 
+    try:
+        source_options = app.settings_view.get_source_options()
+    except Exception:
+        source_options = {}
+
     def on_new_doc(doc):
         app.after(0, lambda: app.log(f"Nuevo documento descargado: {doc['title']}"))
 
@@ -29,7 +34,7 @@ def start_scrape_thread(app: App, stop_event: "threading.Event"):
         app.after(0, lambda: app.update_stats(count))
 
     try:
-        run_scrapers(fini=fini, ffin=ffin, on_new_doc=on_new_doc, on_progress=on_progress, on_stats=on_stats, stop_event=stop_event, allowed_sources=allowed)
+        run_scrapers(fini=fini, ffin=ffin, on_new_doc=on_new_doc, on_progress=on_progress, on_stats=on_stats, stop_event=stop_event, allowed_sources=allowed, source_options=source_options)
     finally:
         # ensure UI is unblocked when worker finishes
         app.after(0, lambda: app.set_running(False))

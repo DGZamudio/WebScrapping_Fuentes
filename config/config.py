@@ -58,3 +58,9 @@ JEP_DOWNLOAD_URL = "https://relatoria.jep.gov.co"
 
 # Tribunales Superiores
 TRIBUNALES_SUPERIORES_URL = "https://publicacionesprocesales.ramajudicial.gov.co/web/publicaciones-procesales/inicio"
+
+
+
+# Consejo Nacional de Disciplina Judicial
+CNDJ_BASE_URL = "https://relatoria.cndj.gov.co/"
+CNDJ_DOWNLOAD_URL = "https://relatoria.cndj.gov.co/docs_relatoria/"

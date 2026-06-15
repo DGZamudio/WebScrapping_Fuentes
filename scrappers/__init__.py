@@ -1,3 +1,4 @@
+from scrappers.cndj import ScrapCNDJ
 from scrappers.consejoestado import ScrapConsejoEstado
 from scrappers.csupremjusticia import ScrapCorteSuprema
 from scrappers.jep import ScrapJEP
@@ -13,7 +14,8 @@ SCRAPERS = {
     "Corte Suprema": ScrapCorteSuprema(),
     "Consejo de Estado": ScrapConsejoEstado(),
     "JEP": ScrapJEP(),
-    # "Tribunales Superiores": ScrapTribunalesSuperiores()
+    "Tribunales Superiores": ScrapTribunalesSuperiores(),
+    "Consejo Nacional de Disciplina Judicial": ScrapCNDJ(),
 }
 
 _tribunales_discovered = False

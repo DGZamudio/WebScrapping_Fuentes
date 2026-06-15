@@ -30,7 +30,8 @@ def extract_filename(disposition, content_type, url, opt_title):
     else:
         ext = ""
 
-    return {"filename": url.split("/")[-1] or opt_title, "extension": ext}
+    url_path = url.split("?")[0]  # strip query params before extracting filename
+    return {"filename": url_path.split("/")[-1] or opt_title, "extension": ext}
 
 
 def generate_excel_report(path: str, rows: list[dict], title: str = "Inventario") -> None:

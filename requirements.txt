@@ -4,3 +4,5 @@ beautifulsoup4
 webdriver-manager
 openpyxl>=3.0.0
 scrapy
+pywin32
+pypdf
