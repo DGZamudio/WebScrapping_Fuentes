@@ -1,4 +1,3 @@
-import os
 import re
 from typing import List
 
@@ -195,8 +194,9 @@ class ScrapCNDJ(BaseScrapper):
             dedup_key = f"{numero_unico}_{numero_ficha}"
             sala = _extract_sala(decision_text)
             magistrado_fmt = magistrado.title()
-            path = os.path.join(
-                "downloads", self.source, sala, magistrado_fmt, f_public, "(filename)"
+            safe_num = numero_unico.replace("/", "-").replace("\\", "-")
+            path = (
+                f"downloads/{self.source}/{sala}/{magistrado_fmt}/{f_public}/{safe_num}(extension)"
             )
 
             docs.append(RawDocModel(
@@ -206,6 +206,7 @@ class ScrapCNDJ(BaseScrapper):
                 tipo="",
                 f_public=f_public,
                 save_path=path,
+                convert_to="rtf",
             ))
 
         return docs
