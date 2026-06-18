@@ -13,7 +13,7 @@ class ScrapCorteSuprema(BaseScrapper):
         self.url = CORTE_SUPREMA_URL
         self.tipos = {"Tutelas": "SCT", "Laboral": "SCL", "Civil": "SCC", "Penal": "SCP"}
 
-    def scrap(self, fini, ffin, q="", limit=1000):
+    def scrap(self, fini, ffin, q="", limit=1000, stop_event=None, on_progress=None):
         docs = []
 
         fecha_inicio = datetime.fromisoformat(fini).date()

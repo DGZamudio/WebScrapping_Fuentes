@@ -54,7 +54,6 @@ class SettingsView(tk.Frame):
         super().__init__(parent)
         self.controller = controller
         self.source_vars = {}
-        self.ts_details_var = tk.BooleanVar(value=True)
         self._build()
         self.load_settings()
 
@@ -136,15 +135,6 @@ class SettingsView(tk.Frame):
             chk.pack(anchor="w")
             self.source_vars[source] = var
 
-            if source == "Tribunales Superiores":
-                sub = tk.Checkbutton(
-                    scrollable_frame,
-                    text="   ↳ Incluir archivos detallados (más lento)",
-                    variable=self.ts_details_var,
-                    bg=scrollable_frame.cget("bg"),
-                    font=("Arial", 9),
-                )
-                sub.pack(anchor="w", padx=(15, 0))
 
         # Add collapsible tribunales section
         if tribunales_sources:
@@ -193,12 +183,7 @@ class SettingsView(tk.Frame):
             return list(SCRAPERS.keys())
 
     def get_source_options(self):
-        """Return per-source configuration options."""
-        return {
-            "Tribunales Superiores": {
-                "include_details": self.ts_details_var.get(),
-            }
-        }
+        return {}
         
     def save_settings(self):
         """Persist current settings to `config/settings.json`."""
@@ -207,7 +192,6 @@ class SettingsView(tk.Frame):
             "start": self.start_date.get(),
             "end": self.end_date.get(),
             "enabled_sources": self.get_enabled_sources(),
-            "ts_include_details": self.ts_details_var.get(),
         }
         with open(SETTINGS_PATH, "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
@@ -231,8 +215,6 @@ class SettingsView(tk.Frame):
                 if enabled and isinstance(enabled, list):
                     for k, var in self.source_vars.items():
                         var.set(k in enabled)
-                if "ts_include_details" in data:
-                    self.ts_details_var.set(data["ts_include_details"])
         except Exception:
             # fail silently; UI should still work
             pass

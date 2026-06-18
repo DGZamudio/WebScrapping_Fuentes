@@ -54,7 +54,7 @@ def run_scrapers(fini=None, ffin=None, on_new_doc=None, on_progress=None, on_sta
 
         count = 0
         try:
-            docs = scraper.scrap(fini=fini, ffin=ffin)
+            docs = scraper.scrap(fini=fini, ffin=ffin, stop_event=stop_event, on_progress=on_progress)
             for doc in docs:
                 # check cancellation between documents
                 if stop_event is not None and getattr(stop_event, "is_set", lambda: False)():

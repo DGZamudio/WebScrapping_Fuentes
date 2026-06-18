@@ -25,7 +25,7 @@ class ScrapTribunales(BaseScrapper):
         self.source = tribunal_name if tribunal_name else "Tribunales"
         self.url = None
         
-    def scrap(self, fini, ffin, q="", limit=1000) -> List[RawDocModel]:
+    def scrap(self, fini, ffin, q="", limit=1000, stop_event=None, on_progress=None) -> List[RawDocModel]:
         self.url = CONSEJO_ESTADO_URL
         session = requests.Session()
         docs = []

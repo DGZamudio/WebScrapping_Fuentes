@@ -9,6 +9,12 @@ from scrappers.base import BaseScrapper
 BASE_DOMAIN = "https://publicacionesprocesales.ramajudicial.gov.co"
 _PORTLET = "co_com_avanti_efectosProcesales_PublicacionesEfectosProcesalesPortletV2_INSTANCE"
 _INVALID_PATH_CHARS = re.compile(r'[<>:"/\\|?*]')
+_TIPOS_PERMITIDOS = {
+    "Notificaciones por Estados",
+    "Acciones de Tutela",
+    "Sentencias",
+    "Autos masivo",
+}
 
 
 class ScrapTribunalesSuperiores(BaseScrapper):
@@ -16,7 +22,6 @@ class ScrapTribunalesSuperiores(BaseScrapper):
         self.source = "Tribunales Superiores"
         self.url = TRIBUNALES_SUPERIORES_URL
         self._instance_id = None
-        self.include_details = True
 
     def _get_instance_id(self, session, headers):
         html = session.get(self.url, headers=headers).text
@@ -65,24 +70,7 @@ class ScrapTribunalesSuperiores(BaseScrapper):
 
         return files
 
-    def _get_bulk_file(self, row, title, detail_url):
-        article_match = re.search(r'/(\d+)(?:\?|$)', detail_url)
-        article_id = article_match.group(1) if article_match else title
-
-        for comment in row.find_all(string=lambda t: isinstance(t, Comment)):
-            url_match = re.search(
-                r'(/documents/[\w/.\-]+|/c/document_library/get_file\?[^\s"\'<>]+)',
-                str(comment),
-            )
-            if url_match:
-                url = url_match.group(1)
-                if url.startswith("/"):
-                    url = BASE_DOMAIN + url
-                return [(title, url, article_id)]
-
-        return []
-
-    def scrap(self, fini, ffin, q="", limit=10) -> List[RawDocModel]:
+    def scrap(self, fini, ffin, q="", limit=10, stop_event=None, on_progress=None) -> List[RawDocModel]:
         session = requests.Session()
         headers = {"User-Agent": "Mozilla/5.0"}
 
@@ -137,6 +125,9 @@ class ScrapTribunalesSuperiores(BaseScrapper):
                 break
 
             for row in rows:
+                if stop_event is not None and stop_event.is_set():
+                    return docs
+
                 try:
                     title_tag = row.find("div", class_="titulo-publicacion")
                     if not title_tag:
@@ -159,18 +150,22 @@ class ScrapTribunalesSuperiores(BaseScrapper):
                             categorias[k.strip()] = v.strip()
 
                     tipo         = categorias.get("Tipo de publicación", "")
+                    if tipo not in _TIPOS_PERMITIDOS:
+                        continue
+
                     especialidad = categorias.get("Especialidad", "sin-especialidad")
                     despacho_raw = categorias.get("Despacho", "")
                     despacho_dir = _INVALID_PATH_CHARS.sub("-", despacho_raw)[:60]
+                    tipo_dir     = _INVALID_PATH_CHARS.sub("-", tipo)
 
                     detail_url = a_tag.get("href", "")
                     if not detail_url:
                         continue
 
-                    if self.include_details:
-                        archivos = self._get_detail_files(session, headers, detail_url)
-                    else:
-                        archivos = self._get_bulk_file(row, title, detail_url)
+                    if on_progress:
+                        on_progress(f"[Tribunales Superiores] Leyendo detalle: {title}")
+
+                    archivos = self._get_detail_files(session, headers, detail_url)
                     if not archivos:
                         continue
 
@@ -179,8 +174,8 @@ class ScrapTribunalesSuperiores(BaseScrapper):
                         doc_name = _INVALID_PATH_CHARS.sub("-", name_no_ext)
 
                         save_path = (
-                            f"downloads/{self.source}/{especialidad}"
-                            f"/{despacho_dir}/{fecha_p}/{doc_name}(extension)"
+                            f"downloads/{self.source}/{tipo_dir}"
+                            f"/{especialidad}/{despacho_dir}/{fecha_p}/{doc_name}(extension)"
                         )
 
                         doc = RawDocModel(

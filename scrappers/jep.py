@@ -12,7 +12,7 @@ class ScrapJEP(BaseScrapper):
         self.source = "JEP"
         self.url = None
         
-    def scrap(self, fini, ffin, q="", limit=10000) -> List[RawDocModel]:
+    def scrap(self, fini, ffin, q="", limit=10000, stop_event=None, on_progress=None) -> List[RawDocModel]:
         anio_inicial = fini[:4] # Extraer solo el año ya que estas se almacenan por año
         anio_final = ffin[:4]
         self.url = JEP_URL

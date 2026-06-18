@@ -12,7 +12,7 @@ class ScrapConstitucional(BaseScrapper):
         self.source = "Corte Constitucional"
         self.url = None
         
-    def scrap(self, fini, ffin, q="", limit=10000) -> List[RawDocModel]:
+    def scrap(self, fini, ffin, q="", limit=10000, stop_event=None, on_progress=None) -> List[RawDocModel]:
         fecha_local = datetime.strptime(fini, "%Y-%m-%d")
         fecha_final_global = datetime.strptime(ffin, "%Y-%m-%d")
         docs = []

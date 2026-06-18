@@ -22,44 +22,6 @@ _DATE_PATTERN = re.compile(
 
 _TOKEN_PATTERN = re.compile(r'__RequestVerificationToken[^>]+value="([^"]+)"')
 
-_SALA_PATTERN = re.compile(
-    r"SALA\s+(?:\d+\s+)?"
-    r"(DE\s+INSTRUCCI[OÓ]N|DE\s+JUZGAMIENTO|JUZGAMIENTO|ORDINARI?A?|DUAL(?:\s+DE\s+INSTRUCCI[OÓ]N)?|PLENA|EXTRAORDINARI[AN]A?)",
-    re.IGNORECASE,
-)
-# "SALA 018 DEL..." / "SALA NO. 015 DEL..." / "SALA Nº 26 DEL..." / "SALA N| 4 DEL..."
-# "SALA 009. DEL..." / "SALA No. 09 DE DD/MM/YYYY" / "SALAN° 52 DEL..."
-_SALA_NUMBERED_PATTERN = re.compile(
-    r"SALA\s*(?:N\S*\s+)?\d+\.?\s*(?:DEL?(?:\s|\d)|\s*DE\s+\d{1,2}/)",
-    re.IGNORECASE,
-)
-
-_SALA_NORM = {
-    "DE INSTRUCCION": "Sala de Instruccion",
-    "DE INSTRUCCIÓN": "Sala de Instruccion",
-    "DE JUZGAMIENTO": "Sala de Juzgamiento",
-    "JUZGAMIENTO": "Sala de Juzgamiento",
-    "ORDINARIA": "Sala Ordinaria",
-    "ORDINARA": "Sala Ordinaria",
-    "ORDINARI": "Sala Ordinaria",
-    "DUAL": "Sala Dual",
-    "DUAL DE INSTRUCCION": "Sala Dual de Instruccion",
-    "DUAL DE INSTRUCCIÓN": "Sala Dual de Instruccion",
-    "PLENA": "Sala Plena",
-    "EXTRAORDINARIA": "Sala Extraordinaria",
-    "EXTRAORDINARINA": "Sala Extraordinaria",
-}
-
-
-def _extract_sala(decision_text: str) -> str:
-    m = _SALA_PATTERN.search(decision_text.upper())
-    if m:
-        key = re.sub(r"\s+", " ", m.group(1)).strip()
-        return _SALA_NORM.get(key, "Sala " + key.title())
-    if _SALA_NUMBERED_PATTERN.search(decision_text.upper()):
-        return "Sala Ordinaria"
-    return "Otras Decisiones"
-
 
 def _parse_date(text: str):
     m = _DATE_PATTERN.search(text.upper())
@@ -84,7 +46,7 @@ class ScrapCNDJ(BaseScrapper):
     def __init__(self):
         self.source = "Consejo Nacional de Disciplina Judicial"
 
-    def scrap(self, fini, ffin, q="", limit=10000) -> List[RawDocModel]:
+    def scrap(self, fini, ffin, q="", limit=10000, stop_event=None, on_progress=None) -> List[RawDocModel]:
         session = requests.Session()
         session.headers.update({"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"})
 
@@ -192,11 +154,10 @@ class ScrapCNDJ(BaseScrapper):
 
             url = f"{CNDJ_DOWNLOAD_URL}{archivo}.pdf"
             dedup_key = f"{numero_unico}_{numero_ficha}"
-            sala = _extract_sala(decision_text)
             magistrado_fmt = magistrado.title()
             safe_num = numero_unico.replace("/", "-").replace("\\", "-")
             path = (
-                f"downloads/{self.source}/{sala}/{magistrado_fmt}/{f_public}/{safe_num}(extension)"
+                f"downloads/{self.source}/{magistrado_fmt}/{f_public}/{safe_num}(extension)"
             )
 
             docs.append(RawDocModel(
