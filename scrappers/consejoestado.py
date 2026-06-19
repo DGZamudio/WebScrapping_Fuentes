@@ -66,9 +66,11 @@ class ScrapConsejoEstado(BaseScrapper):
             "__ASYNCPOST": "true",
             "__EVENTTARGET": valores[0],
             "__EVENTARGUMENT": valores[1] if len(valores) > 1 else "",
-            "ctl00$MainContent$ScriptManager1": "ctl00$MainContent$PanelUpdate|MainContent_BuscarProvidenciasLinkButton"
+            "ctl00$MainContent$ScriptManager1": "ctl00$MainContent$PanelUpdate|MainContent_BuscarProvidenciasLinkButton",
+            "ctl00$MainContent$FechaDesdeTextBox": fini,
+            "ctl00$MainContent$FechaHastaTextBox": ffin
         }
-        
+
         # Clic en "Ver resultados"
         res3 = session.post(self.url, data=data, headers=headers)
         html_update, asp_data = parse_ajax_response(res3.text)

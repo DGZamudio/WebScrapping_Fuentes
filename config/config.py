@@ -52,7 +52,7 @@ CORTE_SUPREMA_URL = "https://consultaprovidenciasbk.cortesuprema.gov.co/api"
 
 # JEP
 JEP_URL = "https://relatoria.jep.gov.co/listarProvidecias"
-JEP_DOWNLOAD_URL = "https://relatoria.jep.gov.co"
+JEP_DOWNLOAD_URL = "https://relatoria.jep.gov.co/"
 
 
 

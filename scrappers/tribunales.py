@@ -96,9 +96,11 @@ class ScrapTribunales(BaseScrapper):
                 "__ASYNCPOST": "true",
                 "__EVENTTARGET": valores[0],
                 "__EVENTARGUMENT": valores[1] if len(valores) > 1 else "",
-                "ctl00$MainContent$ScriptManager1": "ctl00$MainContent$PanelUpdate|MainContent_BuscarProvidenciasLinkButton"
+                "ctl00$MainContent$ScriptManager1": "ctl00$MainContent$PanelUpdate|MainContent_BuscarProvidenciasLinkButton",
+                "ctl00$MainContent$FechaDesdeTextBox": fini,
+                "ctl00$MainContent$FechaHastaTextBox": ffin
             }
-            
+
             # Clic en "Ver resultados"
             res3 = session.post(self.url, data=data, headers=headers)
             html_update, asp_data = parse_ajax_response(res3.text)
@@ -145,13 +147,17 @@ class ScrapTribunales(BaseScrapper):
                         radicado_formateado = f"{radicado[:5]}-{radicado[5:7]}-{radicado[7:9]}-{radicado[9:12]}-{radicado[12:16]}-{radicado[16:21]}-{radicado[21:]}"
                         interno = soup_doc.find("span", id="ContentPlaceHolder1_InfoProcesoProvidencia1_InfoProceso1_LblInterno").text.strip()
 
+                        proceso_safe = re.sub(r'[\\/*?:"<>|]', '-', proceso)
+                        interno_suffix = ('(' + interno[:60] + ')') if interno else ''
+
                         doc = RawDocModel(
                             source=self.source,
                             link={"url":link_descarga, "method":"GET", "body": {"path": radicado}},
                             title=radicado,
                             tipo=soup_doc.find("span", id="ContentPlaceHolder1_InfoProcesoProvidencia1_LblTIPOPROVIDENCIA").text.strip(),
                             f_public=fecha,
-                            save_path=f"downloads/{self.source}/{tipo_tribunal}/{fecha[:5]}/{sala_desicion}/{proceso}/{radicado_formateado}{'('+interno+')' if interno else None}(extension)"
+                            save_path=f"downloads/{self.source}/{fecha[:4]}/{sala_desicion}/{proceso_safe}/{radicado_formateado}{interno_suffix}(extension)",
+                            convert_to="rtf",
                         )
                         docs.append(doc)
                     except Exception as e:
@@ -161,7 +167,13 @@ class ScrapTribunales(BaseScrapper):
                 if stop: break
 
                 btn_sig = localsoup.find("a", id="MainContent_ResultadoBusqueda1_PaginaSiguienteLinkButton")
-                if not btn_sig: break # No hay más páginas
+                if not btn_sig: break
+
+                # Detectar última página por el indicador "Página X de Y"
+                page_text = localsoup.get_text()
+                match = re.search(r'[Pp]ágina\s+(\d+)\s+de\s+(\d+)', page_text)
+                if match and match.group(1) == match.group(2):
+                    break
 
                 postback_sig = btn_sig.get("href")
                 v_sig = re.findall(r"'(.*?)'", postback_sig)
@@ -174,7 +186,13 @@ class ScrapTribunales(BaseScrapper):
                     "ctl00$MainContent$ScriptManager1": f"ctl00$MainContent$PanelUpdate|{v_sig[0]}"
                 }
 
-                res_pag = session.post(self.url, data=data_pag, headers=headers)
+                for _ in range(3):
+                    try:
+                        res_pag = session.post(self.url, data=data_pag, headers=headers)
+                        break
+                    except Exception:
+                        import time; time.sleep(3)
+                        session = requests.Session()
                 html_update, asp_data = parse_ajax_response(res_pag.text)
                 localsoup = BeautifulSoup(html_update, "html.parser")
         
