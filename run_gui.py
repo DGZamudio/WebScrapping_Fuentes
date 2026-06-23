@@ -5,15 +5,12 @@ from db.memory import Memory
 
 
 def start_scrape_thread(app: App, stop_event: "threading.Event"):
-    # Read dates from settings just before starting
+    # Read dates from the dashboard execute card (user-editable, pre-filled smartly)
     try:
-        cfg = app.settings_view.get_dates()
+        fini, ffin = app.dashboard.get_dates()
     except Exception:
-        cfg = {}
+        fini, ffin = None, None
 
-    fini = cfg.get("start") or None
-    ffin = cfg.get("end") or None
-    # read enabled scrapers from settings
     try:
         allowed = app.settings_view.get_enabled_sources()
     except Exception:
@@ -56,7 +53,7 @@ if __name__ == "__main__":
 
         # wire stop button immediately to the stop_event
         try:
-            app.console.set_stop_callback(lambda: stop_event.set())
+            app.dashboard.set_stop_callback(lambda: stop_event.set())
         except Exception:
             pass
 

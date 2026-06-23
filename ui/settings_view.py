@@ -1,163 +1,223 @@
 import tkinter as tk
-from datetime import datetime
-from pathlib import Path
 from tkinter import ttk
+from pathlib import Path
 import json
-from db.memory import Memory
+
 from scrappers import SCRAPERS, discover_tribunales
+from ui.theme import COLORS, FONTS
 
 SETTINGS_PATH = Path("config") / "settings.json"
 
 
-class CollapsibleFrame(tk.Frame):
-    """A collapsible frame widget that can expand/collapse its content."""
+class _CollapsibleSection(tk.Frame):
+    """Collapsible group row used for Tribunales Administrativos."""
 
-    def __init__(self, parent, text="", *args, **kwargs):
-        super().__init__(parent, *args, **kwargs)
+    def __init__(self, parent, text, count, bg=COLORS["card"], **kwargs):
+        super().__init__(parent, bg=bg, **kwargs)
+        self._bg = bg
+        self._expanded = False
 
-        self.show = tk.BooleanVar(value=False)
+        # ── Header row ────────────────────────────────────────────────────────
+        hdr = tk.Frame(self, bg=bg, cursor="hand2")
+        hdr.pack(fill="x", pady=(6, 0))
 
-        # Header button
-        self.toggle_button = tk.Button(
-            self,
-            text=f"▶ {text}",
-            command=self.toggle,
-            relief="flat",
-            bg=self.cget("bg"),
-            fg="#466a80",
-            font=("Arial", 10, "bold"),
-            anchor="w",
-            padx=5
+        self._arrow = tk.Label(
+            hdr, text="▶", bg=bg, fg=COLORS["accent"],
+            font=("Segoe UI", 8, "bold"), width=2, cursor="hand2",
         )
-        self.toggle_button.pack(fill="x")
+        self._arrow.pack(side="left")
 
-        # Content frame
-        self.content_frame = tk.Frame(self, bg=self.cget("bg"))
-        self.content_frame.pack(fill="x", expand=True)
-        self.content_frame.pack_forget()  # Hide initially
+        tk.Label(
+            hdr, text=text, bg=bg, fg=COLORS["text_secondary"],
+            font=FONTS["body_bold"], anchor="w", cursor="hand2",
+        ).pack(side="left")
 
-    def toggle(self):
-        if self.show.get():
-            self.content_frame.pack_forget()
-            self.toggle_button.config(text=self.toggle_button.cget("text").replace("▼", "▶"))
-            self.show.set(False)
+        tk.Label(
+            hdr, text=f"{count} tribunales",
+            bg=bg, fg=COLORS["text_muted"], font=FONTS["caption"],
+        ).pack(side="left", padx=(8, 0), pady=(1, 0))
+
+        # ── Content frame (hidden by default) ────────────────────────────────
+        self.content = tk.Frame(self, bg=bg)
+
+        for widget in (hdr, self._arrow):
+            widget.bind("<Button-1>", self._toggle)
+
+    def _toggle(self, _=None):
+        if self._expanded:
+            self.content.pack_forget()
+            self._arrow.config(text="▶")
         else:
-            self.content_frame.pack(fill="x", expand=True, after=self.toggle_button)
-            self.toggle_button.config(text=self.toggle_button.cget("text").replace("▶", "▼"))
-            self.show.set(True)
+            self.content.pack(fill="x", padx=(16, 0), pady=(4, 0))
+            self._arrow.config(text="▼")
+        self._expanded = not self._expanded
 
 
 class SettingsView(tk.Frame):
-    """Example settings view - add your configuration options here."""
-
     def __init__(self, parent, controller=None):
-        super().__init__(parent)
+        super().__init__(parent, bg=COLORS["bg"])
         self.controller = controller
-        self.source_vars = {}
+        self.source_vars: dict[str, tk.BooleanVar] = {}
+        self._all_vars: list[tk.BooleanVar] = []        # flat list for select-all
         self._build()
         self.load_settings()
 
+    # ------------------------------------------------------------------ build
+
     def _build(self):
-        title = tk.Label(self, text="Configuración", font=("Arial", 14, "bold"))
-        title.pack(anchor="w", pady=10)
+        # ── Sticky header ─────────────────────────────────────────────────────
+        header = tk.Frame(self, bg=COLORS["bg"])
+        header.pack(fill="x", padx=24, pady=(24, 0))
 
-        # Date range settings
-        dates_frame = tk.LabelFrame(self, text="Rango de Fechas", padx=10, pady=10)
-        dates_frame.pack(fill="x", pady=10)
+        tk.Label(
+            header, text="Configuración",
+            bg=COLORS["bg"], fg=COLORS["text"], font=FONTS["h1"],
+        ).pack(side="left")
 
-        tk.Label(dates_frame, text="Fecha Inicio (YYYY-MM-DD):").pack(anchor="w")
-        self.start_date = tk.Entry(dates_frame, width=30)
-        # Prefill start with last inserted date from DB if available
-        try:
-            last = Memory().get_last_inserted()
-        except Exception:
-            last = None
-        if last:
-            self.start_date.insert(0, last)
-        else:
-            self.start_date.insert(0, "2026-02-01")
-        self.start_date.pack(fill="x", pady=(0, 10))
+        tk.Label(
+            header, text="Fuentes activas y opciones de descarga",
+            bg=COLORS["bg"], fg=COLORS["text_muted"], font=FONTS["small"],
+        ).pack(side="right", pady=(10, 0))
 
-        tk.Label(dates_frame, text="Fecha Fin (YYYY-MM-DD):").pack(anchor="w")
-        self.end_date = tk.Entry(dates_frame, width=30)
-        # default end to today
-        self.end_date.insert(0, datetime.now().strftime("%Y-%m-%d"))
-        self.end_date.pack(fill="x")
-
-        # Save button
-        tk.Button(dates_frame, text="Guardar", command=self._on_save).pack(anchor="w", pady=(10, 0))
-
-        sources_frame = tk.LabelFrame(self, text="Fuentes a Descargar", padx=10, pady=10)
-        sources_frame.pack(fill="both", expand=True, pady=10)
-
-        # Create a Canvas with Scrollbar for scrollable sources
-        canvas = tk.Canvas(sources_frame, height=200, bg=sources_frame.cget("bg"), highlightthickness=0)
-        scrollbar = ttk.Scrollbar(sources_frame, orient="vertical", command=canvas.yview)
-        scrollable_frame = tk.Frame(canvas, bg=sources_frame.cget("bg"))
-
-        scrollable_frame.bind(
-            "<Configure>",
-            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+        tk.Frame(self, bg=COLORS["card_border"], height=1).pack(
+            fill="x", padx=24, pady=(14, 0)
         )
 
-        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+        # ── Scrollable body ────────────────────────────────────────────────────
+        canvas = tk.Canvas(self, bg=COLORS["bg"], highlightthickness=0)
+        scrollbar = ttk.Scrollbar(self, orient="vertical", command=canvas.yview)
         canvas.configure(yscrollcommand=scrollbar.set)
-
-        canvas.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
+        canvas.pack(side="left", fill="both", expand=True)
 
-        # Bind mousewheel scroll
-        def _on_mousewheel(event):
-            canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+        body = tk.Frame(canvas, bg=COLORS["bg"])
+        win_id = canvas.create_window((0, 0), window=body, anchor="nw")
 
-        canvas.bind_all("<MouseWheel>", _on_mousewheel)
+        canvas.bind("<Configure>", lambda e: canvas.itemconfig(win_id, width=e.width))
+        body.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
+        canvas.bind_all("<MouseWheel>", lambda e: canvas.yview_scroll(int(-1 * (e.delta / 120)), "units"))
 
-        # Discover all available tribunales before showing sources
+        # ── Sources card ───────────────────────────────────────────────────────
+        card = self._card(body)
+        card.pack(fill="x", padx=24, pady=(24, 24))
+
+        # Card header
+        card_hdr = tk.Frame(card, bg=COLORS["card"])
+        card_hdr.pack(fill="x", padx=20, pady=(18, 0))
+
+        tk.Label(
+            card_hdr, text="Fuentes a descargar",
+            bg=COLORS["card"], fg=COLORS["text"], font=FONTS["h3"],
+        ).pack(side="left")
+
+        # Select-all / none toggle link
+        self._sel_all_lbl = tk.Label(
+            card_hdr, text="Seleccionar todo",
+            bg=COLORS["card"], fg=COLORS["accent"],
+            font=FONTS["small"], cursor="hand2",
+        )
+        self._sel_all_lbl.pack(side="right", pady=(2, 0))
+        self._sel_all_lbl.bind("<Button-1>", self._toggle_all)
+
+        tk.Frame(card, bg=COLORS["card_border"], height=1).pack(fill="x", padx=20, pady=(12, 0))
+
+        # Checkbox body
+        chk_body = tk.Frame(card, bg=COLORS["card"])
+        chk_body.pack(fill="both", expand=True, padx=20, pady=(12, 0))
+
         try:
             discover_tribunales()
         except Exception as e:
             print(f"Error discovering tribunales: {e}")
 
-        # Separate tribunales from other sources
-        tribunales_sources = {}
-        other_sources = {}
+        tribunales = {}
+        others = {}
+        for src in SCRAPERS:
+            (tribunales if src.startswith("Tribunal Administrativo") else others)[src] = SCRAPERS[src]
 
-        for source in SCRAPERS.keys():
-            if source.startswith("Tribunal") and source != "Tribunales Superiores":
-                tribunales_sources[source] = SCRAPERS[source]
-            else:
-                other_sources[source] = SCRAPERS[source]
-
-        # Add non-tribunal sources first
-        for source in other_sources.keys():
+        # Non-tribunal sources
+        for src in others:
             var = tk.BooleanVar(value=True)
-            chk = tk.Checkbutton(scrollable_frame, text=source, variable=var, bg=scrollable_frame.cget("bg"))
-            chk.pack(anchor="w")
-            self.source_vars[source] = var
+            self._add_checkbox(chk_body, src, var)
+            self.source_vars[src] = var
+            self._all_vars.append(var)
 
+        # Tribunales collapsible
+        if tribunales:
+            tk.Frame(chk_body, bg=COLORS["card_border"], height=1).pack(
+                fill="x", pady=(10, 4)
+            )
+            section = _CollapsibleSection(
+                chk_body,
+                text="Tribunales Administrativos",
+                count=len(tribunales),
+                bg=COLORS["card"],
+            )
+            section.pack(fill="x")
 
-        # Add collapsible tribunales section
-        if tribunales_sources:
-            separator = tk.Frame(scrollable_frame, bg="#b2b1b1", height=1)
-            separator.pack(fill="x", padx=4, pady=8)
-
-            tribunales_collapsible = CollapsibleFrame(scrollable_frame, text="Tribunales Administrativos", bg=scrollable_frame.cget("bg"))
-            tribunales_collapsible.pack(fill="x", pady=(0, 5))
-
-            for source in sorted(tribunales_sources.keys()):
+            for src in sorted(tribunales):
                 var = tk.BooleanVar(value=True)
-                chk = tk.Checkbutton(
-                    tribunales_collapsible.content_frame,
-                    text=source.replace("Tribunal - ", ""),
-                    variable=var,
-                    bg=tribunales_collapsible.content_frame.cget("bg")
-                )
-                chk.pack(anchor="w", padx=(20, 0))  # Indent slightly
-                self.source_vars[source] = var
+                self._add_checkbox(section.content, src, var, indent=True)
+                self.source_vars[src] = var
+                self._all_vars.append(var)
 
-        button_frame = tk.Frame(sources_frame, bg=sources_frame.cget("bg"))
-        button_frame.pack(anchor="w", pady=(10, 0))
-        tk.Button(button_frame, text="Guardar", command=self._on_save).pack(anchor="w")
+        # Card footer: save button
+        tk.Frame(card, bg=COLORS["card_border"], height=1).pack(fill="x", padx=20, pady=(16, 0))
+        footer = tk.Frame(card, bg=COLORS["card"])
+        footer.pack(fill="x", padx=20, pady=(10, 16))
+
+        tk.Label(
+            footer, text="Los cambios se aplican en la próxima ejecución.",
+            bg=COLORS["card"], fg=COLORS["text_muted"], font=FONTS["caption"],
+        ).pack(side="left", pady=(2, 0))
+
+        tk.Button(
+            footer, text="Guardar configuración",
+            command=self._on_save,
+            bg=COLORS["btn_primary"], fg=COLORS["btn_text"],
+            activebackground=COLORS["btn_primary_hover"],
+            activeforeground=COLORS["btn_text"],
+            font=FONTS["body_bold"],
+            relief="flat", bd=0, cursor="hand2",
+            padx=14, pady=7,
+        ).pack(side="right")
+
+    # ----------------------------------------------------------------- helpers
+
+    def _card(self, parent):
+        return tk.Frame(
+            parent, bg=COLORS["card"],
+            highlightbackground=COLORS["card_border"], highlightthickness=1,
+        )
+
+    def _add_checkbox(self, parent, text, var, indent=False):
+        row = tk.Frame(parent, bg=COLORS["card"])
+        row.pack(fill="x", pady=2)
+
+        if indent:
+            tk.Frame(row, bg=COLORS["card"], width=4).pack(side="left")
+
+        chk = tk.Checkbutton(
+            row, text=text, variable=var,
+            bg=COLORS["card"], fg=COLORS["text"] if not indent else COLORS["text_secondary"],
+            activebackground=COLORS["card"],
+            selectcolor="#eaf0ff",
+            font=FONTS["body"] if not indent else FONTS["small"],
+            anchor="w", cursor="hand2",
+            relief="flat", bd=0,
+        )
+        chk.pack(side="left", fill="x")
+
+    def _toggle_all(self, _=None):
+        any_off = any(not v.get() for v in self._all_vars)
+        new_val = True if any_off else False
+        for v in self._all_vars:
+            v.set(new_val)
+        self._sel_all_lbl.config(
+            text="Seleccionar todo" if not new_val else "Deseleccionar todo"
+        )
+
+    # -------------------------------------------------------------------- API
 
     def _on_save(self):
         try:
@@ -169,14 +229,9 @@ class SettingsView(tk.Frame):
                 self.controller.log(f"Error guardando configuración: {e}")
 
     def get_dates(self):
-        """Return the configured date range."""
-        return {
-            "start": self.start_date.get(),
-            "end": self.end_date.get(),
-        }
+        return {}
 
     def get_enabled_sources(self):
-        """Return list of enabled scraper keys (those checked in the UI)."""
         try:
             return [k for k, v in self.source_vars.items() if v.get()]
         except Exception:
@@ -184,37 +239,28 @@ class SettingsView(tk.Frame):
 
     def get_source_options(self):
         return {}
-        
+
     def save_settings(self):
-        """Persist current settings to `config/settings.json`."""
         SETTINGS_PATH.parent.mkdir(parents=True, exist_ok=True)
-        data = {
-            "start": self.start_date.get(),
-            "end": self.end_date.get(),
-            "enabled_sources": self.get_enabled_sources(),
-        }
+        data = {"enabled_sources": self.get_enabled_sources()}
         with open(SETTINGS_PATH, "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
 
     def load_settings(self):
-        """Load persisted settings (if present) and apply to widgets."""
         try:
             if SETTINGS_PATH.exists():
                 with open(SETTINGS_PATH, "r", encoding="utf-8") as f:
                     data = json.load(f)
-                start = data.get("start")
-                end = data.get("end")
                 enabled = data.get("enabled_sources")
-
-                if start:
-                    self.start_date.delete(0, "end")
-                    self.start_date.insert(0, start)
-                if end:
-                    self.end_date.delete(0, "end")
-                    self.end_date.insert(0, end)
-                if enabled and isinstance(enabled, list):
+                if isinstance(enabled, list):
                     for k, var in self.source_vars.items():
                         var.set(k in enabled)
+                self._update_sel_all_label()
         except Exception:
-            # fail silently; UI should still work
             pass
+
+    def _update_sel_all_label(self):
+        all_on = all(v.get() for v in self._all_vars)
+        self._sel_all_lbl.config(
+            text="Deseleccionar todo" if all_on else "Seleccionar todo"
+        )

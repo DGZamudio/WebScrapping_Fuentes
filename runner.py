@@ -79,6 +79,8 @@ def run_scrapers(fini=None, ffin=None, on_new_doc=None, on_progress=None, on_sta
                         logging.info(msg)
                         if on_new_doc:
                             on_new_doc(doc)
+                    except FileNotFoundError as missing:
+                        logging.warning(str(missing))
                     except Exception as download_error:
                         msg = f"Error al descargar {doc['title']}: {download_error}"
                         logging.error(msg)

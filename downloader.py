@@ -1,5 +1,7 @@
+import logging
 from pathlib import Path
 import requests
+from bs4 import BeautifulSoup
 
 from models.models import RawDocModel
 from utils import extract_filename
@@ -11,6 +13,8 @@ _WORD_FORMATS = {"rtf": 6, "docx": 16, "pdf": 17}
 def _pdf_to_rtf_fallback(input_path: Path) -> Path:
     from pypdf import PdfReader
     reader = PdfReader(str(input_path))
+    if reader.is_encrypted:
+        reader.decrypt("")
     output_path = input_path.with_suffix(".rtf")
     with open(output_path, "w", encoding="ascii", errors="replace") as f:
         f.write("{\\rtf1\\ansi\\ansicpg1252\\deff0\n")
@@ -75,7 +79,36 @@ class Downloader:
     def _convert(self, out_path: Path, target_format: str) -> Path:
         if target_format != "rtf":
             raise ValueError(f"Formato no soportado: {target_format}")
-        return _pdf_to_rtf_fallback(out_path)
+        try:
+            return _pdf_to_rtf_fallback(out_path)
+        except Exception as e:
+            logging.warning(f"No se pudo convertir a RTF ({out_path.name}): {e}")
+            return out_path  # keep PDF if conversion fails
+
+    @staticmethod
+    def _resolve_jwt_indirect(jwt_url: str, headers: dict) -> requests.Response:
+        """Fetch VerProvidencia page → blob URL → stream download.
+
+        Raises FileNotFoundError (not a generic Exception) when the document
+        exists in the court system but its file has not yet been uploaded to
+        blob storage.  The caller can catch this to skip silently.
+        """
+        session = requests.Session()
+        session.headers.update(headers)
+        ver = session.get(jwt_url, timeout=30)
+        ver.raise_for_status()
+        soup = BeautifulSoup(ver.text, "html.parser")
+
+        blob_url = next(
+            (a["href"] for a in soup.find_all("a", href=True)
+             if "blob.core.windows.net" in a["href"]),
+            None,
+        )
+        if blob_url:
+            return session.get(blob_url, stream=True, timeout=120)
+
+        # Document registered in SAMAI but file not yet available in blob storage
+        raise FileNotFoundError(f"Archivo aún no disponible en SAMAI: {jwt_url[:80]}")
 
     def close(self):
         if self._word_converter:
@@ -92,6 +125,8 @@ class Downloader:
                     headers["Content-Type"] = "application/json"
                     body = doc.link.get("body", {})
                     response = requests.post(doc.link["url"], json=body, headers=headers, stream=True, timeout=120)
+                elif doc.link["method"] == "jwt_indirect":
+                    response = self._resolve_jwt_indirect(doc.link["url"], headers)
                 else:
                     response = requests.get(doc.link["url"], headers=headers, stream=True, timeout=120)
                 break
@@ -131,7 +166,8 @@ class Downloader:
 
         if doc.convert_to:
             converted = self._convert(out_path, doc.convert_to)
-            out_path.unlink(missing_ok=True)
+            if converted != out_path:
+                out_path.unlink(missing_ok=True)
             return converted
 
         return out_path

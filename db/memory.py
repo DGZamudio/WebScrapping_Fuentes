@@ -16,6 +16,54 @@ class Memory:
                     downloaded_at DATETIME
                 )
             """)
+            conn.execute(
+                "CREATE TABLE IF NOT EXISTS _migrations (id TEXT PRIMARY KEY)"
+            )
+        self._run_migrations()
+
+    def _run_migrations(self):
+        with self.get_conn() as conn:
+            # v1 — 5-digit prefix match (kept for idempotency)
+            cur = conn.execute(
+                "SELECT 1 FROM _migrations WHERE id = 'split_tribunal_sources'"
+            )
+            if not cur.fetchone():
+                self._migrate_tribunal_sources(conn, prefix_len=5)
+                conn.execute("INSERT INTO _migrations VALUES ('split_tribunal_sources')")
+
+            # v2 — 2-digit department prefix; catches municipal radicados and Bogotá DC
+            cur = conn.execute(
+                "SELECT 1 FROM _migrations WHERE id = 'split_tribunal_sources_v2'"
+            )
+            if not cur.fetchone():
+                self._migrate_tribunal_sources(conn, prefix_len=2)
+                conn.execute("INSERT INTO _migrations VALUES ('split_tribunal_sources_v2')")
+
+    def _migrate_tribunal_sources(self, conn, prefix_len: int):
+        """Map 'Tribunales Administrativos' rows to per-tribunal names.
+
+        Uses the first `prefix_len` chars of the radicado (title) to identify the
+        department — each tribunal's corp_code starts with the departmental DANE code.
+        Bogotá DC (dept 11) is also mapped to Cundinamarca's tribunal (corp_code 2500023).
+        """
+        from scrappers.tribunales import _TRIBUNALES
+
+        # Build dept-prefix → tribunal-name mapping
+        prefix_map = {}
+        for corp_code, corp_name in _TRIBUNALES.items():
+            prefix_map[corp_code[:prefix_len]] = corp_name
+
+        # Bogotá DC (11) falls under the Cundinamarca tribunal
+        if prefix_len == 2 and "2500023"[:2] in prefix_map:
+            prefix_map["11"] = prefix_map["25"]
+
+        for prefix, corp_name in prefix_map.items():
+            conn.execute(
+                "UPDATE downloaded SET source = ? "
+                "WHERE source = 'Tribunales Administrativos' AND title LIKE ?",
+                (corp_name, f"{prefix}%"),
+            )
+        logging.info("Migration split_tribunal_sources (prefix_len=%d) completed.", prefix_len)
 
     def get_conn(self):
         return sqlite3.connect(DB_PATH)
@@ -68,6 +116,40 @@ class Memory:
                 cur = conn.execute("SELECT COUNT(*) FROM downloaded")
             row = cur.fetchone()
             return row[0] if row else 0
+
+    def get_counts_by_source(self):
+        """Return list of (source, count) sorted by count descending."""
+        with self.get_conn() as conn:
+            cur = conn.execute(
+                "SELECT source, COUNT(*) as cnt FROM downloaded GROUP BY source ORDER BY cnt DESC"
+            )
+            return [(row[0], row[1]) for row in cur.fetchall()]
+
+    def get_counts_grouped(self):
+        """Return counts grouped by entity family.
+
+        Returns list of (display_name, total, children) where children is a list of
+        (source, count) tuples. Single-scraper sources have an empty children list.
+        Sources that share a common family (e.g. all Tribunal Administrativo X) are
+        collapsed into one parent row with the individual breakdown as children.
+        """
+        flat = self.get_counts_by_source()
+        tribunal_children = []
+        singles = []
+
+        for source, count in flat:
+            if source.startswith("Tribunal Administrativo"):
+                tribunal_children.append((source, count))
+            else:
+                singles.append((source, count, []))
+
+        result = list(singles)
+        if tribunal_children:
+            total = sum(c for _, c in tribunal_children)
+            result.append(("Tribunales Administrativos", total, tribunal_children))
+
+        result.sort(key=lambda x: -x[1])
+        return result
 
     def get_all_downloaded(self, source=None):
         """Return all downloaded documents from the database."""

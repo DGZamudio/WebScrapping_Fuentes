@@ -1,204 +1,298 @@
 import re
-from typing import List
-from datetime import datetime, timedelta
+import time
+from datetime import datetime
+from typing import List, Optional
+
 import requests
-from config.config import CONSEJO_ESTADO_URL
-from models.models import RawDocModel
-from scrappers.base import BaseScrapper
 from bs4 import BeautifulSoup
 
-from utils import get_asp_data, parse_ajax_response
+from models.models import RawDocModel
+from scrappers.base import BaseScrapper
+
+_URL = "https://samai.consejodeestado.gov.co/vistas/utiles/WEstados.aspx"
+
+_TRIBUNALES = {
+    "0500123": "Tribunal Administrativo de Antioquia",
+    "8100123": "Tribunal Administrativo de Arauca",
+    "0800123": "Tribunal Administrativo del Atlántico",
+    "1300123": "Tribunal Administrativo de Bolívar",
+    "1500123": "Tribunal Administrativo de Boyacá",
+    "1700123": "Tribunal Administrativo de Caldas",
+    "1800123": "Tribunal Administrativo del Caquetá",
+    "8500123": "Tribunal Administrativo del Casanare",
+    "1900123": "Tribunal Administrativo del Cauca",
+    "2000123": "Tribunal Administrativo del Cesar",
+    "2700123": "Tribunal Administrativo del Chocó",
+    "2300123": "Tribunal Administrativo de Córdoba",
+    "2500023": "Tribunal Administrativo de Cundinamarca",
+    "4100123": "Tribunal Administrativo del Huila",
+    "4400123": "Tribunal Administrativo de la Guajira",
+    "4700123": "Tribunal Administrativo del Magdalena",
+    "5000123": "Tribunal Administrativo del Meta",
+    "5200123": "Tribunal Administrativo de Nariño",
+    "5400123": "Tribunal Administrativo de Norte de Santander",
+    "8600123": "Tribunal Administrativo del Putumayo",
+    "6300123": "Tribunal Administrativo del Quindío",
+    "6600123": "Tribunal Administrativo de Risaralda",
+    "8800123": "Tribunal Administrativo de San Andrés",
+    "6800123": "Tribunal Administrativo de Santander",
+    "7000123": "Tribunal Administrativo de Sucre",
+    "7300123": "Tribunal Administrativo del Tolima",
+    "7600123": "Tribunal Administrativo del Valle del Cauca",
+}
+
+_INVALID_PATH = re.compile(r'[\\/*?:"<>|]')
+
+
+def _safe(text, maxlen=60):
+    return _INVALID_PATH.sub("-", text)[:maxlen]
+
+
+def _parse_estado_date(val: str):
+    """Parse '22/06/2026 0:00:00' → datetime."""
+    return datetime.strptime(val.split(" ")[0], "%d/%m/%Y")
+
+
+def _parse_prov_date(val: str):
+    """Parse '19/06/2026 ' → '2026-06-19'."""
+    try:
+        return datetime.strptime(val.strip(), "%d/%m/%Y").strftime("%Y-%m-%d")
+    except Exception:
+        return None
+
+
+def _all_inputs(soup) -> dict:
+    out = {}
+    for inp in soup.find_all("input"):
+        name = inp.get("name")
+        if name:
+            out[name] = inp.get("value", "")
+    return out
 
 
 class ScrapTribunales(BaseScrapper):
-    def __init__(self, tribunal_name=None, tribunal_index=None):
-        """
-        Initialize ScrapTribunales.
-        
-        Args:
-            tribunal_name: Name of specific tribunal to scrap (e.g., "Tribunal Superior")
-            tribunal_index: Index of tribunal button to scrap (1-based, excluding index 0)
-                           If None, scraps all tribunales
-        """
-        self.tribunal_name = tribunal_name
-        self.tribunal_index = tribunal_index
-        self.source = tribunal_name if tribunal_name else "Tribunales"
-        self.url = None
-        
+    source = "Tribunales Administrativos"
+
+    def __init__(self, corp_code: str, corp_name: str):
+        self._corp_code = corp_code
+        self._corp_name = corp_name
+
     def scrap(self, fini, ffin, q="", limit=1000, stop_event=None, on_progress=None) -> List[RawDocModel]:
-        self.url = CONSEJO_ESTADO_URL
-        session = requests.Session()
-        docs = []
+        fini_dt = datetime.strptime(fini, "%Y-%m-%d")
+        ffin_dt = datetime.strptime(ffin, "%Y-%m-%d")
+        if on_progress:
+            on_progress(f"[Tribunales Administrativos] Procesando {self._corp_name}…")
+        try:
+            return self._scrap_corp(self._corp_code, self._corp_name, fini_dt, ffin_dt, stop_event, on_progress)
+        except Exception as e:
+            if on_progress:
+                on_progress(f"[Tribunales Administrativos] Error en {self._corp_name}: {e}")
+            return []
 
-        # GET inicial para obtener cookies y VS base
-        res = session.get(self.url)
-        soup = BeautifulSoup(res.text, "html.parser")
-        headers = {
-            "X-Requested-With": "XMLHttpRequest",
-            "X-MicrosoftAjax": "Delta=true",
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36...",
-            "Referer": self.url
+    # ------------------------------------------------------------------ helpers
+
+    def _new_session(self):
+        s = requests.Session()
+        s.headers.update({"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"})
+        return s
+
+    def _step1_get(self, session):
+        res = session.get(_URL, timeout=30)
+        res.raise_for_status()
+        return BeautifulSoup(res.text, "html.parser")
+
+    def _step2_select_corp(self, session, soup1, corp_code):
+        data = {
+            **_all_inputs(soup1),
+            "ctl00$MainContent$LstCorpHabilitada": corp_code,
+            "ctl00$MainContent$ImgBuscar2.x": "10",
+            "ctl00$MainContent$ImgBuscar2.y": "10",
         }
+        res = session.post(_URL, data=data, timeout=30)
+        res.raise_for_status()
+        return BeautifulSoup(res.text, "html.parser")
 
-        botones_tribunales = soup.select("#MainContent_CorporacionesTitulanDataList input[type='submit']")
+    def _step3_select_section(self, session, soup2, corp_code, sec_code):
+        data = {
+            **_all_inputs(soup2),
+            "ctl00$MainContent$LstCorpHabilitada": corp_code,
+            "ctl00$MainContent$LstCoorporacion": sec_code,
+            "ctl00$MainContent$ImgBuscar3.x": "10",
+            "ctl00$MainContent$ImgBuscar3.y": "10",
+        }
+        res = session.post(_URL, data=data, timeout=30)
+        res.raise_for_status()
+        return BeautifulSoup(res.text, "html.parser")
 
-        # Determinar que tribunales scrapear según los parámetros
-        indices_to_scrap = [self.tribunal_index] if self.tribunal_index is not None else range(1, len(botones_tribunales))
+    def _step4a_check_all(self, session, soup3, corp_code, sec_code, fecha_val):
+        """Postback to enable ChkSeccion (all magistrates)."""
+        data = {
+            **_all_inputs(soup3),
+            "ctl00$MainContent$LstCorpHabilitada": corp_code,
+            "ctl00$MainContent$LstCoorporacion": sec_code,
+            "ctl00$MainContent$LstUEstados": fecha_val,
+            "ctl00$MainContent$ChkSeccion": "on",
+            "__EVENTTARGET": "ctl00$MainContent$ChkSeccion",
+            "__EVENTARGUMENT": "",
+        }
+        data.pop("ctl00$MainContent$ImgBuscar2", None)
+        data.pop("ctl00$MainContent$ImgBuscar3", None)
+        data.pop("ctl00$MainContent$CmdBuscar", None)
+        res = session.post(_URL, data=data, timeout=30)
+        res.raise_for_status()
+        return BeautifulSoup(res.text, "html.parser")
 
-        for i in indices_to_scrap:
-            asp_data = get_asp_data(soup)
-            boton_local = botones_tribunales[i]
-            name_tribunal = boton_local.get("name")
-            tipo_tribunal = boton_local.get("title")
-            value_tribunal = boton_local.get("value")
-            print(tipo_tribunal)
+    def _step4b_consultar(self, session, soup_chk, corp_code, sec_code, fecha_val):
+        """Submit CmdBuscar with ChkSeccion checked. Retries once on timeout."""
+        data = {
+            **_all_inputs(soup_chk),
+            "ctl00$MainContent$LstCorpHabilitada": corp_code,
+            "ctl00$MainContent$LstCoorporacion": sec_code,
+            "ctl00$MainContent$LstUEstados": fecha_val,
+            "ctl00$MainContent$ChkSeccion": "on",
+            "ctl00$MainContent$LstCriterio": "Na",
+            "ctl00$MainContent$Txtcriterio": "",
+            "ctl00$MainContent$CmdBuscar": "Consultar",
+        }
+        data.pop("ctl00$MainContent$ImgBuscar2", None)
+        data.pop("ctl00$MainContent$ImgBuscar3", None)
+        for attempt in range(2):
+            try:
+                res = session.post(_URL, data=data, timeout=120)
+                res.raise_for_status()
+                return res.text
+            except requests.exceptions.Timeout:
+                if attempt == 0:
+                    time.sleep(5)
+                    continue
+                raise
 
-            data = {
-                **asp_data,
-                "__ASYNCPOST": "true",
-                "ctl00$MainContent$ScriptManager1": f"ctl00$MainContent$PanelUpdate|{name_tribunal}",
-                name_tribunal: value_tribunal
-            }
+    # ------------------------------------------------------------------ scraping
 
-            # POST 1: Seleccionar Tribunal
-            res2 = session.post(self.url, data=data, headers=headers)
-            html_update, asp_data = parse_ajax_response(res2.text)
-            localsoup = BeautifulSoup(html_update, "html.parser")
+    def _scrap_corp(self, corp_code, corp_name, fini_dt, ffin_dt, stop_event, on_progress):
+        session = self._new_session()
+        soup1 = self._step1_get(session)
+        soup2 = self._step2_select_corp(session, soup1, corp_code)
 
-            # POST 2: Apartado de filtros y ver resultados
+        sel_sec = soup2.find("select", {"id": "MainContent_LstCoorporacion"})
+        if not sel_sec:
+            return []
 
-            # Settear fecha inicio y fin
-            boton_fechas = localsoup.find("a", id="MainContent_OQueContengaFechaLinkButton")
-            postback_str = boton_fechas.get("href")
-            valores = re.findall(r'["\'](.*?)["\']', postback_str)
-            data = {
-                **asp_data,
-                "__ASYNCPOST": "true",
-                "__EVENTTARGET": valores[0],
-                "__EVENTARGUMENT": valores[1] if len(valores) > 1 else "",
-                "ctl00$MainContent$ScriptManager1": "ctl00$MainContent$PanelUpdate|ctl00$MainContent$OQueContengaFechaLinkButton",
-                "ctl00$MainContent$FechaDesdeTextBox": fini,
-                "ctl00$MainContent$FechaHastaTextBox": ffin
-            }
-            resf = session.post(self.url, data=data, headers=headers)
-            html_update, asp_data = parse_ajax_response(resf.text)
-            localsoup = BeautifulSoup(html_update, "html.parser")
+        secciones = [(o.get("value", ""), o.text.strip()) for o in sel_sec.find_all("option") if o.get("value")]
 
-            # Buscar botón de "Ver resultados"
-            boton_busqueda = localsoup.find("a", id="MainContent_BuscarProvidenciasLinkButton")
-            if not boton_busqueda: continue
-            
-            postback_str = boton_busqueda.get("href")
-            valores = re.findall(r"'(.*?)'", postback_str)
-            
-            data = {
-                **asp_data,
-                "__ASYNCPOST": "true",
-                "__EVENTTARGET": valores[0],
-                "__EVENTARGUMENT": valores[1] if len(valores) > 1 else "",
-                "ctl00$MainContent$ScriptManager1": "ctl00$MainContent$PanelUpdate|MainContent_BuscarProvidenciasLinkButton",
-                "ctl00$MainContent$FechaDesdeTextBox": fini,
-                "ctl00$MainContent$FechaHastaTextBox": ffin
-            }
+        docs = []
+        for sec_code, sec_name in secciones:
+            if stop_event and stop_event.is_set():
+                break
+            try:
+                # Fresh session state per section
+                session2 = self._new_session()
+                s1 = self._step1_get(session2)
+                s2 = self._step2_select_corp(session2, s1, corp_code)
+                s3 = self._step3_select_section(session2, s2, corp_code, sec_code)
 
-            # Clic en "Ver resultados"
-            res3 = session.post(self.url, data=data, headers=headers)
-            html_update, asp_data = parse_ajax_response(res3.text)
-            localsoup = BeautifulSoup(html_update, "html.parser")
-
-            fini_dt = datetime.strptime(fini, "%Y-%m-%d") - timedelta(days=1)
-            stop = False
-
-            while not stop:
-                # Buscar enlaces de documentos en la tabla de resultados
-                botones_ver_documentos = localsoup.find_all("a", id=re.compile(r"MainContent_ResultadoBusqueda1_TitulacionesRepeater_documentlink_"))
-
-                for j, boton in enumerate(botones_ver_documentos):
-                    try:
-                        # Extraer URL del popup (onclick)
-                        url_doc_rel = boton.get("onclick").split("'")[1]
-                        url_doc = f"https://www.consejodeestado.gov.co{url_doc_rel}" if url_doc_rel.startswith("/") else url_doc_rel
-
-                        # GET al detalle del documento
-                        res_doc = session.get(url_doc)
-                        soup_doc = BeautifulSoup(res_doc.text, "html.parser")
-
-                        download_elem = soup_doc.find("a", id="ContentPlaceHolder1_VerProvidencia1_DescargarProvideciaLinkButton")
-                        if not download_elem:
-                            raise Exception(f"Error al obtener datos de {self.source}: No se encontró el elemento de descarga. El sitio pudo haber cambiado su estructura o el formato de respuesta, informare al equipo de desarrollo para actualizar el scraper.")
-                        
-                        link_descarga = download_elem.get("href", '')
-                        
-                        fecha_elem = soup_doc.find("span", id="ContentPlaceHolder1_InfoProcesoProvidencia1_LblFECHAPROV")
-                        if not fecha_elem:
-                            raise Exception(f"Error al obtener datos de {self.source}: No se encontró el elemento de fecha. El sitio pudo haber cambiado su estructura o el formato de respuesta, informare al equipo de desarrollo para actualizar el scraper.")
-                        
-                        fecha_str = fecha_elem.text.split(",")[1].strip()
-                        fecha_dt = datetime.strptime(fecha_str, "%d de %B de %Y")
-
-                        if fecha_dt < fini_dt:
-                            stop = True
-                            break
-                        
-                        sala_desicion = soup_doc.find("span", id="ContentPlaceHolder1_InfoProcesoProvidencia1_InfoProceso1_LblSalaDecision").text.strip()
-                        proceso = soup_doc.find("span", id="ContentPlaceHolder1_InfoProcesoProvidencia1_InfoProceso1_LblClaseProceso").text.strip()
-                        fecha = fecha_dt.strftime("%Y%m%d")
-                        radicado = soup_doc.find("span", id="ContentPlaceHolder1_InfoProcesoProvidencia1_InfoProceso1_LblRadicado").text.strip()
-                        radicado_formateado = f"{radicado[:5]}-{radicado[5:7]}-{radicado[7:9]}-{radicado[9:12]}-{radicado[12:16]}-{radicado[16:21]}-{radicado[21:]}"
-                        interno = soup_doc.find("span", id="ContentPlaceHolder1_InfoProcesoProvidencia1_InfoProceso1_LblInterno").text.strip()
-
-                        proceso_safe = re.sub(r'[\\/*?:"<>|]', '-', proceso)
-                        interno_suffix = ('(' + interno[:60] + ')') if interno else ''
-
-                        doc = RawDocModel(
-                            source=self.source,
-                            link={"url":link_descarga, "method":"GET", "body": {"path": radicado}},
-                            title=radicado,
-                            tipo=soup_doc.find("span", id="ContentPlaceHolder1_InfoProcesoProvidencia1_LblTIPOPROVIDENCIA").text.strip(),
-                            f_public=fecha,
-                            save_path=f"downloads/{self.source}/{fecha[:4]}/{sala_desicion}/{proceso_safe}/{radicado_formateado}{interno_suffix}(extension)",
-                            convert_to="rtf",
-                        )
-                        docs.append(doc)
-                    except Exception as e:
-                        print(f"Error procesando documento {j}: {str(e)}")
-                        continue
-
-                if stop: break
-
-                btn_sig = localsoup.find("a", id="MainContent_ResultadoBusqueda1_PaginaSiguienteLinkButton")
-                if not btn_sig: break
-
-                # Detectar última página por el indicador "Página X de Y"
-                page_text = localsoup.get_text()
-                match = re.search(r'[Pp]ágina\s+(\d+)\s+de\s+(\d+)', page_text)
-                if match and match.group(1) == match.group(2):
-                    break
-
-                postback_sig = btn_sig.get("href")
-                v_sig = re.findall(r"'(.*?)'", postback_sig)
-                
-                data_pag = {
-                    **asp_data,
-                    "__ASYNCPOST": "true",
-                    "__EVENTTARGET": v_sig[0],
-                    "__EVENTARGUMENT": v_sig[1] if len(v_sig) > 1 else "",
-                    "ctl00$MainContent$ScriptManager1": f"ctl00$MainContent$PanelUpdate|{v_sig[0]}"
-                }
-
-                for _ in range(3):
-                    try:
-                        res_pag = session.post(self.url, data=data_pag, headers=headers)
-                        break
-                    except Exception:
-                        import time; time.sleep(3)
-                        session = requests.Session()
-                html_update, asp_data = parse_ajax_response(res_pag.text)
-                localsoup = BeautifulSoup(html_update, "html.parser")
-        
-            # Refrescar la página principal para el siguiente tribunal
-            res = session.get(self.url)
-            soup = BeautifulSoup(res.text, "html.parser")
-            botones_tribunales = soup.select("#MainContent_CorporacionesTitulanDataList input[type='submit']")
+                docs.extend(
+                    self._scrap_section(session2, s3, corp_code, corp_name, sec_code, sec_name,
+                                        fini_dt, ffin_dt, stop_event, on_progress)
+                )
+            except Exception as e:
+                if on_progress:
+                    on_progress(f"[Tribunales Administrativos] Error en {corp_name} / {sec_name}: {e}")
 
         return docs
+
+    def _scrap_section(self, session, soup3, corp_code, corp_name, sec_code, sec_name,
+                       fini_dt, ffin_dt, stop_event, on_progress):
+        sel_fechas = soup3.find("select", {"id": "MainContent_LstUEstados"})
+        if not sel_fechas:
+            return []
+
+        # Filter dates within [fini, ffin]
+        fechas_en_rango = []
+        for opt in sel_fechas.find_all("option"):
+            val = opt.get("value", "")
+            if not val:
+                continue
+            try:
+                dt = _parse_estado_date(val)
+                if fini_dt <= dt <= ffin_dt:
+                    fechas_en_rango.append((val, dt))
+            except Exception:
+                continue
+
+        if not fechas_en_rango:
+            return []
+
+        docs = []
+        for fecha_val, fecha_dt in fechas_en_rango:
+            if stop_event and stop_event.is_set():
+                break
+
+            try:
+                soup_chk = self._step4a_check_all(session, soup3, corp_code, sec_code, fecha_val)
+                html = self._step4b_consultar(session, soup_chk, corp_code, sec_code, fecha_val)
+
+                if "No hay resultados" in html:
+                    continue
+
+                soup4 = BeautifulSoup(html, "html.parser")
+                gv = soup4.find("table", {"id": "MainContent_GvProvidencias"})
+                if not gv:
+                    continue
+
+                estado_fecha_str = fecha_dt.strftime("%Y-%m-%d")
+
+                for row in gv.find_all("tr")[1:]:  # skip header
+                    doc = self._parse_row(row, corp_code, corp_name, sec_name, estado_fecha_str)
+                    if doc:
+                        docs.append(doc)
+
+                # Update soup3 for next fecha iteration (keep session alive)
+                soup3 = soup_chk
+
+            except Exception as e:
+                if on_progress:
+                    on_progress(f"[Tribunales Administrativos] Error fecha {fecha_val} en {sec_name}: {e}")
+
+        return docs
+
+    def _parse_row(self, row, corp_code, corp_name, sec_name, estado_fecha_str):
+        tds = row.find_all("td")
+        if len(tds) < 10:
+            return None
+
+        radicado = tds[1].get_text(strip=True)
+        ponente = tds[2].get_text(strip=True)
+        actuacion = tds[7].get_text(strip=True)
+        fecha_prov_raw = tds[6].get_text(strip=True)
+
+        fecha_prov = _parse_prov_date(fecha_prov_raw) or estado_fecha_str
+
+        jwt_url = self._extract_jwt_url(tds[9])
+        if not jwt_url:
+            return None
+
+        safe_corp = _safe(corp_name)
+        safe_sec = _safe(sec_name)
+        safe_ponente = _safe(ponente)
+        safe_radicado = _safe(radicado)
+
+        return RawDocModel(
+            source=corp_name,
+            link={"url": jwt_url, "method": "jwt_indirect", "body": {"path": f"{corp_code}_{radicado}"}},
+            title=radicado,
+            tipo=actuacion[:100],
+            f_public=fecha_prov,
+            save_path=f"downloads/{self.source}/{safe_corp}/{safe_sec}/{fecha_prov[:4]}/{safe_ponente}/{safe_radicado}(extension)",
+            convert_to="rtf",
+        )
+
+    @staticmethod
+    def _extract_jwt_url(td) -> Optional[str]:
+        """Extract VerProvidencia JWT URL from the btn-success onclick attribute."""
+        a = td.find("a", class_=lambda c: c and "btn-success" in c)
+        if not a:
+            return None
+        onclick = a.get("onclick", "")
+        m = re.search(r"CargarVentana\('(https?://[^']+)'\)", onclick, re.IGNORECASE)
+        return m.group(1) if m else None
