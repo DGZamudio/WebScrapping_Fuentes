@@ -40,10 +40,6 @@ CORTE_CONSTITUCIONAL_DOWNLOAD_URL = "https://www.corteconstitucional.gov.co/sent
 
 
 
-# Consejo de Estado
-CONSEJO_ESTADO_URL = "https://samai.consejodeestado.gov.co/TitulacionRelatoria/BuscadorProvidenciasTituladas.aspx"
-
-
 
 # Corte Suprema de Justicia
 CORTE_SUPREMA_URL = "https://consultaprovidenciasbk.cortesuprema.gov.co/api"
@@ -55,6 +51,9 @@ JEP_URL = "https://relatoria.jep.gov.co/listarProvidecias"
 JEP_DOWNLOAD_URL = "https://relatoria.jep.gov.co/"
 
 
+
+# Tribunales Administrativos
+SAMAI_URL = "https://samai.consejodeestado.gov.co/vistas/utiles/WEstados.aspx"
 
 # Tribunales Superiores
 TRIBUNALES_SUPERIORES_URL = "https://publicacionesprocesales.ramajudicial.gov.co/web/publicaciones-procesales/inicio"

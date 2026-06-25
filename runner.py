@@ -91,7 +91,7 @@ def run_scrapers(fini=None, ffin=None, on_new_doc=None, on_progress=None, on_sta
             if on_progress:
                 on_progress(f"Error scraping {scraper.source}: {e}")
 
-        results[scraper.source] = count
+        results[key] = count
         msg = f"Total de documentos descargados para {scraper.source}: {count}"
         if on_progress:
             on_progress(msg)

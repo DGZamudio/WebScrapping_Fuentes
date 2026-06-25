@@ -1,17 +1,20 @@
 import re
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 from typing import List, Optional
 
 import requests
 from bs4 import BeautifulSoup
 
+from config.config import SAMAI_URL
 from models.models import RawDocModel
 from scrappers.base import BaseScrapper
 
-_URL = "https://samai.consejodeestado.gov.co/vistas/utiles/WEstados.aspx"
+_URL = SAMAI_URL
 
-_TRIBUNALES = {
+_SAMAI_CORPS = {
+    "1100103": "Consejo de Estado",
     "0500123": "Tribunal Administrativo de Antioquia",
     "8100123": "Tribunal Administrativo de Arauca",
     "0800123": "Tribunal Administrativo del Atlántico",
@@ -76,17 +79,18 @@ class ScrapTribunales(BaseScrapper):
     def __init__(self, corp_code: str, corp_name: str):
         self._corp_code = corp_code
         self._corp_name = corp_name
+        self.source = corp_name
 
     def scrap(self, fini, ffin, q="", limit=1000, stop_event=None, on_progress=None) -> List[RawDocModel]:
         fini_dt = datetime.strptime(fini, "%Y-%m-%d")
         ffin_dt = datetime.strptime(ffin, "%Y-%m-%d")
         if on_progress:
-            on_progress(f"[Tribunales Administrativos] Procesando {self._corp_name}…")
+            on_progress(f"[SAMAI] Procesando {self._corp_name}…")
         try:
             return self._scrap_corp(self._corp_code, self._corp_name, fini_dt, ffin_dt, stop_event, on_progress)
         except Exception as e:
             if on_progress:
-                on_progress(f"[Tribunales Administrativos] Error en {self._corp_name}: {e}")
+                on_progress(f"[SAMAI] Error en {self._corp_name}: {e}")
             return []
 
     # ------------------------------------------------------------------ helpers
@@ -96,9 +100,22 @@ class ScrapTribunales(BaseScrapper):
         s.headers.update({"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"})
         return s
 
+    @staticmethod
+    def _fetch(fn, *args, **kwargs):
+        """Call fn(*args, **kwargs), retrying once after 5 s on Timeout."""
+        for attempt in range(2):
+            try:
+                res = fn(*args, **kwargs)
+                res.raise_for_status()
+                return res
+            except requests.exceptions.Timeout:
+                if attempt == 0:
+                    time.sleep(5)
+                    continue
+                raise
+
     def _step1_get(self, session):
-        res = session.get(_URL, timeout=30)
-        res.raise_for_status()
+        res = self._fetch(session.get, _URL, timeout=30)
         return BeautifulSoup(res.text, "html.parser")
 
     def _step2_select_corp(self, session, soup1, corp_code):
@@ -108,8 +125,7 @@ class ScrapTribunales(BaseScrapper):
             "ctl00$MainContent$ImgBuscar2.x": "10",
             "ctl00$MainContent$ImgBuscar2.y": "10",
         }
-        res = session.post(_URL, data=data, timeout=30)
-        res.raise_for_status()
+        res = self._fetch(session.post, _URL, data=data, timeout=30)
         return BeautifulSoup(res.text, "html.parser")
 
     def _step3_select_section(self, session, soup2, corp_code, sec_code):
@@ -120,8 +136,7 @@ class ScrapTribunales(BaseScrapper):
             "ctl00$MainContent$ImgBuscar3.x": "10",
             "ctl00$MainContent$ImgBuscar3.y": "10",
         }
-        res = session.post(_URL, data=data, timeout=30)
-        res.raise_for_status()
+        res = self._fetch(session.post, _URL, data=data, timeout=30)
         return BeautifulSoup(res.text, "html.parser")
 
     def _step4a_check_all(self, session, soup3, corp_code, sec_code, fecha_val):
@@ -138,12 +153,11 @@ class ScrapTribunales(BaseScrapper):
         data.pop("ctl00$MainContent$ImgBuscar2", None)
         data.pop("ctl00$MainContent$ImgBuscar3", None)
         data.pop("ctl00$MainContent$CmdBuscar", None)
-        res = session.post(_URL, data=data, timeout=30)
-        res.raise_for_status()
+        res = self._fetch(session.post, _URL, data=data, timeout=30)
         return BeautifulSoup(res.text, "html.parser")
 
     def _step4b_consultar(self, session, soup_chk, corp_code, sec_code, fecha_val):
-        """Submit CmdBuscar with ChkSeccion checked. Retries once on timeout."""
+        """Submit CmdBuscar with ChkSeccion checked."""
         data = {
             **_all_inputs(soup_chk),
             "ctl00$MainContent$LstCorpHabilitada": corp_code,
@@ -156,16 +170,7 @@ class ScrapTribunales(BaseScrapper):
         }
         data.pop("ctl00$MainContent$ImgBuscar2", None)
         data.pop("ctl00$MainContent$ImgBuscar3", None)
-        for attempt in range(2):
-            try:
-                res = session.post(_URL, data=data, timeout=120)
-                res.raise_for_status()
-                return res.text
-            except requests.exceptions.Timeout:
-                if attempt == 0:
-                    time.sleep(5)
-                    continue
-                raise
+        return self._fetch(session.post, _URL, data=data, timeout=120).text
 
     # ------------------------------------------------------------------ scraping
 
@@ -180,24 +185,32 @@ class ScrapTribunales(BaseScrapper):
 
         secciones = [(o.get("value", ""), o.text.strip()) for o in sel_sec.find_all("option") if o.get("value")]
 
-        docs = []
-        for sec_code, sec_name in secciones:
-            if stop_event and stop_event.is_set():
-                break
+        def _process_section(sec_code, sec_name):
             try:
-                # Fresh session state per section
-                session2 = self._new_session()
-                s1 = self._step1_get(session2)
-                s2 = self._step2_select_corp(session2, s1, corp_code)
-                s3 = self._step3_select_section(session2, s2, corp_code, sec_code)
-
-                docs.extend(
-                    self._scrap_section(session2, s3, corp_code, corp_name, sec_code, sec_name,
-                                        fini_dt, ffin_dt, stop_event, on_progress)
-                )
+                s = self._new_session()
+                s1 = self._step1_get(s)
+                s2 = self._step2_select_corp(s, s1, corp_code)
+                s3 = self._step3_select_section(s, s2, corp_code, sec_code)
+                return self._scrap_section(s, s3, corp_code, corp_name, sec_code, sec_name,
+                                           fini_dt, ffin_dt, stop_event, on_progress)
             except Exception as e:
                 if on_progress:
-                    on_progress(f"[Tribunales Administrativos] Error en {corp_name} / {sec_name}: {e}")
+                    on_progress(f"[{corp_name}] Error en {sec_name}: {e}")
+                return []
+
+        docs = []
+        with ThreadPoolExecutor(max_workers=4) as executor:
+            futures = {
+                executor.submit(_process_section, sec_code, sec_name): sec_name
+                for sec_code, sec_name in secciones
+            }
+            for future in as_completed(futures):
+                if stop_event and stop_event.is_set():
+                    break
+                try:
+                    docs.extend(future.result())
+                except Exception:
+                    pass
 
         return docs
 
@@ -247,12 +260,9 @@ class ScrapTribunales(BaseScrapper):
                     if doc:
                         docs.append(doc)
 
-                # Update soup3 for next fecha iteration (keep session alive)
-                soup3 = soup_chk
-
             except Exception as e:
                 if on_progress:
-                    on_progress(f"[Tribunales Administrativos] Error fecha {fecha_val} en {sec_name}: {e}")
+                    on_progress(f"[SAMAI] Error fecha {fecha_val} en {sec_name}: {e}")
 
         return docs
 
@@ -276,15 +286,16 @@ class ScrapTribunales(BaseScrapper):
         safe_sec = _safe(sec_name)
         safe_ponente = _safe(ponente)
         safe_radicado = _safe(radicado)
+        safe_actuacion = _safe(actuacion)
 
         return RawDocModel(
             source=corp_name,
-            link={"url": jwt_url, "method": "jwt_indirect", "body": {"path": f"{corp_code}_{radicado}"}},
+            link={"url": jwt_url, "method": "jwt_indirect", "body": {"path": f"{corp_code}_{radicado}_{actuacion[:100]}"}},
             title=radicado,
             tipo=actuacion[:100],
             f_public=fecha_prov,
-            save_path=f"downloads/{self.source}/{safe_corp}/{safe_sec}/{fecha_prov[:4]}/{safe_ponente}/{safe_radicado}(extension)",
-            convert_to="rtf",
+            save_path=f"downloads/{safe_corp}/{safe_sec}/{fecha_prov[:4]}/{safe_ponente}/{safe_radicado}_{safe_actuacion}(extension)",
+            convert_to="rtf_word",
         )
 
     @staticmethod

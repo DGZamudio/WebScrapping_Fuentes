@@ -3,16 +3,16 @@ from tkinter import ttk
 from pathlib import Path
 import json
 
-from scrappers import SCRAPERS, discover_tribunales
+from scrappers import SCRAPERS
 from ui.theme import COLORS, FONTS
 
 SETTINGS_PATH = Path("config") / "settings.json"
 
 
 class _CollapsibleSection(tk.Frame):
-    """Collapsible group row used for Tribunales Administrativos."""
+    """Collapsible group row for grouping related sources."""
 
-    def __init__(self, parent, text, count, bg=COLORS["card"], **kwargs):
+    def __init__(self, parent, text, count, label="fuentes", bg=COLORS["card"], **kwargs):
         super().__init__(parent, bg=bg, **kwargs)
         self._bg = bg
         self._expanded = False
@@ -33,7 +33,7 @@ class _CollapsibleSection(tk.Frame):
         ).pack(side="left")
 
         tk.Label(
-            hdr, text=f"{count} tribunales",
+            hdr, text=f"{count} {label}",
             bg=bg, fg=COLORS["text_muted"], font=FONTS["caption"],
         ).pack(side="left", padx=(8, 0), pady=(1, 0))
 
@@ -125,15 +125,17 @@ class SettingsView(tk.Frame):
         chk_body = tk.Frame(card, bg=COLORS["card"])
         chk_body.pack(fill="both", expand=True, padx=20, pady=(12, 0))
 
-        try:
-            discover_tribunales()
-        except Exception as e:
-            print(f"Error discovering tribunales: {e}")
 
-        tribunales = {}
+        trib_adm = {}
+        trib_sup = {}
         others = {}
         for src in SCRAPERS:
-            (tribunales if src.startswith("Tribunal Administrativo") else others)[src] = SCRAPERS[src]
+            if src.startswith("Tribunal Administrativo"):
+                trib_adm[src] = SCRAPERS[src]
+            elif src.startswith("Tribunal Superior"):
+                trib_sup[src] = SCRAPERS[src]
+            else:
+                others[src] = SCRAPERS[src]
 
         # Non-tribunal sources
         for src in others:
@@ -142,20 +144,41 @@ class SettingsView(tk.Frame):
             self.source_vars[src] = var
             self._all_vars.append(var)
 
-        # Tribunales collapsible
-        if tribunales:
+        # Tribunales Administrativos collapsible
+        if trib_adm:
             tk.Frame(chk_body, bg=COLORS["card_border"], height=1).pack(
                 fill="x", pady=(10, 4)
             )
             section = _CollapsibleSection(
                 chk_body,
                 text="Tribunales Administrativos",
-                count=len(tribunales),
+                count=len(trib_adm),
+                label="tribunales",
                 bg=COLORS["card"],
             )
             section.pack(fill="x")
 
-            for src in sorted(tribunales):
+            for src in sorted(trib_adm):
+                var = tk.BooleanVar(value=True)
+                self._add_checkbox(section.content, src, var, indent=True)
+                self.source_vars[src] = var
+                self._all_vars.append(var)
+
+        # Tribunales Superiores collapsible
+        if trib_sup:
+            tk.Frame(chk_body, bg=COLORS["card_border"], height=1).pack(
+                fill="x", pady=(10, 4)
+            )
+            section = _CollapsibleSection(
+                chk_body,
+                text="Tribunales Superiores",
+                count=len(trib_sup),
+                label="tribunales",
+                bg=COLORS["card"],
+            )
+            section.pack(fill="x")
+
+            for src in sorted(trib_sup):
                 var = tk.BooleanVar(value=True)
                 self._add_checkbox(section.content, src, var, indent=True)
                 self.source_vars[src] = var

@@ -34,6 +34,14 @@ def _parse_date(text: str):
     return None
 
 
+def _format_radicado(numero_unico: str) -> str:
+    """'05001250200020210021501' → '05001-25-02-000-2021-00215-01'"""
+    n = numero_unico.replace("/", "").replace("-", "").replace("\\", "")
+    if len(n) != 23:
+        return n
+    return f"{n[0:5]}-{n[5:7]}-{n[7:9]}-{n[9:12]}-{n[12:16]}-{n[16:21]}-{n[21:23]}"
+
+
 def _radicado_year(numero_unico: str):
     if len(numero_unico) >= 16:
         year = numero_unico[12:16]
@@ -124,6 +132,8 @@ class ScrapCNDJ(BaseScrapper):
                     all_rows[numero_unico] = (magistrado, decision_text, numero_ficha)
 
         # 3. Filtrar por fecha y obtener archivo desde endpoint de detalle
+        years_in_range = {str(y) for y in range(int(fini[:4]), int(ffin[:4]) + 1)}
+
         detail_headers = {
             "Content-Type": "application/json",
             "RequestVerificationToken": token,
@@ -131,6 +141,11 @@ class ScrapCNDJ(BaseScrapper):
 
         docs = []
         for numero_unico, (magistrado, decision_text, numero_ficha) in all_rows.items():
+            # Pre-filtro por año: descarta filas donde ningún año del rango aparezca
+            # en el texto de decisión ni en el número único (simula búsqueda DataTables)
+            if not any(y in decision_text or y in numero_unico for y in years_in_range):
+                continue
+
             f_public = _parse_date(decision_text) or _radicado_year(numero_unico) or fini
 
             if f_public < fini or f_public > ffin:
@@ -155,7 +170,7 @@ class ScrapCNDJ(BaseScrapper):
             url = f"{CNDJ_DOWNLOAD_URL}{archivo}.pdf"
             dedup_key = f"{numero_unico}_{numero_ficha}"
             magistrado_fmt = magistrado.title()
-            safe_num = numero_unico.replace("/", "-").replace("\\", "-")
+            safe_num = "F" + _format_radicado(numero_unico) + f"_{f_public[:4]}"
             path = (
                 f"downloads/{self.source}/{magistrado_fmt}/{f_public}/{safe_num}(extension)"
             )

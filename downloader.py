@@ -74,16 +74,28 @@ class WordConverter:
 
 class Downloader:
     def __init__(self):
-        self._word_converter = None
+        self._word_converter = WordConverter()
 
     def _convert(self, out_path: Path, target_format: str) -> Path:
-        if target_format != "rtf":
+        if target_format == "rtf_word":
+            # Word COM first, pypdf fallback
+            try:
+                return self._word_converter.convert(out_path, "rtf")
+            except Exception as word_err:
+                logging.warning(f"WordConverter fallo ({out_path.name}): {word_err}. Usando pypdf fallback.")
+                try:
+                    return _pdf_to_rtf_fallback(out_path)
+                except Exception as e:
+                    logging.warning(f"No se pudo convertir a RTF ({out_path.name}): {e}")
+                    return out_path
+        elif target_format == "rtf":
+            try:
+                return _pdf_to_rtf_fallback(out_path)
+            except Exception as e:
+                logging.warning(f"No se pudo convertir a RTF ({out_path.name}): {e}")
+                return out_path  # keep PDF if conversion fails
+        else:
             raise ValueError(f"Formato no soportado: {target_format}")
-        try:
-            return _pdf_to_rtf_fallback(out_path)
-        except Exception as e:
-            logging.warning(f"No se pudo convertir a RTF ({out_path.name}): {e}")
-            return out_path  # keep PDF if conversion fails
 
     @staticmethod
     def _resolve_jwt_indirect(jwt_url: str, headers: dict) -> requests.Response:

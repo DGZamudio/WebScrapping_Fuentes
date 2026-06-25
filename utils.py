@@ -88,30 +88,3 @@ def generate_excel_report(path: str, rows: list[dict], title: str = "Inventario"
     
     # Save workbook
     wb.save(path)
-
-
-def get_asp_data(soup):
-    viewstate = soup.select_one("input[name='__VIEWSTATE']")["value"]    
-    eventvalidation = soup.select_one("input[name='__EVENTVALIDATION']")["value"]
-    viewstate_generator = soup.select_one("input[name='__VIEWSTATEGENERATOR']")["value"] # Datos asp.net
-
-    return {"__VIEWSTATE":viewstate, "__EVENTVALIDATION":eventvalidation, "__VIEWSTATEGENERATOR":viewstate_generator}
-
-def parse_ajax_response(response_text):
-    # El formato AJAX de ASP.NET es: longitud|tipo|id|contenido|
-    # Queremos el contenido que pertenece al updatePanel
-    partes = response_text.split('|')
-    
-    # Buscamos el ViewState nuevo que SIEMPRE cambia en el POST
-    new_asp_data = {}
-    for i in range(len(partes)):
-        if partes[i] in ["__VIEWSTATE", "__EVENTVALIDATION", "__VIEWSTATEGENERATOR"]:
-            new_asp_data[partes[i]] = partes[i+1]
-            
-    # Intentamos extraer el HTML del bloque 'updatePanel'
-    html_content = ""
-    if "updatePanel" in partes:
-        idx = partes.index("updatePanel")
-        html_content = partes[idx + 2] # El HTML suele estar 2 posiciones después
-        
-    return html_content, new_asp_data

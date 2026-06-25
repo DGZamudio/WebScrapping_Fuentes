@@ -46,7 +46,7 @@ class Memory:
         department — each tribunal's corp_code starts with the departmental DANE code.
         Bogotá DC (dept 11) is also mapped to Cundinamarca's tribunal (corp_code 2500023).
         """
-        from scrappers.tribunales import _TRIBUNALES
+        from scrappers.samai import _SAMAI_CORPS as _TRIBUNALES
 
         # Build dept-prefix → tribunal-name mapping
         prefix_map = {}
@@ -134,19 +134,25 @@ class Memory:
         collapsed into one parent row with the individual breakdown as children.
         """
         flat = self.get_counts_by_source()
-        tribunal_children = []
+        adm_children = []
+        sup_children = []
         singles = []
 
         for source, count in flat:
             if source.startswith("Tribunal Administrativo"):
-                tribunal_children.append((source, count))
+                adm_children.append((source, count))
+            elif source.startswith("Tribunal Superior"):
+                sup_children.append((source, count))
             else:
                 singles.append((source, count, []))
 
         result = list(singles)
-        if tribunal_children:
-            total = sum(c for _, c in tribunal_children)
-            result.append(("Tribunales Administrativos", total, tribunal_children))
+        if adm_children:
+            total = sum(c for _, c in adm_children)
+            result.append(("Tribunales Administrativos", total, adm_children))
+        if sup_children:
+            total = sum(c for _, c in sup_children)
+            result.append(("Tribunales Superiores", total, sup_children))
 
         result.sort(key=lambda x: -x[1])
         return result

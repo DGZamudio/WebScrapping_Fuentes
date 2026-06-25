@@ -1,6 +1,7 @@
 import re
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import List
-from bs4 import BeautifulSoup, Comment
+from bs4 import BeautifulSoup
 import requests
 from config.config import TRIBUNALES_SUPERIORES_URL
 from models.models import RawDocModel
@@ -15,17 +16,63 @@ _TIPOS_PERMITIDOS = {
     "Sentencias",
     "Autos masivo",
 }
+_DETAIL_WORKERS = 5
+
+_SUPERIORES_DEPTS = {
+    "05": "Tribunal Superior de Antioquia",
+    "08": "Tribunal Superior del Atlántico",
+    "11": "Tribunal Superior de Bogotá",
+    "13": "Tribunal Superior de Bolívar",
+    "15": "Tribunal Superior de Boyacá",
+    "17": "Tribunal Superior de Caldas",
+    "18": "Tribunal Superior del Caquetá",
+    "19": "Tribunal Superior del Cauca",
+    "20": "Tribunal Superior del Cesar",
+    "23": "Tribunal Superior de Córdoba",
+    "25": "Tribunal Superior de Cundinamarca",
+    "27": "Tribunal Superior del Chocó",
+    "41": "Tribunal Superior del Huila",
+    "44": "Tribunal Superior de la Guajira",
+    "47": "Tribunal Superior del Magdalena",
+    "50": "Tribunal Superior del Meta",
+    "52": "Tribunal Superior de Nariño",
+    "54": "Tribunal Superior de Norte de Santander",
+    "63": "Tribunal Superior del Quindío",
+    "66": "Tribunal Superior de Risaralda",
+    "68": "Tribunal Superior de Santander",
+    "70": "Tribunal Superior de Sucre",
+    "73": "Tribunal Superior del Tolima",
+    "76": "Tribunal Superior del Valle del Cauca",
+    "81": "Tribunal Superior de Arauca",
+    "85": "Tribunal Superior de Casanare",
+    "86": "Tribunal Superior del Putumayo",
+    "88": "Tribunal Superior de San Andrés",
+    "91": "Tribunal Superior del Amazonas",
+    "94": "Tribunal Superior de Guainía",
+    "95": "Tribunal Superior del Guaviare",
+    "97": "Tribunal Superior del Vaupés",
+    "99": "Tribunal Superior del Vichada",
+}
 
 
 class ScrapTribunalesSuperiores(BaseScrapper):
-    def __init__(self):
-        self.source = "Tribunales Superiores"
+    def __init__(self, dept_code: str = "", dept_name: str = "Tribunales Superiores"):
+        self.source = dept_name
         self.url = TRIBUNALES_SUPERIORES_URL
+        self._dept_code = dept_code
         self._instance_id = None
 
     def _get_instance_id(self, session, headers):
-        html = session.get(self.url, headers=headers).text
-        match = re.search(rf'p_p_id_{_PORTLET}_([A-Za-z0-9]+)_', html)
+        for attempt in range(3):
+            try:
+                resp = session.get(self.url, headers=headers, timeout=60)
+                if resp.status_code < 500:
+                    break
+            except requests.exceptions.Timeout:
+                if attempt == 2:
+                    raise
+        resp.raise_for_status()
+        match = re.search(rf'p_p_id_{_PORTLET}_([A-Za-z0-9]+)_', resp.text)
         if not match:
             raise Exception(
                 "No se encontró instance_id. El sitio puede haber cambiado su estructura."
@@ -35,18 +82,23 @@ class ScrapTribunalesSuperiores(BaseScrapper):
     def _p(self, key):
         return f"_{_PORTLET}_{self._instance_id}_{key}"
 
-    def _get_detail_files(self, session, headers, detail_url):
+    def _fetch_detail(self, headers, detail_url):
+        """Fetch a detail page in its own session (thread-safe) and return file list."""
+        s = requests.Session()
         for attempt in range(3):
             try:
-                resp = session.get(detail_url, headers=headers, timeout=60)
+                resp = s.get(detail_url, headers=headers, timeout=60)
                 if resp.status_code < 500:
                     break
             except requests.exceptions.Timeout:
                 if attempt == 2:
-                    raise
-        resp.raise_for_status()
-        soup = BeautifulSoup(resp.text, "html.parser")
+                    return []
+        try:
+            resp.raise_for_status()
+        except Exception:
+            return []
 
+        soup = BeautifulSoup(resp.text, "html.parser")
         files = []
         table = soup.find("table", id=re.compile(r"tabla-docs"))
         if not table:
@@ -96,6 +148,8 @@ class ScrapTribunalesSuperiores(BaseScrapper):
                 self._p("resetCur"): "false",
                 self._p("cur"): num_pag,
             }
+            if self._dept_code:
+                params[self._p("idDepto")] = self._dept_code
 
             for attempt in range(3):
                 try:
@@ -119,15 +173,15 @@ class ScrapTribunalesSuperiores(BaseScrapper):
             tbody = soup.find("tbody", {"class": "table-data"})
             if not tbody:
                 break
-
             rows = tbody.find_all("tr")
             if not rows:
                 break
 
+            # Parse row metadata first, then fetch all detail pages in parallel
+            pending = []
             for row in rows:
                 if stop_event is not None and stop_event.is_set():
                     return docs
-
                 try:
                     title_tag = row.find("div", class_="titulo-publicacion")
                     if not title_tag:
@@ -135,7 +189,6 @@ class ScrapTribunalesSuperiores(BaseScrapper):
                     a_tag = title_tag.find("a")
                     if not a_tag:
                         continue
-                    title = a_tag.text.strip()
 
                     fecha_p_tag = row.find("p", class_="publish-date")
                     if not fecha_p_tag:
@@ -149,7 +202,7 @@ class ScrapTribunalesSuperiores(BaseScrapper):
                             k, v = text.split(":", 1)
                             categorias[k.strip()] = v.strip()
 
-                    tipo         = categorias.get("Tipo de publicación", "")
+                    tipo = categorias.get("Tipo de publicación", "")
                     if tipo not in _TIPOS_PERMITIDOS:
                         continue
 
@@ -162,23 +215,36 @@ class ScrapTribunalesSuperiores(BaseScrapper):
                     if not detail_url:
                         continue
 
-                    if on_progress:
-                        on_progress(f"[Tribunales Superiores] Leyendo detalle: {title}")
+                    pending.append((fecha_p, tipo, tipo_dir, especialidad, despacho_dir, detail_url))
+                except Exception as e:
+                    print(f"Error procesando fila: {e}")
+                    continue
 
-                    archivos = self._get_detail_files(session, headers, detail_url)
-                    if not archivos:
+            if on_progress and pending:
+                on_progress(f"[{self.source}] Obteniendo {len(pending)} detalles en paralelo…")
+
+            with ThreadPoolExecutor(max_workers=_DETAIL_WORKERS) as executor:
+                future_to_meta = {
+                    executor.submit(self._fetch_detail, headers, item[-1]): item
+                    for item in pending
+                }
+                for future in as_completed(future_to_meta):
+                    if stop_event is not None and stop_event.is_set():
+                        return docs
+                    fecha_p, tipo, tipo_dir, especialidad, despacho_dir, _ = future_to_meta[future]
+                    try:
+                        archivos = future.result()
+                    except Exception:
                         continue
 
                     for filename, download_url, file_uuid in archivos:
                         name_no_ext = (filename.rsplit(".", 1)[0] if "." in filename else filename).strip()
                         doc_name = _INVALID_PATH_CHARS.sub("-", name_no_ext)
-
                         save_path = (
                             f"downloads/{self.source}/{tipo_dir}"
                             f"/{especialidad}/{despacho_dir}/{fecha_p}/{doc_name}(extension)"
                         )
-
-                        doc = RawDocModel(
+                        docs.append(RawDocModel(
                             source=self.source,
                             link={"url": download_url, "method": "GET", "body": {"path": file_uuid}},
                             title=name_no_ext,
@@ -186,12 +252,7 @@ class ScrapTribunalesSuperiores(BaseScrapper):
                             f_public=fecha_p,
                             save_path=save_path,
                             convert_to="rtf",
-                        )
-                        docs.append(doc)
-
-                except Exception as e:
-                    print(f"Error procesando fila: {e}")
-                    continue
+                        ))
 
             if num_pag >= max_pages:
                 break
