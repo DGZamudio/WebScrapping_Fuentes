@@ -1,4 +1,4 @@
-import tkinter as tk
+import customtkinter as ctk
 
 from ui.dashboard import DashBoard
 from ui.theme import COLORS
@@ -8,17 +8,17 @@ from .stats_view import StatsView
 from .status_bar import StatusBar
 
 
-class App(tk.Tk):
+class App(ctk.CTk):
     def __init__(self):
         super().__init__()
         self.title("IURISYNC — Descarga Automática de Documentos Legales")
         self.geometry("1100x700")
         self.minsize(920, 600)
         self.state("zoomed")
-        self.configure(bg=COLORS["sidebar"])
+        self.configure(fg_color=COLORS["sidebar"])
 
         # Main container: sidebar | content
-        self.container = tk.Frame(self, bg=COLORS["bg"])
+        self.container = ctk.CTkFrame(self, fg_color=COLORS["bg"], corner_radius=0)
         self.container.pack(side="top", fill="both", expand=True)
         self.container.grid_rowconfigure(0, weight=1)
         self.container.grid_columnconfigure(1, weight=1)
@@ -26,7 +26,7 @@ class App(tk.Tk):
         self.nav = NavMenu(self.container, controller=self)
         self.nav.grid(row=0, column=0, sticky="nsew")
 
-        self.content_area = tk.Frame(self.container, bg=COLORS["bg"])
+        self.content_area = ctk.CTkFrame(self.container, fg_color=COLORS["bg"], corner_radius=0)
         self.content_area.grid(row=0, column=1, sticky="nsew")
         self.content_area.grid_rowconfigure(0, weight=1)
         self.content_area.grid_columnconfigure(0, weight=1)
