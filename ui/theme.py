@@ -1,3 +1,8 @@
+import customtkinter as ctk
+
+ctk.set_appearance_mode("light")
+ctk.set_default_color_theme("blue")
+
 COLORS = {
     # Sidebar
     "sidebar":             "#1a2332",
@@ -74,3 +79,6 @@ FONTS = {
 }
 
 NAV_WIDTH = 220
+
+CORNER_RADIUS = 8
+BORDER_WIDTH = 1
