@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>IURISYNC Analytics</title>
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js" charset="utf-8"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#1e2130;color:#e2e8f0;font-family:system-ui,-apple-system,sans-serif;min-height:100vh;padding-bottom:32px}
+header{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;background:#252b3b;border-bottom:1px solid #2d3655;position:sticky;top:0;z-index:10}
+header h1{font-size:1.15rem;font-weight:700;letter-spacing:.02em}
+header h1 span{color:#4f8ef7}
+.btn{background:#4f8ef7;color:#fff;border:none;padding:8px 18px;border-radius:6px;font-size:.875rem;font-weight:600;cursor:pointer;transition:opacity .15s}
+.btn:hover{opacity:.85}
+.btn-sec{background:#2d3655}
+
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;padding:20px 24px 4px}
+.kpi-card{background:#252b3b;border-radius:10px;padding:18px 22px;border-left:4px solid #4f8ef7}
+.kpi-card.warn{border-left-color:#f59e0b}
+.kpi-card.ok{border-left-color:#22c55e}
+.kpi-value{font-size:2.1rem;font-weight:800;color:#fff;line-height:1}
+.kpi-label{font-size:.75rem;color:#94a3b8;margin-top:8px;text-transform:uppercase;letter-spacing:.07em}
+.kpi-sub{font-size:.72rem;color:#64748b;margin-top:3px}
+
+.filtros{display:flex;align-items:flex-end;gap:14px;padding:18px 24px;flex-wrap:wrap;background:#1e2130}
+.filtros .fg{display:flex;flex-direction:column;gap:4px}
+.filtros label{font-size:.75rem;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em}
+.filtros select,.filtros input[type=date]{background:#252b3b;border:1px solid #2d3655;color:#e2e8f0;padding:7px 12px;border-radius:6px;font-size:.875rem;min-width:180px}
+.filtros input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1)}
+
+.card{background:#252b3b;border-radius:10px;padding:20px 24px;margin:0 24px 20px}
+.card h2{font-size:.78rem;font-weight:700;color:#64748b;margin-bottom:14px;text-transform:uppercase;letter-spacing:.08em}
+.row2{display:grid;grid-template-columns:1.5fr 1fr;gap:20px;padding:0 24px 20px}
+.row2 .card{margin:0}
+
+.tbl{width:100%;border-collapse:collapse;font-size:.875rem}
+.tbl th{text-align:left;color:#64748b;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;padding:8px 12px;border-bottom:1px solid #2d3655}
+.tbl td{padding:10px 12px;border-bottom:1px solid #1e2130}
+.tbl tr:last-child td{border-bottom:none}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:600}
+.badge.activa{background:#14532d;color:#4ade80}
+.badge.inactiva{background:#4c0519;color:#f87171}
+
+#overlay{position:fixed;inset:0;background:rgba(30,33,48,.85);display:flex;align-items:center;justify-content:center;font-size:1rem;color:#94a3b8;z-index:100;transition:opacity .2s}
+#overlay.oculto{opacity:0;pointer-events:none}
+.sin-datos{color:#475569;padding:20px;font-size:.875rem}
+</style>
+</head>
+<body>
+
+<div id="overlay">Cargando datos...</div>
+
+<header>
+  <h1>&#128202; IURISYNC <span>Analytics</span></h1>
+  <button class="btn" onclick="cargarDatos()">&#8635; Actualizar</button>
+</header>
+
+<!-- KPIs -->
+<div class="kpi-row">
+  <div class="kpi-card" id="card-total">
+    <div class="kpi-value" id="kv-total">&#8212;</div>
+    <div class="kpi-label">Total documentos</div>
+  </div>
+  <div class="kpi-card ok" id="card-semana">
+    <div class="kpi-value" id="kv-semana">&#8212;</div>
+    <div class="kpi-label">Esta semana</div>
+  </div>
+  <div class="kpi-card" id="card-fuentes">
+    <div class="kpi-value" id="kv-fuentes">&#8212;</div>
+    <div class="kpi-label">Fuentes activas (7 días)</div>
+    <div class="kpi-sub" id="ks-fuentes"></div>
+  </div>
+  <div class="kpi-card" id="card-drive">
+    <div class="kpi-value" id="kv-drive">&#8212;</div>
+    <div class="kpi-label">Sincronizado en Drive</div>
+  </div>
+</div>
+
+<!-- Filtros -->
+<div class="filtros">
+  <div class="fg">
+    <label>Fuente</label>
+    <select id="f-fuente"><option value="">Todas</option></select>
+  </div>
+  <div class="fg">
+    <label>Desde</label>
+    <input type="date" id="f-desde">
+  </div>
+  <div class="fg">
+    <label>Hasta</label>
+    <input type="date" id="f-hasta">
+  </div>
+  <button class="btn" style="align-self:flex-end" onclick="cargarDatos()">Aplicar</button>
+  <button class="btn btn-sec" style="align-self:flex-end" onclick="limpiar()">Limpiar</button>
+</div>
+
+<!-- Actividad diaria -->
+<div class="card" style="margin-top:4px">
+  <h2>Actividad diaria &#8212; últimos 30 días</h2>
+  <div id="chart-actividad" style="height:220px"></div>
+</div>
+
+<!-- Volumen + Estado -->
+<div class="row2">
+  <div class="card">
+    <h2>Volumen mensual por fuente</h2>
+    <div id="chart-volumen" style="height:300px"></div>
+  </div>
+  <div class="card">
+    <h2>Estado de fuentes</h2>
+    <div id="tabla-estado" style="overflow-y:auto;max-height:300px"></div>
+  </div>
+</div>
+
+<!-- Top tipos -->
+<div class="card">
+  <h2>Top tipos de documento</h2>
+  <div id="chart-tipos" style="height:320px"></div>
+</div>
+
+<script>
+const LAYOUT = {
+  paper_bgcolor:'#252b3b', plot_bgcolor:'#1e2130',
+  font:{color:'#94a3b8',family:'system-ui',size:11},
+  margin:{t:8,r:16,b:48,l:16},
+  xaxis:{gridcolor:'#2d3655',zerolinecolor:'#2d3655'},
+  yaxis:{gridcolor:'#2d3655',zerolinecolor:'#2d3655'},
+};
+const CFG = {displayModeBar:false, responsive:true};
+
+function cargarDatos() {
+  const p = new URLSearchParams();
+  const fuente = document.getElementById('f-fuente').value;
+  const desde  = document.getElementById('f-desde').value;
+  const hasta  = document.getElementById('f-hasta').value;
+  if (fuente) p.set('fuente', fuente);
+  if (desde)  p.set('desde',  desde);
+  if (hasta)  p.set('hasta',  hasta);
+
+  document.getElementById('overlay').classList.remove('oculto');
+
+  fetch('/api/datos?' + p)
+    .then(r => r.json())
+    .then(d => {
+      poblarFuentes(d.fuentes || []);
+      renderKPIs(d.kpis || {});
+      renderActividad(d.actividad_diaria || []);
+      renderVolumen(d.volumen_mensual || {});
+      renderTipos(d.top_tipos || []);
+      renderEstado(d.estado_fuentes || []);
+      document.getElementById('overlay').classList.add('oculto');
+    })
+    .catch(e => {
+      console.error(e);
+      document.getElementById('overlay').classList.add('oculto');
+    });
+}
+
+function poblarFuentes(lista) {
+  const sel = document.getElementById('f-fuente');
+  const actual = sel.value;
+  sel.innerHTML = '<option value="">Todas</option>';
+  lista.forEach(f => {
+    const o = document.createElement('option');
+    o.value = f; o.textContent = f;
+    if (f === actual) o.selected = true;
+    sel.appendChild(o);
+  });
+}
+
+function limpiar() {
+  document.getElementById('f-fuente').value = '';
+  document.getElementById('f-desde').value  = '';
+  document.getElementById('f-hasta').value  = '';
+  cargarDatos();
+}
+
+function fmt(n) { return (n ?? 0).toLocaleString('es-CO'); }
+
+function renderKPIs(k) {
+  document.getElementById('kv-total').textContent   = fmt(k.total);
+  document.getElementById('kv-semana').textContent  = fmt(k.esta_semana);
+  document.getElementById('kv-fuentes').textContent = k.fuentes_activas ?? '—';
+  document.getElementById('ks-fuentes').textContent =
+    k.fuentes_total ? 'de ' + k.fuentes_total + ' totales' : '';
+
+  const driveV = document.getElementById('kv-drive');
+  const driveC = document.getElementById('card-drive');
+  if (k.pct_drive !== null && k.pct_drive !== undefined) {
+    driveV.textContent = k.pct_drive + '%';
+    driveC.className = 'kpi-card ' + (k.pct_drive >= 80 ? 'ok' : 'warn');
+  } else {
+    driveV.textContent = 'N/D';
+    driveC.className = 'kpi-card';
+  }
+  const semC = document.getElementById('card-semana');
+  semC.className = 'kpi-card ' + (k.esta_semana > 0 ? 'ok' : 'warn');
+}
+
+function renderActividad(rows) {
+  if (!rows.length) {
+    document.getElementById('chart-actividad').innerHTML = '<p class="sin-datos">Sin datos en el período</p>';
+    return;
+  }
+  Plotly.react('chart-actividad', [{
+    type:'bar', x:rows.map(r=>r.fecha), y:rows.map(r=>r.total),
+    marker:{color: rows.map(r => r.total === 0 ? '#7f1d1d' : '#4f8ef7')},
+    hovertemplate:'<b>%{x}</b><br>%{y} documentos<extra></extra>',
+  }], {
+    ...LAYOUT,
+    xaxis:{...LAYOUT.xaxis, tickangle:-30},
+    margin:{t:8,r:16,b:52,l:40},
+  }, CFG);
+}
+
+function renderVolumen(vol) {
+  if (!vol.meses || !vol.meses.length) {
+    document.getElementById('chart-volumen').innerHTML = '<p class="sin-datos">Sin datos de Sheets disponibles</p>';
+    return;
+  }
+  const traces = Object.entries(vol.series).map(([fuente, vals]) => ({
+    type:'bar', name:fuente, x:vol.meses, y:vals,
+    hovertemplate:'<b>' + fuente + '</b><br>%{x}: %{y} docs<extra></extra>',
+  }));
+  Plotly.react('chart-volumen', traces, {
+    ...LAYOUT,
+    barmode:'stack',
+    legend:{font:{size:9}, bgcolor:'#1e2130', orientation:'h', y:-0.22},
+    xaxis:{...LAYOUT.xaxis, tickangle:-30},
+    margin:{t:8,r:16,b:90,l:40},
+  }, CFG);
+}
+
+function renderTipos(tipos) {
+  if (!tipos.length) {
+    document.getElementById('chart-tipos').innerHTML = '<p class="sin-datos">Sin datos de Sheets disponibles</p>';
+    return;
+  }
+  const labels = tipos.map(t => t.tipo.length > 35 ? t.tipo.slice(0,34)+'…' : t.tipo);
+  Plotly.react('chart-tipos', [{
+    type:'bar', orientation:'h',
+    x:tipos.map(t=>t.total), y:labels,
+    marker:{color:'#4f8ef7'},
+    customdata:tipos.map(t=>t.tipo),
+    hovertemplate:'<b>%{customdata}</b><br>%{x} documentos<extra></extra>',
+  }], {
+    ...LAYOUT,
+    margin:{t:8,r:30,b:40,l:230},
+    yaxis:{...LAYOUT.yaxis, automargin:true},
+  }, CFG);
+}
+
+function renderEstado(filas) {
+  const el = document.getElementById('tabla-estado');
+  if (!filas.length) {
+    el.innerHTML = '<p class="sin-datos">Sin datos de Sheets disponibles</p>';
+    return;
+  }
+  const filas_ord = [...filas].sort((a,b) => a.dias_inactivo - b.dias_inactivo);
+  el.innerHTML = '<table class="tbl">'
+    + '<thead><tr>'
+    + '<th>Fuente</th><th>Última captura</th><th>Días</th><th>Total</th><th>Estado</th>'
+    + '</tr></thead><tbody>'
+    + filas_ord.map(f =>
+        '<tr>'
+        + '<td style="max-width:160px;word-break:break-word">' + f.fuente + '</td>'
+        + '<td>' + f.ultima_captura + '</td>'
+        + '<td>' + f.dias_inactivo + '</td>'
+        + '<td>' + fmt(f.total_docs) + '</td>'
+        + '<td><span class="badge ' + (f.estado === 'Activa' ? 'activa' : 'inactiva') + '">' + f.estado + '</span></td>'
+        + '</tr>'
+      ).join('')
+    + '</tbody></table>';
+}
+
+cargarDatos();
+</script>
+</body>
+</html>

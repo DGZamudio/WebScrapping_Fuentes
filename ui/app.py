@@ -4,6 +4,7 @@ from ui.dashboard import DashBoard
 from ui.theme import COLORS
 from .nav_menu import NavMenu
 from .settings_view import SettingsView
+from .stats_view import StatsView
 from .status_bar import StatusBar
 
 
@@ -39,12 +40,23 @@ class App(tk.Tk):
         self.settings_view = SettingsView(self.content_area, self)
         self.register_view("configuracion", "Configuración", self.settings_view)
 
+        self.stats_view = StatsView(self.content_area, self, port=None)
+        self.register_view("estadisticas", "Estadísticas", self.stats_view)
+
         self.show_view("dashboard")
 
         self.status = StatusBar(self)
         self.status.pack(fill="x", side="bottom")
 
         self._run_callback = None
+
+    def set_stats_port(self, port: int | None) -> None:
+        """Recrea StatsView con el puerto del servidor Flask."""
+        old = self.views.get("estadisticas")
+        if old:
+            old.destroy()
+        self.stats_view = StatsView(self.content_area, self, port=port)
+        self.views["estadisticas"] = self.stats_view
 
     def register_view(self, name, label, view_widget):
         self.views[name] = view_widget
