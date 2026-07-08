@@ -24,6 +24,7 @@ Write-Host "Compilando ejecutable..." -ForegroundColor Yellow
 $pyinstallerArgs = @(
     "--onedir",
     "--windowed",
+    "--collect-data", "customtkinter",
     "--name", "IURISYNC",
     "--add-data", "scrappers;scrappers",
     "--add-data", "ui;ui",
