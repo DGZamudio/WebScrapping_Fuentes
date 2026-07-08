@@ -1,113 +1,89 @@
-import tkinter as tk
+import customtkinter as ctk
 from ui.theme import COLORS, FONTS, NAV_WIDTH
 
 _ICONS = {
-    "dashboard":    "⊞",
-    "consola":      "▶",
+    "dashboard":     "⊞",
+    "consola":       "▶",
     "configuracion": "⚙",
+    "estadisticas":  "📊",
 }
 
 
-class NavMenu(tk.Frame):
+class NavMenu(ctk.CTkFrame):
     """Modern dark sidebar navigation."""
 
     def __init__(self, parent, controller=None):
-        super().__init__(parent, bg=COLORS["sidebar"], width=NAV_WIDTH)
+        super().__init__(parent, fg_color=COLORS["sidebar"], width=NAV_WIDTH, corner_radius=0)
         self.controller = controller
         self.pack_propagate(False)
         self.buttons = {}
         self.active_button = None
-        self._containers = {}
         self._indicators = {}
         self._build_header()
 
     def _build_header(self):
-        logo_frame = tk.Frame(self, bg=COLORS["sidebar"])
+        logo_frame = ctk.CTkFrame(self, fg_color="transparent")
         logo_frame.pack(fill="x", padx=20, pady=(24, 16))
 
-        tk.Label(
-            logo_frame,
-            text="IURISYNC",
-            bg=COLORS["sidebar"],
-            fg=COLORS["sidebar_title"],
+        ctk.CTkLabel(
+            logo_frame, text="IURISYNC",
+            text_color=COLORS["sidebar_title"], fg_color="transparent",
             font=FONTS["nav_title"],
         ).pack(anchor="w")
 
-        tk.Label(
-            logo_frame,
-            text="Sistema de Descarga Legal",
-            bg=COLORS["sidebar"],
-            fg=COLORS["sidebar_text"],
+        ctk.CTkLabel(
+            logo_frame, text="Sistema de Descarga Legal",
+            text_color=COLORS["sidebar_text"], fg_color="transparent",
             font=FONTS["caption"],
         ).pack(anchor="w")
 
-        tk.Frame(self, bg=COLORS["sidebar_section"], height=1).pack(
+        ctk.CTkFrame(self, fg_color=COLORS["sidebar_section"], height=1, corner_radius=0).pack(
             fill="x", padx=20, pady=(0, 4)
         )
 
-        tk.Label(
-            self,
-            text="NAVEGACIÓN",
-            bg=COLORS["sidebar"],
-            fg=COLORS["sidebar_section"],
+        ctk.CTkLabel(
+            self, text="NAVEGACIÓN",
+            text_color=COLORS["sidebar_section"], fg_color="transparent",
             font=FONTS["nav_section"],
         ).pack(anchor="w", padx=20, pady=(10, 6))
 
     def add_button(self, name, label, callback):
         icon = _ICONS.get(name, "•")
 
-        container = tk.Frame(self, bg=COLORS["sidebar"])
+        container = ctk.CTkFrame(self, fg_color=COLORS["sidebar"], corner_radius=0)
         container.pack(fill="x", pady=1)
 
-        indicator = tk.Frame(container, bg=COLORS["sidebar"], width=4)
+        indicator = ctk.CTkFrame(container, fg_color=COLORS["sidebar"], width=4, corner_radius=0)
         indicator.pack(side="left", fill="y")
 
-        btn = tk.Label(
+        btn = ctk.CTkButton(
             container,
             text=f"  {icon}   {label}",
-            bg=COLORS["sidebar"],
-            fg=COLORS["sidebar_text"],
+            fg_color=COLORS["sidebar"],
+            hover_color=COLORS["sidebar_hover"],
+            text_color=COLORS["sidebar_text"],
             font=FONTS["nav_item"],
             anchor="w",
-            cursor="hand2",
-            padx=10,
-            pady=11,
+            corner_radius=0,
+            border_width=0,
+            command=lambda n=name, cb=callback: self._on_click(n, cb),
         )
-        btn.pack(fill="x", side="left", expand=True)
-
-        btn.bind("<Enter>",    lambda e, b=btn, n=name: self._on_hover(b, n))
-        btn.bind("<Leave>",    lambda e, b=btn, n=name: self._on_leave(b, n))
-        btn.bind("<Button-1>", lambda e, n=name, cb=callback: self._on_click(n, cb))
-        container.bind("<Button-1>", lambda e, n=name, cb=callback: self._on_click(n, cb))
+        btn.pack(fill="x", side="left", expand=True, ipady=4)
 
         self.buttons[name] = btn
-        self._containers[name] = container
         self._indicators[name] = indicator
 
-        # Version footer after the last known nav item
         if name == "configuracion":
-            tk.Frame(self, bg=COLORS["sidebar_section"], height=1).pack(
+            ctk.CTkFrame(self, fg_color=COLORS["sidebar_section"], height=1, corner_radius=0).pack(
                 fill="x", padx=20, pady=(12, 0)
             )
-            footer = tk.Frame(self, bg=COLORS["sidebar"])
+            footer = ctk.CTkFrame(self, fg_color="transparent")
             footer.pack(side="bottom", fill="x", padx=20, pady=14)
-            tk.Label(
-                footer,
-                text="Avance Jurídico  ·  v1.0",
-                bg=COLORS["sidebar"],
-                fg=COLORS["sidebar_section"],
+            ctk.CTkLabel(
+                footer, text="Avance Jurídico  ·  v1.0",
+                text_color=COLORS["sidebar_section"], fg_color="transparent",
                 font=FONTS["caption"],
             ).pack(anchor="w")
-
-    def _on_hover(self, btn, name):
-        if name != self.active_button:
-            btn.config(bg=COLORS["sidebar_hover"], fg=COLORS["sidebar_text_active"])
-            self._containers[name].config(bg=COLORS["sidebar_hover"])
-
-    def _on_leave(self, btn, name):
-        if name != self.active_button:
-            btn.config(bg=COLORS["sidebar"], fg=COLORS["sidebar_text"])
-            self._containers[name].config(bg=COLORS["sidebar"])
 
     def _on_click(self, name, callback):
         self.set_active(name)
@@ -116,14 +92,12 @@ class NavMenu(tk.Frame):
     def set_active(self, name):
         if self.active_button and self.active_button in self.buttons:
             prev = self.active_button
-            self.buttons[prev].config(bg=COLORS["sidebar"], fg=COLORS["sidebar_text"])
-            self._containers[prev].config(bg=COLORS["sidebar"])
-            self._indicators[prev].config(bg=COLORS["sidebar"])
+            self.buttons[prev].configure(fg_color=COLORS["sidebar"], text_color=COLORS["sidebar_text"])
+            self._indicators[prev].configure(fg_color=COLORS["sidebar"])
 
         self.active_button = name
         if name in self.buttons:
-            self.buttons[name].config(
-                bg=COLORS["sidebar_active"], fg=COLORS["sidebar_text_active"]
+            self.buttons[name].configure(
+                fg_color=COLORS["sidebar_active"], text_color=COLORS["sidebar_text_active"]
             )
-            self._containers[name].config(bg=COLORS["sidebar_active"])
-            self._indicators[name].config(bg=COLORS["sidebar_active_bar"])
+            self._indicators[name].configure(fg_color=COLORS["sidebar_active_bar"])
