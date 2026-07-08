@@ -1,14 +1,14 @@
-import tkinter as tk
-from tkinter import filedialog, ttk
-from tkinter.scrolledtext import ScrolledText
+from tkinter import filedialog
 from datetime import datetime, date
 import threading
 import logging
 
+import customtkinter as ctk
 from tkcalendar import DateEntry
 from db.memory import Memory
 from utils import generate_excel_report
-from ui.theme import COLORS, FONTS
+from ui.theme import COLORS, FONTS, CORNER_RADIUS, BORDER_WIDTH
+from ui.list_filter import reflow_rows
 
 logger = logging.getLogger(__name__)
 
@@ -20,78 +20,62 @@ def _btn(parent, text, command, style="primary", **kw):
         "danger":    (COLORS["btn_danger"],    COLORS["btn_danger_hover"]),
         "secondary": (COLORS["btn_secondary"], COLORS["btn_secondary_hover"]),
     }
-    bg, hover = palettes.get(style, palettes["primary"])
-    return tk.Button(
+    fg, hover = palettes.get(style, palettes["primary"])
+    return ctk.CTkButton(
         parent, text=text, command=command,
-        bg=bg, fg=COLORS["btn_text"],
-        activebackground=hover, activeforeground=COLORS["btn_text"],
-        disabledforeground=COLORS["btn_disabled_fg"],
-        font=FONTS["body_bold"], relief="flat", bd=0,
-        cursor="hand2", padx=14, pady=7,
+        fg_color=fg, hover_color=hover, text_color=COLORS["btn_text"],
+        font=FONTS["body_bold"], corner_radius=CORNER_RADIUS,
         **kw,
     )
 
 
 def _card(parent):
-    return tk.Frame(
-        parent, bg=COLORS["card"],
-        highlightbackground=COLORS["card_border"], highlightthickness=1,
+    return ctk.CTkFrame(
+        parent, fg_color=COLORS["card"],
+        border_color=COLORS["card_border"], border_width=BORDER_WIDTH,
+        corner_radius=CORNER_RADIUS,
     )
 
 
-class DashBoard(tk.Frame):
+class DashBoard(ctk.CTkFrame):
     def __init__(self, parent, controller=None):
-        super().__init__(parent, bg=COLORS["bg"])
+        super().__init__(parent, fg_color=COLORS["bg"], corner_radius=0)
         self.controller = controller
         self._run_callback = None
         self._log_callback = None
         self._stop_cb = None
         self._sync_cb = None
         self._upload_pending_cb = None
+        self._source_rows = []
+        self._source_groups = []
+        self._source_entries = []
         self._build()
 
     # ------------------------------------------------------------------ build
 
     def _build(self):
-        # ── Sticky header ────────────────────────────────────────────────────
-        header = tk.Frame(self, bg=COLORS["bg"])
+        header = ctk.CTkFrame(self, fg_color="transparent")
         header.pack(fill="x", padx=24, pady=(24, 0))
 
-        tk.Label(
+        ctk.CTkLabel(
             header, text="Panel de Control",
-            bg=COLORS["bg"], fg=COLORS["text"], font=FONTS["h1"],
+            text_color=COLORS["text"], fg_color="transparent", font=FONTS["h1"],
         ).pack(side="left")
 
-        tk.Label(
+        ctk.CTkLabel(
             header, text=datetime.now().strftime("Bienvenido  ·  %d %b %Y"),
-            bg=COLORS["bg"], fg=COLORS["text_muted"], font=FONTS["small"],
+            text_color=COLORS["text_muted"], fg_color="transparent", font=FONTS["small"],
         ).pack(side="right", pady=(10, 0))
 
-        tk.Frame(self, bg=COLORS["card_border"], height=1).pack(
+        ctk.CTkFrame(self, fg_color=COLORS["card_border"], height=1, corner_radius=0).pack(
             fill="x", padx=24, pady=(14, 0)
         )
 
-        # ── Scrollable body ───────────────────────────────────────────────────
-        scroll_canvas = tk.Canvas(self, bg=COLORS["bg"], highlightthickness=0)
-        scrollbar = ttk.Scrollbar(self, orient="vertical", command=scroll_canvas.yview)
-        scroll_canvas.configure(yscrollcommand=scrollbar.set)
-        scrollbar.pack(side="right", fill="y")
-        scroll_canvas.pack(side="left", fill="both", expand=True)
-
-        content = tk.Frame(scroll_canvas, bg=COLORS["bg"])
-        win_id = scroll_canvas.create_window((0, 0), window=content, anchor="nw")
-
-        scroll_canvas.bind("<Configure>", lambda e: scroll_canvas.itemconfig(win_id, width=e.width))
-        content.bind("<Configure>", lambda e: scroll_canvas.configure(scrollregion=scroll_canvas.bbox("all")))
-
-        def _scroll(e):
-            scroll_canvas.yview_scroll(int(-1 * (e.delta / 120)), "units")
-
-        scroll_canvas.bind("<Enter>", lambda e: scroll_canvas.bind_all("<MouseWheel>", _scroll))
-        scroll_canvas.bind("<Leave>", lambda e: scroll_canvas.unbind_all("<MouseWheel>"))
+        content = ctk.CTkScrollableFrame(self, fg_color=COLORS["bg"])
+        content.pack(fill="both", expand=True, padx=0, pady=0)
 
         # ── Stat cards ───────────────────────────────────────────────────────
-        stats = tk.Frame(content, bg=COLORS["bg"])
+        stats = ctk.CTkFrame(content, fg_color="transparent")
         stats.pack(fill="x", padx=24, pady=24)
         stats.columnconfigure((0, 1, 2), weight=1, uniform="stat")
 
@@ -114,23 +98,22 @@ class DashBoard(tk.Frame):
         run_card = _card(content)
         run_card.pack(fill="x", padx=24, pady=(0, 16))
 
-        run_top = tk.Frame(run_card, bg=COLORS["card"])
+        run_top = ctk.CTkFrame(run_card, fg_color="transparent")
         run_top.pack(fill="x", padx=20, pady=(18, 0))
 
-        tk.Label(
+        ctk.CTkLabel(
             run_top, text="Ejecutar descarga",
-            bg=COLORS["card"], fg=COLORS["text"], font=FONTS["h3"],
+            text_color=COLORS["text"], fg_color="transparent", font=FONTS["h3"],
         ).pack(side="left")
 
-        tk.Frame(run_card, bg=COLORS["card_border"], height=1).pack(
+        ctk.CTkFrame(run_card, fg_color=COLORS["card_border"], height=1, corner_radius=0).pack(
             fill="x", padx=20, pady=(12, 0)
         )
 
-        run_body = tk.Frame(run_card, bg=COLORS["card"])
+        run_body = ctk.CTkFrame(run_card, fg_color="transparent")
         run_body.pack(fill="x", padx=20, pady=16)
 
-        # Date fields row
-        dates_row = tk.Frame(run_body, bg=COLORS["card"])
+        dates_row = ctk.CTkFrame(run_body, fg_color="transparent")
         dates_row.pack(fill="x", pady=(0, 14))
 
         date_style = {
@@ -156,13 +139,12 @@ class DashBoard(tk.Frame):
             "tooltipforeground": COLORS["sidebar_text_active"],
         }
 
-        # Start date
-        start_col = tk.Frame(dates_row, bg=COLORS["card"])
+        start_col = ctk.CTkFrame(dates_row, fg_color="transparent")
         start_col.pack(side="left", padx=(0, 24))
 
-        tk.Label(
+        ctk.CTkLabel(
             start_col, text="Desde",
-            bg=COLORS["card"], fg=COLORS["text_muted"], font=FONTS["small"],
+            text_color=COLORS["text_muted"], fg_color="transparent", font=FONTS["small"],
         ).pack(anchor="w", pady=(0, 4))
 
         self._run_start = DateEntry(
@@ -173,13 +155,12 @@ class DashBoard(tk.Frame):
         self._run_start.pack(ipady=4)
         self._prefill_start_date()
 
-        # End date
-        end_col = tk.Frame(dates_row, bg=COLORS["card"])
+        end_col = ctk.CTkFrame(dates_row, fg_color="transparent")
         end_col.pack(side="left")
 
-        tk.Label(
+        ctk.CTkLabel(
             end_col, text="Hasta",
-            bg=COLORS["card"], fg=COLORS["text_muted"], font=FONTS["small"],
+            text_color=COLORS["text_muted"], fg_color="transparent", font=FONTS["small"],
         ).pack(anchor="w", pady=(0, 4))
 
         self._run_end = DateEntry(
@@ -190,17 +171,15 @@ class DashBoard(tk.Frame):
         self._run_end.pack(ipady=4)
         self._run_end.set_date(date.today())
 
-        # Reset link
-        reset_lbl = tk.Label(
+        reset_lbl = ctk.CTkLabel(
             dates_row, text="↺  Restablecer",
-            bg=COLORS["card"], fg=COLORS["accent"],
+            text_color=COLORS["accent"], fg_color="transparent",
             font=FONTS["small"], cursor="hand2",
         )
         reset_lbl.pack(side="left", padx=(20, 0), pady=(16, 0))
         reset_lbl.bind("<Button-1>", lambda e: self._reset_dates())
 
-        # Execute / Stop buttons
-        btn_row = tk.Frame(run_body, bg=COLORS["card"])
+        btn_row = ctk.CTkFrame(run_body, fg_color="transparent")
         btn_row.pack(fill="x")
 
         self.btn_execute = _btn(
@@ -209,7 +188,7 @@ class DashBoard(tk.Frame):
         self.btn_execute.pack(side="left")
 
         self.btn_stop = _btn(btn_row, "■  Parar", self._on_stop, style="danger")
-        self.btn_stop.config(state="disabled", bg=COLORS["btn_disabled_bg"], cursor="")
+        self.btn_stop.configure(state="disabled", fg_color=COLORS["btn_disabled_bg"], cursor="")
         self.btn_stop.pack(side="left", padx=(10, 0))
 
         self.btn_sync = _btn(btn_row, "☁  Sincronizar desde Drive", self._on_sync, style="secondary")
@@ -218,45 +197,42 @@ class DashBoard(tk.Frame):
         self.btn_upload_pending = _btn(btn_row, "⬆  Subir pendientes", self._on_upload_pending, style="secondary")
         self.btn_upload_pending.pack(side="left", padx=(10, 0))
 
-        tk.Label(
+        ctk.CTkLabel(
             btn_row,
             text="Las fuentes activas se configuran en  Configuración →",
-            bg=COLORS["card"], fg=COLORS["text_muted"], font=FONTS["caption"],
+            text_color=COLORS["text_muted"], fg_color="transparent", font=FONTS["caption"],
         ).pack(side="left", padx=(16, 0), pady=(2, 0))
 
-        # Terminal log area
-        tk.Frame(run_card, bg=COLORS["card_border"], height=1).pack(
+        ctk.CTkFrame(run_card, fg_color=COLORS["card_border"], height=1, corner_radius=0).pack(
             fill="x", padx=0, pady=(12, 0)
         )
 
-        console_bar = tk.Frame(run_card, bg="#0f1923")
+        console_bar = ctk.CTkFrame(run_card, fg_color="#0f1923", corner_radius=0)
         console_bar.pack(fill="x")
 
-        tk.Label(
+        ctk.CTkLabel(
             console_bar, text="● ● ●",
-            bg="#0f1923", fg="#3d5166",
-            font=("Segoe UI", 9), padx=10,
-        ).pack(side="left", pady=6)
+            fg_color="transparent", text_color="#3d5166",
+            font=("Segoe UI", 9),
+        ).pack(side="left", padx=10, pady=6)
 
-        tk.Label(
+        ctk.CTkLabel(
             console_bar, text="Terminal",
-            bg="#0f1923", fg="#4a6580",
+            fg_color="transparent", text_color="#4a6580",
             font=FONTS["caption"],
         ).pack(side="left")
 
-        self._terminal = ScrolledText(
+        self._terminal = ctk.CTkTextbox(
             run_card,
-            bg="#0f1923", fg="#c9d1d9",
+            fg_color="#0f1923", text_color="#c9d1d9",
             font=("Consolas", 9),
-            relief="flat", bd=0,
-            height=12,
-            state="disabled",
+            corner_radius=0, border_width=0,
+            height=200,
             wrap="word",
-            insertbackground="#c9d1d9",
+            state="disabled",
         )
         self._terminal.pack(fill="x", padx=0, pady=0)
 
-        # Color tags for log classification
         self._terminal.tag_config("success", foreground="#3fb950")
         self._terminal.tag_config("error",   foreground="#f85149")
         self._terminal.tag_config("warning", foreground="#d29922")
@@ -269,59 +245,54 @@ class DashBoard(tk.Frame):
         self._sources_card.pack(fill="x", padx=24, pady=(0, 16))
         self._build_sources_card()
 
-
     # --------------------------------------------------------- sources card
 
     def _build_sources_card(self):
         card = self._sources_card
 
-        hdr = tk.Frame(card, bg=COLORS["card"])
+        hdr = ctk.CTkFrame(card, fg_color="transparent")
         hdr.pack(fill="x", padx=20, pady=(18, 0))
-        tk.Label(
+        ctk.CTkLabel(
             hdr, text="Documentos por Entidad",
-            bg=COLORS["card"], fg=COLORS["text"], font=FONTS["h3"],
+            text_color=COLORS["text"], fg_color="transparent", font=FONTS["h3"],
         ).pack(side="left")
-        self._sources_count_label = tk.Label(
-            hdr, text="", bg=COLORS["card"], fg=COLORS["text_muted"], font=FONTS["small"],
+        self._sources_count_label = ctk.CTkLabel(
+            hdr, text="", text_color=COLORS["text_muted"], fg_color="transparent", font=FONTS["small"],
         )
         self._sources_count_label.pack(side="right", pady=(2, 0))
 
-        tk.Frame(card, bg=COLORS["card_border"], height=1).pack(fill="x", padx=20, pady=(12, 0))
-
-        wrap = tk.Frame(card, bg=COLORS["card"])
-        wrap.pack(fill="x", padx=20, pady=(0, 16))
-
-        self._sources_canvas = tk.Canvas(wrap, bg=COLORS["card"], highlightthickness=0, height=180)
-        sb = ttk.Scrollbar(wrap, orient="vertical", command=self._sources_canvas.yview)
-        self._sources_canvas.configure(yscrollcommand=sb.set)
-        self._sources_canvas.pack(side="left", fill="both", expand=True)
-        sb.pack(side="right", fill="y")
-
-        self._sources_inner = tk.Frame(self._sources_canvas, bg=COLORS["card"])
-        self._sources_win = self._sources_canvas.create_window((0, 0), window=self._sources_inner, anchor="nw")
-
-        self._sources_inner.bind(
-            "<Configure>",
-            lambda e: self._sources_canvas.configure(scrollregion=self._sources_canvas.bbox("all")),
-        )
-        self._sources_canvas.bind(
-            "<Configure>",
-            lambda e: self._sources_canvas.itemconfig(self._sources_win, width=e.width),
-        )
-        self._sources_canvas.bind(
-            "<MouseWheel>",
-            lambda e: self._sources_canvas.yview_scroll(int(-1 * (e.delta / 120)), "units"),
+        ctk.CTkFrame(card, fg_color=COLORS["card_border"], height=1, corner_radius=0).pack(
+            fill="x", padx=20, pady=(12, 0)
         )
 
-        tk.Label(
+        search_row = ctk.CTkFrame(card, fg_color="transparent")
+        search_row.pack(fill="x", padx=20, pady=(12, 0))
+
+        self._sources_search_var = ctk.StringVar()
+        self._sources_search_var.trace_add(
+            "write", lambda *_: self._apply_sources_filter(self._sources_search_var.get())
+        )
+        ctk.CTkEntry(
+            search_row, textvariable=self._sources_search_var,
+            placeholder_text="Buscar entidad...",
+            fg_color=COLORS["bg"], border_color=COLORS["card_border"],
+            text_color=COLORS["text"], corner_radius=CORNER_RADIUS,
+        ).pack(fill="x")
+
+        wrap = ctk.CTkFrame(card, fg_color="transparent")
+        wrap.pack(fill="x", padx=20, pady=(12, 16))
+
+        self._sources_inner = ctk.CTkScrollableFrame(wrap, fg_color=COLORS["card"], height=180)
+        self._sources_inner.pack(fill="both", expand=True)
+
+        ctk.CTkLabel(
             self._sources_inner,
             text="Sin datos aún — los conteos aparecerán al descargar documentos.",
-            bg=COLORS["card"], fg=COLORS["text_muted"], font=FONTS["small"],
+            text_color=COLORS["text_muted"], fg_color="transparent", font=FONTS["small"],
         ).pack(anchor="w", pady=8)
 
-        # Footer: export button
-        tk.Frame(card, bg=COLORS["card_border"], height=1).pack(fill="x", padx=20)
-        footer = tk.Frame(card, bg=COLORS["card"])
+        ctk.CTkFrame(card, fg_color=COLORS["card_border"], height=1, corner_radius=0).pack(fill="x", padx=20)
+        footer = ctk.CTkFrame(card, fg_color="transparent")
         footer.pack(fill="x", padx=20, pady=(10, 16))
         self.btn_download_report = _btn(
             footer, "⬇  Exportar Excel", self._on_start_downloads, style="primary"
@@ -336,104 +307,171 @@ class DashBoard(tk.Frame):
 
         for w in self._sources_inner.winfo_children():
             w.destroy()
+        self._source_rows = []
+        self._source_groups = []
+        self._source_entries = []
 
         if not groups:
-            tk.Label(
+            ctk.CTkLabel(
                 self._sources_inner,
                 text="Sin datos aún — los conteos aparecerán al descargar documentos.",
-                bg=COLORS["card"], fg=COLORS["text_muted"], font=FONTS["small"],
+                text_color=COLORS["text_muted"], fg_color="transparent", font=FONTS["small"],
             ).pack(anchor="w", pady=8)
-            self._sources_count_label.config(text="")
+            self._sources_count_label.configure(text="")
             return
 
         n_total = sum(1 + len(c) for _, _, c in groups)
-        self._sources_count_label.config(text=f"{n_total} fuentes")
+        self._sources_count_label.configure(text=f"{n_total} fuentes")
 
         max_count = groups[0][1]
         BAR_W = 90
 
         for name, total, children in groups:
             if children:
-                self._add_group_row(name, total, children, max_count, BAR_W)
+                g = self._add_group_row(name, total, children, max_count, BAR_W)
+                self._source_groups.append(g)
+                self._source_entries.append(("group", name, g))
             else:
-                self._add_flat_row(self._sources_inner, name, total, max_count, BAR_W, indent=0)
+                row = self._add_flat_row(self._sources_inner, name, total, max_count, BAR_W, indent=0)
+                self._source_rows.append((name, row))
+                self._source_entries.append(("flat", name, row))
+
+        self._apply_sources_filter(self._sources_search_var.get())
 
     def _add_flat_row(self, parent, name, count, max_count, bar_w, indent=0):
-        row = tk.Frame(parent, bg=COLORS["card"])
+        row = ctk.CTkFrame(parent, fg_color="transparent")
         row.pack(fill="x", pady=2)
 
         if indent:
-            tk.Frame(row, bg=COLORS["card"], width=indent).pack(side="left")
+            ctk.CTkFrame(row, fg_color="transparent", width=indent).pack(side="left")
 
         is_child = indent > 0
         disp = name if len(name) <= 35 else name[:33] + "…"
-        tk.Label(
-            row, text=disp, bg=COLORS["card"],
-            fg=COLORS["text_muted"] if is_child else COLORS["text_secondary"],
+        ctk.CTkLabel(
+            row, text=disp, fg_color="transparent",
+            text_color=COLORS["text_muted"] if is_child else COLORS["text_secondary"],
             font=FONTS["caption"] if is_child else FONTS["small"],
-            anchor="w", width=35,
+            anchor="w", width=180,
         ).pack(side="left")
 
-        track = tk.Frame(row, bg=COLORS["card_border"], height=7 if is_child else 8, width=bar_w)
+        track = ctk.CTkFrame(
+            row, fg_color=COLORS["card_border"], height=7 if is_child else 8, width=bar_w, corner_radius=0,
+        )
         track.pack(side="left", padx=(6, 6))
-        track.pack_propagate(False)
         fill_w = max(2, int(bar_w * count / max_count))
-        tk.Frame(track, bg=COLORS["info"] if is_child else COLORS["accent"],
-                 height=8, width=fill_w).place(x=0, y=0, height=8)
+        ctk.CTkFrame(
+            track, fg_color=COLORS["info"] if is_child else COLORS["accent"],
+            height=8, width=fill_w, corner_radius=0,
+        ).place(x=0, y=0)
 
-        tk.Label(
-            row, text=f"{count:,}", bg=COLORS["card"],
-            fg=COLORS["text_muted"] if is_child else COLORS["text"],
+        ctk.CTkLabel(
+            row, text=f"{count:,}", fg_color="transparent",
+            text_color=COLORS["text_muted"] if is_child else COLORS["text"],
             font=FONTS["caption"] if is_child else FONTS["body_bold"],
-            anchor="e", width=7,
+            anchor="e", width=60,
         ).pack(side="left")
+
+        return row
 
     def _add_group_row(self, name, total, children, max_count, bar_w):
-        group = tk.Frame(self._sources_inner, bg=COLORS["card"])
+        group = ctk.CTkFrame(self._sources_inner, fg_color="transparent")
         group.pack(fill="x")
 
-        children_frame = tk.Frame(group, bg=COLORS["card"])
+        children_frame = ctk.CTkFrame(group, fg_color="transparent")
         expanded = [False]
 
-        hdr = tk.Frame(group, bg=COLORS["card"], cursor="hand2")
+        hdr = ctk.CTkFrame(group, fg_color="transparent", cursor="hand2")
         hdr.pack(fill="x", pady=2)
 
-        arrow = tk.Label(hdr, text="▶", bg=COLORS["card"], fg=COLORS["accent"],
-                         font=("Segoe UI", 8, "bold"), width=2, cursor="hand2")
+        arrow = ctk.CTkLabel(
+            hdr, text="▶", text_color=COLORS["accent"], fg_color="transparent",
+            font=("Segoe UI", 8, "bold"), width=16, cursor="hand2",
+        )
         arrow.pack(side="left")
 
         disp = name if len(name) <= 33 else name[:31] + "…"
-        name_lbl = tk.Label(hdr, text=disp, bg=COLORS["card"], fg=COLORS["text_secondary"],
-                            font=FONTS["body_bold"], anchor="w", width=33, cursor="hand2")
+        name_lbl = ctk.CTkLabel(
+            hdr, text=disp, text_color=COLORS["text_secondary"], fg_color="transparent",
+            font=FONTS["body_bold"], anchor="w", width=170, cursor="hand2",
+        )
         name_lbl.pack(side="left")
 
-        track = tk.Frame(hdr, bg=COLORS["card_border"], height=8, width=bar_w)
+        track = ctk.CTkFrame(hdr, fg_color=COLORS["card_border"], height=8, width=bar_w, corner_radius=0)
         track.pack(side="left", padx=(6, 6))
-        track.pack_propagate(False)
         fill_w = max(2, int(bar_w * total / max_count))
-        tk.Frame(track, bg=COLORS["success"], height=8, width=fill_w).place(x=0, y=0, height=8)
+        ctk.CTkFrame(track, fg_color=COLORS["success"], height=8, width=fill_w, corner_radius=0).place(
+            x=0, y=0
+        )
 
-        tk.Label(hdr, text=f"{total:,}", bg=COLORS["card"], fg=COLORS["text"],
-                 font=FONTS["body_bold"], anchor="e", width=7).pack(side="left")
+        ctk.CTkLabel(
+            hdr, text=f"{total:,}", text_color=COLORS["text"], fg_color="transparent",
+            font=FONTS["body_bold"], anchor="e", width=60,
+        ).pack(side="left")
 
+        child_rows = []
         for child_name, child_count in children:
-            self._add_flat_row(children_frame, child_name, child_count, max_count, bar_w, indent=16)
+            row = self._add_flat_row(children_frame, child_name, child_count, max_count, bar_w, indent=16)
+            child_rows.append((child_name, row))
 
         def toggle(e=None):
             if expanded[0]:
                 children_frame.pack_forget()
-                arrow.config(text="▶")
+                arrow.configure(text="▶")
                 expanded[0] = False
             else:
                 children_frame.pack(fill="x")
-                arrow.config(text="▼")
+                arrow.configure(text="▼")
                 expanded[0] = True
-            self._sources_inner.update_idletasks()
-            self._sources_canvas.configure(scrollregion=self._sources_canvas.bbox("all"))
 
         hdr.bind("<Button-1>", toggle)
         arrow.bind("<Button-1>", toggle)
         name_lbl.bind("<Button-1>", toggle)
+
+        return {
+            "name": name, "group_frame": group, "children_frame": children_frame,
+            "arrow": arrow, "expanded": expanded, "children": child_rows,
+        }
+
+    # -------------------------------------------------------------- filtering
+
+    def _apply_sources_filter(self, query: str):
+        q = query.strip().lower()
+
+        # Forget every top-level sibling first, then re-pack the visible ones
+        # in their original creation order, so flat rows and group headers
+        # (interleaved by Memory().get_counts_grouped()'s ordering) never
+        # scramble relative to each other while filtering.
+        for name, row in self._source_rows:
+            row.pack_forget()
+        for g in self._source_groups:
+            g["group_frame"].pack_forget()
+
+        for kind, name, ref in self._source_entries:
+            if kind == "flat":
+                if not q or q in name.lower():
+                    ref.pack(fill="x", pady=2)
+                continue
+
+            g = ref
+            has_match = q in g["name"].lower() or any(
+                q in c.lower() for c, _ in g["children"]
+            )
+            reflow_rows(g["children"], query)
+
+            if q:
+                if not has_match:
+                    continue
+                g["group_frame"].pack(fill="x")
+                if not g["expanded"][0]:
+                    g["children_frame"].pack(fill="x")
+                    g["arrow"].configure(text="▼")
+                    g["expanded"][0] = True
+            else:
+                g["group_frame"].pack(fill="x")
+                if g["expanded"][0]:
+                    g["children_frame"].pack_forget()
+                    g["arrow"].configure(text="▶")
+                    g["expanded"][0] = False
 
     # ------------------------------------------------------------ date helpers
 
@@ -461,27 +499,36 @@ class DashBoard(tk.Frame):
     # ---------------------------------------------------------------- helpers
 
     def _stat_card(self, parent, col, title, value, subtitle, color):
-        card = tk.Frame(parent, bg=COLORS["card"],
-                        highlightbackground=COLORS["card_border"], highlightthickness=1)
+        card = ctk.CTkFrame(
+            parent, fg_color=COLORS["card"],
+            border_color=COLORS["card_border"], border_width=BORDER_WIDTH,
+            corner_radius=CORNER_RADIUS,
+        )
         card.grid(row=0, column=col, padx=(0, 12) if col < 2 else 0, sticky="ew")
 
-        tk.Frame(card, bg=color, height=4).pack(fill="x")
-        inner = tk.Frame(card, bg=COLORS["card"])
+        ctk.CTkFrame(card, fg_color=color, height=4, corner_radius=0).pack(fill="x")
+        inner = ctk.CTkFrame(card, fg_color="transparent")
         inner.pack(fill="both", padx=18, pady=14)
 
-        tk.Label(inner, text=title.upper(), bg=COLORS["card"],
-                 fg=COLORS["text_muted"], font=FONTS["stat_label"]).pack(anchor="w")
-        val_lbl = tk.Label(inner, text=value, bg=COLORS["card"],
-                           fg=color, font=FONTS["stat_number"])
+        ctk.CTkLabel(
+            inner, text=title.upper(), fg_color="transparent",
+            text_color=COLORS["text_muted"], font=FONTS["stat_label"],
+        ).pack(anchor="w")
+        val_lbl = ctk.CTkLabel(
+            inner, text=value, fg_color="transparent",
+            text_color=color, font=FONTS["stat_number"],
+        )
         val_lbl.pack(anchor="w", pady=(4, 2))
-        tk.Label(inner, text=subtitle, bg=COLORS["card"],
-                 fg=COLORS["text_muted"], font=FONTS["caption"]).pack(anchor="w")
+        ctk.CTkLabel(
+            inner, text=subtitle, fg_color="transparent",
+            text_color=COLORS["text_muted"], font=FONTS["caption"],
+        ).pack(anchor="w")
         return val_lbl
 
     # ------------------------------------------------------------------- API
 
     def update_total(self, count: int):
-        self._total_docs_label.config(text=str(count))
+        self._total_docs_label.configure(text=str(count))
         self._refresh_sources_card()
 
     def set_run_callback(self, cb):
@@ -492,31 +539,31 @@ class DashBoard(tk.Frame):
 
     def set_running(self, running: bool):
         if running:
-            self.btn_execute.config(
+            self.btn_execute.configure(
                 state="disabled", text="⏳  Ejecutando...",
-                bg=COLORS["btn_disabled_bg"], cursor="",
+                fg_color=COLORS["btn_disabled_bg"], cursor="",
             )
-            self.btn_stop.config(
-                state="normal", bg=COLORS["btn_danger"], cursor="hand2",
+            self.btn_stop.configure(
+                state="normal", fg_color=COLORS["btn_danger"], cursor="hand2",
             )
         else:
-            self.btn_execute.config(
+            self.btn_execute.configure(
                 state="normal", text="▶  Ejecutar ahora",
-                bg=COLORS["btn_success"], cursor="hand2",
+                fg_color=COLORS["btn_success"], cursor="hand2",
             )
-            self.btn_stop.config(
-                state="disabled", bg=COLORS["btn_disabled_bg"], cursor="",
+            self.btn_stop.configure(
+                state="disabled", fg_color=COLORS["btn_disabled_bg"], cursor="",
             )
 
     def log(self, msg: str):
         """Append a colored line to the terminal panel."""
         tag = self._tag(msg)
         ts = datetime.now().strftime("%H:%M:%S")
-        self._terminal.config(state="normal")
+        self._terminal.configure(state="normal")
         self._terminal.insert("end", f"[{ts}] ", "ts")
         self._terminal.insert("end", msg + "\n", tag)
         self._terminal.see("end")
-        self._terminal.config(state="disabled")
+        self._terminal.configure(state="disabled")
         if self._log_callback:
             self._log_callback(msg)
         else:
@@ -549,30 +596,34 @@ class DashBoard(tk.Frame):
     def _on_upload_pending(self):
         if not self._upload_pending_cb:
             return
-        self.btn_upload_pending.config(state="disabled", text="⏳  Subiendo...",
-                                       bg=COLORS["btn_disabled_bg"], cursor="")
+        self.btn_upload_pending.configure(
+            state="disabled", text="⏳  Subiendo...",
+            fg_color=COLORS["btn_disabled_bg"], cursor="",
+        )
         def worker():
             try:
                 self._upload_pending_cb(on_progress=lambda m: self.after(0, lambda: self.log(m)))
             finally:
-                self.after(0, lambda: self.btn_upload_pending.config(
+                self.after(0, lambda: self.btn_upload_pending.configure(
                     state="normal", text="⬆  Subir pendientes",
-                    bg=COLORS["btn_secondary"], cursor="hand2",
+                    fg_color=COLORS["btn_secondary"], cursor="hand2",
                 ))
         threading.Thread(target=worker, daemon=True).start()
 
     def _on_sync(self):
         if not self._sync_cb:
             return
-        self.btn_sync.config(state="disabled", text="⏳  Sincronizando...",
-                             bg=COLORS["btn_disabled_bg"], cursor="")
+        self.btn_sync.configure(
+            state="disabled", text="⏳  Sincronizando...",
+            fg_color=COLORS["btn_disabled_bg"], cursor="",
+        )
         def worker():
             try:
                 self._sync_cb(on_progress=lambda m: self.after(0, lambda: self.log(m)))
             finally:
-                self.after(0, lambda: self.btn_sync.config(
+                self.after(0, lambda: self.btn_sync.configure(
                     state="normal", text="☁  Sincronizar desde Drive",
-                    bg=COLORS["btn_secondary"], cursor="hand2",
+                    fg_color=COLORS["btn_secondary"], cursor="hand2",
                 ))
         threading.Thread(target=worker, daemon=True).start()
 
@@ -583,7 +634,7 @@ class DashBoard(tk.Frame):
     def _on_stop(self):
         if self._stop_cb:
             self._stop_cb()
-        self.btn_stop.config(state="disabled", bg=COLORS["btn_disabled_bg"], cursor="")
+        self.btn_stop.configure(state="disabled", fg_color=COLORS["btn_disabled_bg"], cursor="")
 
     def _on_start_downloads(self):
         try:
@@ -607,7 +658,7 @@ class DashBoard(tk.Frame):
         if not file_path:
             return
 
-        self.btn_download_report.config(state="disabled", bg=COLORS["btn_disabled_bg"], cursor="")
+        self.btn_download_report.configure(state="disabled", fg_color=COLORS["btn_disabled_bg"], cursor="")
         self._log(f"[Inventario] Generando reporte en {file_path}...")
 
         def worker():
@@ -617,8 +668,8 @@ class DashBoard(tk.Frame):
             except Exception as e:
                 self._log(f"[Inventario] Error al generar reporte: {e}")
             finally:
-                self.after(0, lambda: self.btn_download_report.config(
-                    state="normal", bg=COLORS["btn_primary"], cursor="hand2"
+                self.after(0, lambda: self.btn_download_report.configure(
+                    state="normal", fg_color=COLORS["btn_primary"], cursor="hand2"
                 ))
 
         threading.Thread(target=worker, daemon=True).start()
