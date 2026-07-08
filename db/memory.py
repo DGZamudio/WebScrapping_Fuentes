@@ -39,6 +39,16 @@ class Memory:
                 self._migrate_tribunal_sources(conn, prefix_len=2)
                 conn.execute("INSERT INTO _migrations VALUES ('split_tribunal_sources_v2')")
 
+            # v3 — add local_path column for Drive pending-upload lookup
+            cur = conn.execute(
+                "SELECT 1 FROM _migrations WHERE id = 'add_local_path'"
+            )
+            if not cur.fetchone():
+                conn.execute(
+                    "ALTER TABLE downloaded ADD COLUMN local_path TEXT"
+                )
+                conn.execute("INSERT INTO _migrations VALUES ('add_local_path')")
+
     def _migrate_tribunal_sources(self, conn, prefix_len: int):
         """Map 'Tribunales Administrativos' rows to per-tribunal names.
 
@@ -76,11 +86,28 @@ class Memory:
             )
             return cur.fetchone() is not None
 
-    def mark(self, doc_id, doc:RawDocModel):
+    def get_doc_by_id(self, doc_id: str) -> dict | None:
+        with self.get_conn() as conn:
+            cur = conn.execute(
+                "SELECT source, title, f_public FROM downloaded WHERE doc_id = ?", (doc_id,)
+            )
+            row = cur.fetchone()
+            return {"source": row[0], "title": row[1], "f_public": row[2]} if row else None
+
+    def get_doc_id_by_local_path(self, rel_path: str) -> str | None:
+        with self.get_conn() as conn:
+            cur = conn.execute(
+                "SELECT doc_id FROM downloaded WHERE local_path = ?", (rel_path,)
+            )
+            row = cur.fetchone()
+            return row[0] if row else None
+
+    def mark(self, doc_id, doc: RawDocModel, local_path: str | None = None):
         with self.get_conn() as conn:
             conn.execute(
-                "INSERT OR IGNORE INTO downloaded(doc_id, source, title, f_public, downloaded_at) VALUES (?, ?, ?, ?, datetime('now'))",
-                (doc_id, doc['source'], doc["title"], doc["f_public"])
+                "INSERT OR IGNORE INTO downloaded(doc_id, source, title, f_public, downloaded_at, local_path) "
+                "VALUES (?, ?, ?, ?, datetime('now'), ?)",
+                (doc_id, doc['source'], doc["title"], doc["f_public"], local_path)
             )
 
     def get_last_inserted(self, source=None):

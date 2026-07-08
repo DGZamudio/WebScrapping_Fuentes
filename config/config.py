@@ -10,6 +10,9 @@ logging.basicConfig(
 
 DB_PATH = Path("memory.db")
 
+# ID de la carpeta raíz en Google Drive (compartida con la cuenta de servicio)
+DRIVE_ROOT_FOLDER_ID = "1Xo7r9iXRCTBjJzpCUKHJEgD8RNVpSzBz"
+
 # options = webdriver.ChromeOptions()
 # options.add_argument("--headless")  # sin abrir navegador
 # options.add_argument("--start-maximized")

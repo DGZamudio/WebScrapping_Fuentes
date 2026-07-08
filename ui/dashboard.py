@@ -46,6 +46,8 @@ class DashBoard(tk.Frame):
         self._run_callback = None
         self._log_callback = None
         self._stop_cb = None
+        self._sync_cb = None
+        self._upload_pending_cb = None
         self._build()
 
     # ------------------------------------------------------------------ build
@@ -81,7 +83,12 @@ class DashBoard(tk.Frame):
 
         scroll_canvas.bind("<Configure>", lambda e: scroll_canvas.itemconfig(win_id, width=e.width))
         content.bind("<Configure>", lambda e: scroll_canvas.configure(scrollregion=scroll_canvas.bbox("all")))
-        scroll_canvas.bind("<MouseWheel>", lambda e: scroll_canvas.yview_scroll(int(-1 * (e.delta / 120)), "units"))
+
+        def _scroll(e):
+            scroll_canvas.yview_scroll(int(-1 * (e.delta / 120)), "units")
+
+        scroll_canvas.bind("<Enter>", lambda e: scroll_canvas.bind_all("<MouseWheel>", _scroll))
+        scroll_canvas.bind("<Leave>", lambda e: scroll_canvas.unbind_all("<MouseWheel>"))
 
         # ── Stat cards ───────────────────────────────────────────────────────
         stats = tk.Frame(content, bg=COLORS["bg"])
@@ -204,6 +211,12 @@ class DashBoard(tk.Frame):
         self.btn_stop = _btn(btn_row, "■  Parar", self._on_stop, style="danger")
         self.btn_stop.config(state="disabled", bg=COLORS["btn_disabled_bg"], cursor="")
         self.btn_stop.pack(side="left", padx=(10, 0))
+
+        self.btn_sync = _btn(btn_row, "☁  Sincronizar desde Drive", self._on_sync, style="secondary")
+        self.btn_sync.pack(side="left", padx=(10, 0))
+
+        self.btn_upload_pending = _btn(btn_row, "⬆  Subir pendientes", self._on_upload_pending, style="secondary")
+        self.btn_upload_pending.pack(side="left", padx=(10, 0))
 
         tk.Label(
             btn_row,
@@ -524,8 +537,44 @@ class DashBoard(tk.Frame):
     def set_stop_callback(self, cb):
         self._stop_cb = cb
 
+    def set_sync_callback(self, cb):
+        self._sync_cb = cb
+
+    def set_upload_pending_callback(self, cb):
+        self._upload_pending_cb = cb
+
     def _log(self, msg):
         self.log(msg)
+
+    def _on_upload_pending(self):
+        if not self._upload_pending_cb:
+            return
+        self.btn_upload_pending.config(state="disabled", text="⏳  Subiendo...",
+                                       bg=COLORS["btn_disabled_bg"], cursor="")
+        def worker():
+            try:
+                self._upload_pending_cb(on_progress=lambda m: self.after(0, lambda: self.log(m)))
+            finally:
+                self.after(0, lambda: self.btn_upload_pending.config(
+                    state="normal", text="⬆  Subir pendientes",
+                    bg=COLORS["btn_secondary"], cursor="hand2",
+                ))
+        threading.Thread(target=worker, daemon=True).start()
+
+    def _on_sync(self):
+        if not self._sync_cb:
+            return
+        self.btn_sync.config(state="disabled", text="⏳  Sincronizando...",
+                             bg=COLORS["btn_disabled_bg"], cursor="")
+        def worker():
+            try:
+                self._sync_cb(on_progress=lambda m: self.after(0, lambda: self.log(m)))
+            finally:
+                self.after(0, lambda: self.btn_sync.config(
+                    state="normal", text="☁  Sincronizar desde Drive",
+                    bg=COLORS["btn_secondary"], cursor="hand2",
+                ))
+        threading.Thread(target=worker, daemon=True).start()
 
     def _on_execute(self):
         if self._run_callback:
