@@ -41,10 +41,16 @@ header h1 span{color:#4f8ef7}
 .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:600}
 .badge.activa{background:#14532d;color:#4ade80}
 .badge.inactiva{background:#4c0519;color:#f87171}
+.badge.nunca{background:#374151;color:#9ca3af}
 
 #overlay{position:fixed;inset:0;background:rgba(30,33,48,.85);display:flex;align-items:center;justify-content:center;font-size:1rem;color:#94a3b8;z-index:100;transition:opacity .2s}
 #overlay.oculto{opacity:0;pointer-events:none}
 .sin-datos{color:#475569;padding:20px;font-size:.875rem}
+
+@media (max-width:640px){
+  .kpi-row{grid-template-columns:repeat(2,1fr)}
+  .row2{grid-template-columns:1fr}
+}
 </style>
 </head>
 <body>
@@ -129,7 +135,14 @@ const LAYOUT = {
 };
 const CFG = {displayModeBar:false, responsive:true};
 
+let _peticionActual = 0;
+
 function cargarDatos() {
+  // clics repetidos (Aplicar/Actualizar/Limpiar) antes de que responda la
+  // petición anterior pueden resolver fuera de orden; solo se aplica al DOM
+  // la respuesta de la petición más reciente, se descartan las demás
+  const miPeticion = ++_peticionActual;
+
   const p = new URLSearchParams();
   const fuente = document.getElementById('f-fuente').value;
   const desde  = document.getElementById('f-desde').value;
@@ -143,6 +156,7 @@ function cargarDatos() {
   fetch('/api/datos?' + p)
     .then(r => r.json())
     .then(d => {
+      if (miPeticion !== _peticionActual) return;
       poblarFuentes(d.fuentes || []);
       renderKPIs(d.kpis || {});
       renderActividad(d.actividad_diaria || []);
@@ -152,6 +166,7 @@ function cargarDatos() {
       document.getElementById('overlay').classList.add('oculto');
     })
     .catch(e => {
+      if (miPeticion !== _peticionActual) return;
       console.error(e);
       document.getElementById('overlay').classList.add('oculto');
     });
@@ -209,7 +224,10 @@ function renderActividad(rows) {
     hovertemplate:'<b>%{x}</b><br>%{y} documentos<extra></extra>',
   }], {
     ...LAYOUT,
-    xaxis:{...LAYOUT.xaxis, tickangle:-30},
+    // type:'date' explícito — sin esto, una segunda llamada a Plotly.react()
+    // sobre el mismo div (cualquier clic repetido en Actualizar/Aplicar) hace
+    // que Plotly reinfiera el eje como numérico en vez de fecha
+    xaxis:{...LAYOUT.xaxis, tickangle:-30, type:'date'},
     margin:{t:8,r:16,b:52,l:40},
   }, CFG);
 }
@@ -227,7 +245,9 @@ function renderVolumen(vol) {
     ...LAYOUT,
     barmode:'stack',
     legend:{font:{size:9}, bgcolor:'#1e2130', orientation:'h', y:-0.22},
-    xaxis:{...LAYOUT.xaxis, tickangle:-30},
+    // type:'date' explícito — mismo motivo que en renderActividad: sin esto,
+    // una segunda llamada a Plotly.react() reinfiere el eje como numérico
+    xaxis:{...LAYOUT.xaxis, tickangle:-30, type:'date'},
     margin:{t:8,r:16,b:90,l:40},
   }, CFG);
 }
@@ -247,9 +267,14 @@ function renderTipos(tipos) {
   }], {
     ...LAYOUT,
     margin:{t:8,r:30,b:40,l:230},
-    yaxis:{...LAYOUT.yaxis, automargin:true},
+    // type:'category' explícito — con una etiqueta vacía ("" de tipos sin
+    // clasificar) Plotly a veces infiere el eje como numérico y las barras
+    // quedan invisibles
+    yaxis:{...LAYOUT.yaxis, automargin:true, type:'category'},
   }, CFG);
 }
+
+const _ESTADO_PRIORIDAD = {Nunca: 0, Inactiva: 1, Activa: 2};
 
 function renderEstado(filas) {
   const el = document.getElementById('tabla-estado');
@@ -257,7 +282,13 @@ function renderEstado(filas) {
     el.innerHTML = '<p class="sin-datos">Sin datos de Sheets disponibles</p>';
     return;
   }
-  const filas_ord = [...filas].sort((a,b) => a.dias_inactivo - b.dias_inactivo);
+  // las que necesitan atención (nunca corrieron o llevan más días inactivas) van primero
+  const filas_ord = [...filas].sort((a,b) => {
+    const p = _ESTADO_PRIORIDAD[a.estado] - _ESTADO_PRIORIDAD[b.estado];
+    if (p !== 0) return p;
+    return (b.dias_inactivo ?? 0) - (a.dias_inactivo ?? 0);
+  });
+  const badgeClass = e => e === 'Activa' ? 'activa' : (e === 'Nunca' ? 'nunca' : 'inactiva');
   el.innerHTML = '<table class="tbl">'
     + '<thead><tr>'
     + '<th>Fuente</th><th>Última captura</th><th>Días</th><th>Total</th><th>Estado</th>'
@@ -265,10 +296,10 @@ function renderEstado(filas) {
     + filas_ord.map(f =>
         '<tr>'
         + '<td style="max-width:160px;word-break:break-word">' + f.fuente + '</td>'
-        + '<td>' + f.ultima_captura + '</td>'
-        + '<td>' + f.dias_inactivo + '</td>'
+        + '<td>' + (f.ultima_captura ?? '—') + '</td>'
+        + '<td>' + (f.dias_inactivo ?? '—') + '</td>'
         + '<td>' + fmt(f.total_docs) + '</td>'
-        + '<td><span class="badge ' + (f.estado === 'Activa' ? 'activa' : 'inactiva') + '">' + f.estado + '</span></td>'
+        + '<td><span class="badge ' + badgeClass(f.estado) + '">' + f.estado + '</span></td>'
         + '</tr>'
       ).join('')
     + '</tbody></table>';

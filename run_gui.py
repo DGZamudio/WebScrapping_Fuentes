@@ -46,6 +46,8 @@ if __name__ == "__main__":
 
     _drive_watcher = DriveUploader()
     _sheets_watcher = SheetsReporter()
+    if _drive_watcher.user_email:
+        _sheets_watcher.compartir_con(_drive_watcher.user_email)
     _watcher = FileWatcher(_drive_watcher, _sheets_watcher)
     _watcher.start()
 

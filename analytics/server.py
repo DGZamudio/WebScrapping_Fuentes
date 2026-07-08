@@ -1,6 +1,7 @@
 import logging
 import socket
 import threading
+from datetime import date
 
 from flask import Flask, jsonify, render_template, request
 
@@ -124,6 +125,44 @@ def api_datos():
                 })
         except Exception as e:
             logging.warning(f"api_datos: estado_fuentes falló ({e})")
+
+    # Fuentes registradas que nunca han producido un documento (ni en Sheets ni en
+    # memory.db) no aparecen en absoluto en el bloque anterior — eso oculta scrapers
+    # nuevos que nunca corrieron o que fallan silenciosamente en cada ejecución.
+    # Se agregan aquí explícitamente marcadas como "Nunca" para que el panel de
+    # monitoreo las muestre en vez de omitirlas.
+    from scrappers import SCRAPERS
+
+    conteos_por_fuente = dict(db.get_counts_by_source())
+    # respaldo por si Sheets no está disponible pero memory.db sí tiene actividad
+    # reciente — evita marcar "Nunca" a una fuente que en realidad sí corrió
+    with db.get_conn() as conn:
+        ultima_por_fuente = dict(conn.execute(
+            "SELECT source, MAX(DATE(downloaded_at)) FROM downloaded GROUP BY source"
+        ).fetchall())
+
+    ya_listadas = {e["fuente"] for e in estado}
+    for nombre in SCRAPERS.keys():
+        if nombre in ya_listadas:
+            continue
+        ultima = ultima_por_fuente.get(nombre)
+        if ultima:
+            dias = (date.today() - date.fromisoformat(ultima)).days
+            estado.append({
+                "fuente": nombre,
+                "ultima_captura": ultima,
+                "dias_inactivo": dias,
+                "estado": "Activa" if dias <= 7 else "Inactiva",
+                "total_docs": conteos_por_fuente.get(nombre, 0),
+            })
+        else:
+            estado.append({
+                "fuente": nombre,
+                "ultima_captura": None,
+                "dias_inactivo": None,
+                "estado": "Nunca",
+                "total_docs": 0,
+            })
 
     # Lista de fuentes para el filtro (memory.db)
     with db.get_conn() as conn:

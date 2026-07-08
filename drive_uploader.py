@@ -41,6 +41,7 @@ class DriveUploader:
         self._service = None
         self._folder_cache: dict[str, str] = {}
         self._root_id: str | None = None
+        self.user_email: str | None = None
         self._init_service()
 
     def _init_service(self):
@@ -59,13 +60,57 @@ class DriveUploader:
 
             about = self._service.about().get(fields="user").execute()
             email = about["user"]["emailAddress"]
+            self.user_email = email
             logging.info(f"DriveUploader: conectado a Google Drive como {email}")
+
+            self._asegurar_acceso_carpeta_raiz(email)
         except Exception as e:
             logging.warning(
                 f"DriveUploader: no se pudo inicializar ({e}) — "
                 "subida deshabilitada"
             )
             self._service = None
+
+    def _asegurar_acceso_carpeta_raiz(self, email: str):
+        """Si la cuenta de Google que acaba de autenticarse no tiene acceso
+        todavía a la carpeta raíz de Drive, se lo concede automáticamente
+        usando la cuenta de servicio (que ya es dueña/tiene acceso de escritura
+        sobre esa carpeta). Evita que la primera subida falle por permisos.
+        """
+        if not _SA_CREDENTIALS_PATH.exists():
+            return
+        try:
+            from google.oauth2 import service_account
+            from googleapiclient.discovery import build as _build
+
+            sa_creds = service_account.Credentials.from_service_account_file(
+                str(_SA_CREDENTIALS_PATH), scopes=SCOPES
+            )
+            sa_service = _build("drive", "v3", credentials=sa_creds)
+
+            permisos = sa_service.permissions().list(
+                fileId=self._root_id, fields="permissions(emailAddress)"
+            ).execute().get("permissions", [])
+            ya_tiene_acceso = any(
+                p.get("emailAddress", "").lower() == email.lower() for p in permisos
+            )
+            if ya_tiene_acceso:
+                return
+
+            sa_service.permissions().create(
+                fileId=self._root_id,
+                body={"type": "user", "role": "writer", "emailAddress": email},
+                sendNotificationEmail=False,
+                fields="id",
+            ).execute()
+            logging.info(
+                f"DriveUploader: carpeta raíz compartida automáticamente con {email}"
+            )
+        except Exception as e:
+            logging.warning(
+                f"DriveUploader: no se pudo compartir automáticamente la carpeta raíz "
+                f"con {email} ({e}) — la subida podría fallar por permisos"
+            )
 
     def _get_or_create_folder(self, name: str, parent_id: str) -> str:
         cache_key = f"{parent_id}/{name}"
@@ -131,8 +176,17 @@ class DriveUploader:
             from googleapiclient.http import MediaFileUpload
 
             source_id = self._get_or_create_folder(doc.source, self._root_id)
-            date_id = self._get_or_create_folder(doc.f_public, source_id)
-            tipo_id = self._get_or_create_folder(doc.tipo, date_id)
+            parent_id = source_id
+            if doc.magistrado:
+                parent_id = self._get_or_create_folder(doc.magistrado, parent_id)
+            if doc.especialidad:
+                parent_id = self._get_or_create_folder(doc.especialidad, parent_id)
+            if doc.seccion and doc.seccion_en_carpeta:
+                parent_id = self._get_or_create_folder(doc.seccion, parent_id)
+            date_id = self._get_or_create_folder(doc.f_public, parent_id)
+            # tipo es opcional para algunas fuentes (ej. CNDJ); si no hay valor, el
+            # archivo queda directamente bajo la carpeta de fecha, sin nivel adicional
+            tipo_id = self._get_or_create_folder(doc.tipo, date_id) if doc.tipo else date_id
 
             try:
                 local_rel = str(local_path.relative_to(Path("downloads"))).replace("\\", "/")

@@ -86,7 +86,12 @@ def kpis(db, df=None, fuente: str | None = None) -> dict:
 
 
 def actividad_diaria(db, desde: str | None = None, hasta: str | None = None, fuente: str | None = None) -> list:
-    """Documentos descargados por día según memory.db (usa downloaded_at)."""
+    """Documentos descargados por día según memory.db (usa downloaded_at).
+
+    Rellena con 0 los días sin actividad dentro del rango: sin esto, un rango
+    con pocos días de datos reales le pasa a Plotly un eje de fechas con muy
+    pocos puntos (a veces uno solo), lo que rompe el autoescalado de ticks.
+    """
     from datetime import date, timedelta
 
     if hasta is None:
@@ -112,4 +117,13 @@ def actividad_diaria(db, desde: str | None = None, hasta: str | None = None, fue
                 (desde, hasta),
             ).fetchall()
 
-    return [{"fecha": r[0], "total": r[1]} for r in rows]
+    conteos = {r[0]: r[1] for r in rows}
+    f_desde = date.fromisoformat(desde)
+    f_hasta = date.fromisoformat(hasta)
+    dias = []
+    d = f_desde
+    while d <= f_hasta:
+        iso = d.isoformat()
+        dias.append({"fecha": iso, "total": conteos.get(iso, 0)})
+        d += timedelta(days=1)
+    return dias
