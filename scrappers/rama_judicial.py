@@ -54,12 +54,22 @@ _SUPERIORES_DEPTS = {
     "99": "Tribunal Superior del Vichada",
 }
 
+_JUZGADOS_ENTIDADES = {
+    "31": "Juzgado de Circuito",
+    "33": "Juzgado Administrativo",
+    "34": "Juzgado de Circuito de Ejecución",
+    "40": "Juzgado Municipal",
+    "41": "Juzgado de Pequeñas Causas",
+    "43": "Juzgado Municipal de Ejecución",
+}
 
-class ScrapTribunalesSuperiores(BaseScrapper):
-    def __init__(self, dept_code: str = "", dept_name: str = "Tribunales Superiores"):
+
+class ScrapRamaJudicial(BaseScrapper):
+    def __init__(self, dept_code: str = "", dept_name: str = "Rama Judicial", entidad_id: str = "22"):
         self.source = dept_name
         self.url = TRIBUNALES_SUPERIORES_URL
         self._dept_code = dept_code
+        self._entidad_id = entidad_id
         self._instance_id = None
 
     def _get_instance_id(self, session, headers):
@@ -140,7 +150,7 @@ class ScrapTribunalesSuperiores(BaseScrapper):
                 "p_p_state": "normal",
                 "p_p_mode": "view",
                 self._p("action"): "busqueda",
-                self._p("idEntidad"): 22,
+                self._p("idEntidad"): self._entidad_id,
                 self._p("fechaInicio"): fini,
                 self._p("fechaFin"): ffin,
                 self._p("verTotales"): "true",
@@ -177,7 +187,6 @@ class ScrapTribunalesSuperiores(BaseScrapper):
             if not rows:
                 break
 
-            # Parse row metadata first, then fetch all detail pages in parallel
             pending = []
             for row in rows:
                 if stop_event is not None and stop_event.is_set():

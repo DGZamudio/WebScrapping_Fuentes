@@ -1,4 +1,5 @@
 import logging
+import time
 from pathlib import Path
 import requests
 from bs4 import BeautifulSoup
@@ -161,25 +162,41 @@ class Downloader:
                 out_path = Path(f"downloads/{doc.source}/{doc.f_public}/{doc.tipo}/{filename['filename']}{filename['extension']}")
             out_path.parent.mkdir(parents=True, exist_ok=True)
 
-            with open(out_path, "wb") as f:
-                for chunk in r.iter_content(8192):
-                    if stop_event is not None and getattr(stop_event, "is_set", lambda: False)():
-                        try:
-                            f.close()
-                        except Exception:
-                            pass
-                        try:
-                            out_path.unlink(missing_ok=True)
-                        except Exception:
-                            pass
-                        raise InterruptedError("Download cancelled")
-                    if chunk:
-                        f.write(chunk)
+            # Si otro hilo ya descargó el mismo archivo (SAMAI paralelo), saltar
+            if out_path.exists() and out_path.stat().st_size > 0:
+                return out_path
+
+            try:
+                with open(out_path, "wb") as f:
+                    for chunk in r.iter_content(8192):
+                        if stop_event is not None and getattr(stop_event, "is_set", lambda: False)():
+                            try:
+                                f.close()
+                            except Exception:
+                                pass
+                            try:
+                                out_path.unlink(missing_ok=True)
+                            except Exception:
+                                pass
+                            raise InterruptedError("Download cancelled")
+                        if chunk:
+                            f.write(chunk)
+            except PermissionError:
+                # Archivo en uso por otro hilo; si ya tiene contenido, lo usamos
+                if out_path.exists() and out_path.stat().st_size > 0:
+                    return out_path
+                raise
 
         if doc.convert_to:
             converted = self._convert(out_path, doc.convert_to)
             if converted != out_path:
-                out_path.unlink(missing_ok=True)
+                # Word COM puede mantener el lock brevemente después de Close()
+                for _ in range(5):
+                    try:
+                        out_path.unlink(missing_ok=True)
+                        break
+                    except PermissionError:
+                        time.sleep(0.5)
             return converted
 
         return out_path

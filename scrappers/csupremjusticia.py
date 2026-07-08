@@ -64,7 +64,9 @@ class ScrapCorteSuprema(BaseScrapper):
                     response = requests.post(self.url, json=payload, headers=headers)
                     
                     if response.status_code != 200:
-                        raise Exception(f"Error al obtener datos de {self.source}: {response.status_code} - {response.text} el sitio pudo haber cambiado su estructura o el formato de respuesta, informare al equipo de desarrollo para actualizar el scraper.")
+                        if response.status_code in (502, 503, 504):
+                            raise Exception(f"Error al obtener datos de {self.source}: servidor temporalmente no disponible ({response.status_code}). Intenta de nuevo más tarde.")
+                        raise Exception(f"Error al obtener datos de {self.source}: {response.status_code} — el sitio pudo haber cambiado su estructura. Informar al equipo de desarrollo.")
                     
                     data = response.json()
 
@@ -107,7 +109,10 @@ class ScrapCorteSuprema(BaseScrapper):
                     print(f"Error: Missing expected field {e} in response for tipo '{tipo}'")
                     stop = True
                 except Exception as e:
-                    print(f"Error scraping tipo '{tipo}': {str(e)}")
+                    msg = str(e)
+                    if "502" in msg or "503" in msg or "504" in msg:
+                        msg += " Para el caso puntual de la Corte Suprema de Justicia no se puede realizar ningún cambio por el momento ya que ambas URLs apuntan a un mismo servidor que actualmente está caído."
+                    print(f"Error scraping tipo '{tipo}': {msg}")
                     stop = True
                     
         return docs

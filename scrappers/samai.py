@@ -282,19 +282,15 @@ class ScrapTribunales(BaseScrapper):
         if not jwt_url:
             return None
 
-        safe_corp = _safe(corp_name)
-        safe_sec = _safe(sec_name)
-        safe_ponente = _safe(ponente)
         safe_radicado = _safe(radicado)
         safe_actuacion = _safe(actuacion)
 
         return RawDocModel(
             source=corp_name,
-            link={"url": jwt_url, "method": "jwt_indirect", "body": {"path": f"{corp_code}_{radicado}_{actuacion[:100]}"}},
+            link={"url": jwt_url, "method": "jwt_indirect", "body": {"path": f"{corp_code}_{radicado}"}},
             title=radicado,
             tipo=actuacion[:100],
             f_public=fecha_prov,
-            save_path=f"downloads/{safe_corp}/{safe_sec}/{fecha_prov[:4]}/{safe_ponente}/{safe_radicado}_{safe_actuacion}(extension)",
             convert_to="rtf_word",
         )
 
