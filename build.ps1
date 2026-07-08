@@ -1,47 +1,52 @@
-# Build script for WebScrapping Fuentes
-# Usage: .\build.ps1
+# Build script para IURISYNC
+# Uso: .\build.ps1
 
 Write-Host "==================================" -ForegroundColor Cyan
-Write-Host "Building WebScrapping Fuentes..." -ForegroundColor Cyan
+Write-Host "  Compilando IURISYNC..." -ForegroundColor Cyan
 Write-Host "==================================" -ForegroundColor Cyan
 Write-Host ""
 
-# Check if PyInstaller is installed
-try {
-    pyinstaller --version | Out-Null
-} catch {
-    Write-Host "PyInstaller not found. Installing..." -ForegroundColor Yellow
-    pip install pyinstaller
+# Verificar PyInstaller
+$pipList = python -m pip show pyinstaller 2>$null
+if (-not $pipList) {
+    Write-Host "PyInstaller no encontrado. Instalando..." -ForegroundColor Yellow
+    python -m pip install pyinstaller
 }
 
-# Clean previous builds
-Write-Host "Cleaning previous builds..." -ForegroundColor Yellow
+# Limpiar builds anteriores
+Write-Host "Limpiando builds anteriores..." -ForegroundColor Yellow
 if (Test-Path "dist") { Remove-Item -Recurse -Force "dist" }
 if (Test-Path "build") { Remove-Item -Recurse -Force "build" }
+if (Test-Path "IURISYNC.spec") { Remove-Item -Force "IURISYNC.spec" }
 
-# Build executable
-Write-Host "Building executable..." -ForegroundColor Yellow
+# Compilar
+Write-Host "Compilando ejecutable..." -ForegroundColor Yellow
 $pyinstallerArgs = @(
-    "--onefile",
+    "--onedir",
     "--windowed",
-    "--name", "WebScrapping",
-    "--add-data", "config;config",
+    "--name", "IURISYNC",
     "--add-data", "scrappers;scrappers",
     "--add-data", "ui;ui",
     "--add-data", "models;models",
     "--add-data", "db;db",
+    "--add-data", "analytics;analytics",
     "run_gui.py"
 )
-pyinstaller @pyinstallerArgs
+python -m PyInstaller @pyinstallerArgs
 
-# Check if build was successful
-if (Test-Path "dist\WebScrapping.exe") {
-    Write-Host "" 
-    Write-Host "Build successful!" -ForegroundColor Green
-    Write-Host "Executable location: dist\WebScrapping.exe" -ForegroundColor Green
+# Verificar resultado
+if (Test-Path "dist\IURISYNC\IURISYNC.exe") {
+    # Copiar credenciales a la carpeta de distribución
+    New-Item -ItemType Directory -Force "dist\IURISYNC\config" | Out-Null
+    Copy-Item "config\credentials.json" "dist\IURISYNC\config\" -ErrorAction SilentlyContinue
+    Copy-Item "config\oauth_credentials.json" "dist\IURISYNC\config\" -ErrorAction SilentlyContinue
+
+    Write-Host ""
+    Write-Host "Build exitoso!" -ForegroundColor Green
+    Write-Host "Distribucion lista en: dist\IURISYNC\" -ForegroundColor Green
 } else {
     Write-Host ""
-    Write-Host "Build failed!" -ForegroundColor Red
+    Write-Host "Build fallido." -ForegroundColor Red
 }
 
 Write-Host ""
