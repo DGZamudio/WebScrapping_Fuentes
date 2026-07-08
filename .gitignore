@@ -17,7 +17,17 @@ __pycache__/
 memory.db
 settings.json
 scraper.log
+iurisync.log
 downloads/
+config/credentials.json
+config/oauth_credentials.json
+config/token.json
+
+# Claude / Superpowers
+CLAUDE.md
+.claude/
+.superpowers/
+docs/superpowers/
 
 # PyInstaller
 dist/
