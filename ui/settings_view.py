@@ -335,7 +335,7 @@ class SettingsView(ctk.CTkFrame):
         row.pack(fill="x", pady=2)
 
         if indent:
-            ctk.CTkFrame(row, fg_color="transparent", width=4).pack(side="left")
+            ctk.CTkFrame(row, fg_color="transparent", width=4, height=1).pack(side="left")
 
         ctk.CTkCheckBox(
             row, text=text, variable=var,

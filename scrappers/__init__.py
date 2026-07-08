@@ -1,3 +1,7 @@
+from scrappers.adr import ScrapADR
+from scrappers.adres import ScrapADRES
+from scrappers.ane import ScrapANE
+from scrappers.anh import ScrapANH
 from scrappers.cndj import ScrapCNDJ
 from scrappers.csupremjusticia import ScrapCorteSuprema
 from scrappers.jep import ScrapJEP
@@ -9,6 +13,10 @@ SCRAPERS = {
     "Corte Constitucional": ScrapConstitucional(),
     "Corte Suprema": ScrapCorteSuprema(),
     "JEP": ScrapJEP(),
+    "Agencia de Desarrollo Rural": ScrapADR(),
+    "Administradora de los Recursos del Sistema General de Seguridad Social en Salud": ScrapADRES(),
+    "Agencia Nacional del Espectro": ScrapANE(),
+    "Agencia Nacional de Hidrocarburos": ScrapANH(),
     **{
         dept_name: ScrapRamaJudicial(dept_code=dept_code, dept_name=dept_name, entidad_id="22")
         for dept_code, dept_name in _SUPERIORES_DEPTS.items()

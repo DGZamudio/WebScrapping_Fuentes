@@ -1,4 +1,5 @@
 import re
+from datetime import datetime, timedelta
 from typing import List
 
 import requests
@@ -21,6 +22,7 @@ _DATE_PATTERN = re.compile(
 )
 
 _TOKEN_PATTERN = re.compile(r'__RequestVerificationToken[^>]+value="([^"]+)"')
+_ARCHIVO_TS_PATTERN = re.compile(r"(\d{14})$")
 
 
 def _parse_date(text: str):
@@ -146,9 +148,15 @@ class ScrapCNDJ(BaseScrapper):
             if not any(y in decision_text or y in numero_unico for y in years_in_range):
                 continue
 
-            f_public = _parse_date(decision_text) or _radicado_year(numero_unico) or fini
+            fecha_decision = _parse_date(decision_text)
+            fecha_estimada = fecha_decision or _radicado_year(numero_unico) or fini
 
-            if f_public < fini or f_public > ffin:
+            # margen de holgura: el archivo suele publicarse días o semanas después de
+            # la decisión (confirmado con datos reales), así que el pre-filtro no puede
+            # exigir precisión exacta antes de consultar el detalle
+            fini_holgado = (datetime.strptime(fini, "%Y-%m-%d") - timedelta(days=90)).strftime("%Y-%m-%d")
+            ffin_holgado = (datetime.strptime(ffin, "%Y-%m-%d") + timedelta(days=90)).strftime("%Y-%m-%d")
+            if fecha_estimada < fini_holgado or fecha_estimada > ffin_holgado:
                 continue
 
             try:
@@ -167,20 +175,34 @@ class ScrapCNDJ(BaseScrapper):
             if not archivo or not archivo.strip():
                 continue
 
+            # el nombre del archivo trae la fecha real de publicación/adjunción al final
+            # (ej. "...ADJUNTA20251024143552"); distinta de fecha_decision (f_providencia),
+            # no se mezclan — aunque no es 100% monótona respecto a la decisión (~8% de ruido)
+            ts_m = _ARCHIVO_TS_PATTERN.search(archivo)
+            f_public = (
+                (f"{ts_m.group(1)[0:4]}-{ts_m.group(1)[4:6]}-{ts_m.group(1)[6:8]}" if ts_m else None)
+                or fecha_decision
+                or _radicado_year(numero_unico)
+                or fini
+            )
+
+            if f_public < fini or f_public > ffin:
+                continue
+
             url = f"{CNDJ_DOWNLOAD_URL}{archivo}.pdf"
             dedup_key = f"{numero_unico}_{numero_ficha}"
             magistrado_fmt = magistrado.title()
             safe_num = "F" + _format_radicado(numero_unico) + f"_{f_public[:4]}"
-            path = (
-                f"downloads/{self.source}/{magistrado_fmt}/{f_public}/{safe_num}(extension)"
-            )
+            path = f"downloads/{self.source}/{magistrado_fmt}/{f_public}/{safe_num}(extension)"
 
             docs.append(RawDocModel(
                 source=self.source,
                 link={"url": url, "method": "GET", "body": {"path": dedup_key}},
                 title=f"{numero_unico} - {magistrado}",
                 tipo="",
+                magistrado=magistrado_fmt,
                 f_public=f_public,
+                f_providencia=fecha_decision,
                 save_path=path,
                 convert_to="rtf",
             ))

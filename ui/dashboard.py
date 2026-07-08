@@ -343,7 +343,7 @@ class DashBoard(ctk.CTkFrame):
         row.pack(fill="x", pady=2)
 
         if indent:
-            ctk.CTkFrame(row, fg_color="transparent", width=indent).pack(side="left")
+            ctk.CTkFrame(row, fg_color="transparent", width=indent, height=1).pack(side="left")
 
         is_child = indent > 0
         disp = name if len(name) <= 35 else name[:33] + "…"

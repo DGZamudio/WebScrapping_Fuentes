@@ -31,7 +31,15 @@ def extract_filename(disposition, content_type, url, opt_title):
         ext = ""
 
     url_path = url.split("?")[0]  # strip query params before extracting filename
-    return {"filename": url_path.split("/")[-1] or opt_title, "extension": ext}
+    name = url_path.split("/")[-1] or opt_title
+    # el nombre tomado de la URL suele traer su propia extensión (ej. "foo.pdf");
+    # quitarla evita que quede duplicada al concatenar con `extension` más abajo
+    if "." in name:
+        base, _, url_ext = name.rpartition(".")
+        name = base
+        if not ext:
+            ext = "." + url_ext
+    return {"filename": name, "extension": ext}
 
 
 def generate_excel_report(path: str, rows: list[dict], title: str = "Inventario") -> None:

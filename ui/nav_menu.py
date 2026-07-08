@@ -53,7 +53,7 @@ class NavMenu(ctk.CTkFrame):
         container = ctk.CTkFrame(self, fg_color=COLORS["sidebar"], corner_radius=0)
         container.pack(fill="x", pady=1)
 
-        indicator = ctk.CTkFrame(container, fg_color=COLORS["sidebar"], width=4, corner_radius=0)
+        indicator = ctk.CTkFrame(container, fg_color=COLORS["sidebar"], width=4, height=1, corner_radius=0)
         indicator.pack(side="left", fill="y")
 
         btn = ctk.CTkButton(

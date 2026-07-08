@@ -40,24 +40,32 @@ class ScrapConstitucional(BaseScrapper):
                 raw = item["_source"]
                 
                 link = f"{CORTE_CONSTITUCIONAL_DOWNLOAD_URL}{raw['rutahtml'].replace('.htm', '.rtf')}"
-                tipo = raw['prov_tipo'] if raw['prov_tipo'] == "Auto" else ""
-                
-                fecha_p = raw["prov_f_public"] if raw.get("prov_f_public", None) else raw["prov_f_sentencia"]
-                
+
+                # prov_f_public (fecha real de publicación) falta en la mayoría de
+                # documentos anteriores a ~2020; en esos casos no hay otra fecha de
+                # publicación disponible y se usa prov_f_sentencia como respaldo para
+                # que el documento siga teniendo carpeta/orden cronológico. La fecha
+                # de providencia siempre se guarda aparte en f_providencia para que
+                # nunca queden mezcladas en el sheet.
+                fecha_p = raw.get("prov_f_public") or raw["prov_f_sentencia"]
+                # el radicado trae "/" (ej. "T-065/24"), no es válido como nombre de archivo
+                safe_title = raw["prov_sentencia"].replace("/", "-")
                 path = os.path.join(
                     "downloads",
                     self.source,
-                    tipo,
-                    fecha_p.replace('-', '')[:4],
-                    "(filename)"
+                    fecha_p,
+                    raw["prov_tipo"],
+                    f"{safe_title}(extension)",
                 )
+
                 doc = RawDocModel(
                     source= self.source,
                     link= {"url":link, "method":"GET", "body": {"path": raw["prov_sentencia"]}},
                     title= raw["prov_sentencia"],
                     tipo= raw["prov_tipo"],
                     f_public= fecha_p,
-                    save_path=path
+                    f_providencia= raw["prov_f_sentencia"],
+                    save_path=path,
                 )
 
                 docs.append(doc)

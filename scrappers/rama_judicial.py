@@ -215,8 +215,9 @@ class ScrapRamaJudicial(BaseScrapper):
                     if tipo not in _TIPOS_PERMITIDOS:
                         continue
 
-                    especialidad = categorias.get("Especialidad", "sin-especialidad")
+                    especialidad_raw = categorias.get("Especialidad", "sin-especialidad")
                     despacho_raw = categorias.get("Despacho", "")
+                    especialidad_dir = _INVALID_PATH_CHARS.sub("-", especialidad_raw)[:60]
                     despacho_dir = _INVALID_PATH_CHARS.sub("-", despacho_raw)[:60]
                     tipo_dir     = _INVALID_PATH_CHARS.sub("-", tipo)
 
@@ -224,7 +225,7 @@ class ScrapRamaJudicial(BaseScrapper):
                     if not detail_url:
                         continue
 
-                    pending.append((fecha_p, tipo, tipo_dir, especialidad, despacho_dir, detail_url))
+                    pending.append((fecha_p, tipo, tipo_dir, especialidad_dir, despacho_dir, detail_url))
                 except Exception as e:
                     print(f"Error procesando fila: {e}")
                     continue
@@ -240,7 +241,7 @@ class ScrapRamaJudicial(BaseScrapper):
                 for future in as_completed(future_to_meta):
                     if stop_event is not None and stop_event.is_set():
                         return docs
-                    fecha_p, tipo, tipo_dir, especialidad, despacho_dir, _ = future_to_meta[future]
+                    fecha_p, tipo, tipo_dir, especialidad_dir, despacho_dir, _ = future_to_meta[future]
                     try:
                         archivos = future.result()
                     except Exception:
@@ -249,15 +250,18 @@ class ScrapRamaJudicial(BaseScrapper):
                     for filename, download_url, file_uuid in archivos:
                         name_no_ext = (filename.rsplit(".", 1)[0] if "." in filename else filename).strip()
                         doc_name = _INVALID_PATH_CHARS.sub("-", name_no_ext)
+                        # mismo orden que las demás fuentes: clasificación → fecha → tipo
                         save_path = (
-                            f"downloads/{self.source}/{tipo_dir}"
-                            f"/{especialidad}/{despacho_dir}/{fecha_p}/{doc_name}(extension)"
+                            f"downloads/{self.source}/{especialidad_dir}/{despacho_dir}"
+                            f"/{fecha_p}/{tipo_dir}/{doc_name}(extension)"
                         )
                         docs.append(RawDocModel(
                             source=self.source,
                             link={"url": download_url, "method": "GET", "body": {"path": file_uuid}},
                             title=name_no_ext,
                             tipo=tipo,
+                            especialidad=especialidad_dir,
+                            seccion=despacho_dir,
                             f_public=fecha_p,
                             save_path=save_path,
                             convert_to="rtf",

@@ -1,3 +1,4 @@
+import os
 import re
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -276,21 +277,43 @@ class ScrapTribunales(BaseScrapper):
         actuacion = tds[7].get_text(strip=True)
         fecha_prov_raw = tds[6].get_text(strip=True)
 
-        fecha_prov = _parse_prov_date(fecha_prov_raw) or estado_fecha_str
+        # estado_fecha_str es la fecha real de publicación (el "estado"/edicto que se
+        # busca); fecha_prov es la fecha de la providencia en sí, casi siempre distinta
+        # (confirmado: hasta 109 días de diferencia) — no se mezclan.
+        fecha_prov = _parse_prov_date(fecha_prov_raw)
 
         jwt_url = self._extract_jwt_url(tds[9])
         if not jwt_url:
             return None
 
+        # "tipo" es la categoría general (Auto/Sentencia/Manifestación...), tomada de
+        # la primera palabra de la actuación; el texto completo se conserva en
+        # "detalle" para no perder la descripción real (ej. "Auto que rechaza
+        # recurso de apelación").
+        palabras = actuacion.split()
+        tipo = _safe(palabras[0]) if palabras else ""
+        seccion = _safe(sec_name, maxlen=100)
         safe_radicado = _safe(radicado)
-        safe_actuacion = _safe(actuacion)
+
+        path = os.path.join(
+            "downloads",
+            corp_name,
+            seccion,
+            estado_fecha_str,
+            tipo,
+            f"{safe_radicado}(extension)",
+        )
 
         return RawDocModel(
             source=corp_name,
             link={"url": jwt_url, "method": "jwt_indirect", "body": {"path": f"{corp_code}_{radicado}"}},
             title=radicado,
-            tipo=actuacion[:100],
-            f_public=fecha_prov,
+            tipo=tipo,
+            detalle=actuacion,
+            seccion=seccion,
+            f_public=estado_fecha_str,
+            f_providencia=fecha_prov,
+            save_path=path,
             convert_to="rtf_word",
         )
 
