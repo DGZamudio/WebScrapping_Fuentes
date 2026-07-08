@@ -1,34 +1,34 @@
-import tkinter as tk
+import customtkinter as ctk
 from ui.theme import COLORS, FONTS
 
 
-class StatusBar(tk.Frame):
+class StatusBar(ctk.CTkFrame):
     def __init__(self, parent):
-        super().__init__(parent, bg=COLORS["statusbar"], height=26)
+        super().__init__(parent, fg_color=COLORS["statusbar"], height=26, corner_radius=0)
         self.pack_propagate(False)
 
-        self._dot = tk.Label(
+        self._dot = ctk.CTkLabel(
             self, text="●",
-            bg=COLORS["statusbar"], fg=COLORS["success"],
+            text_color=COLORS["success"], fg_color="transparent",
             font=("Segoe UI", 8),
         )
         self._dot.pack(side="left", padx=(12, 4))
 
-        self.label = tk.Label(
+        self.label = ctk.CTkLabel(
             self, text="Sistema listo",
-            bg=COLORS["statusbar"], fg=COLORS["statusbar_text"],
+            text_color=COLORS["statusbar_text"], fg_color="transparent",
             font=FONTS["small"], anchor="w",
         )
         self.label.pack(side="left", fill="x", expand=True)
 
-        tk.Label(
+        ctk.CTkLabel(
             self, text="IURISYNC  ",
-            bg=COLORS["statusbar"], fg=COLORS["sidebar_section"],
+            text_color=COLORS["sidebar_section"], fg_color="transparent",
             font=("Segoe UI", 8, "bold"),
         ).pack(side="right")
 
     def set_status(self, text):
-        self.label.config(text=text)
+        self.label.configure(text=text)
         m = text.lower()
         if any(k in m for k in ["error", "exception", "excepción"]):
             color = COLORS["error"]
@@ -38,4 +38,4 @@ class StatusBar(tk.Frame):
             color = COLORS["warning"]
         else:
             color = COLORS["success"]
-        self._dot.config(fg=color)
+        self._dot.configure(text_color=color)
