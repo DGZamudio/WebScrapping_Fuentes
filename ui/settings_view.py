@@ -1,148 +1,142 @@
 import subprocess
 import tkinter as tk
-from tkinter import ttk
 from pathlib import Path
 import json
 
+import customtkinter as ctk
+
 from scrappers import SCRAPERS
 from setup_scheduler import registrar_tarea, _validar_hora
-from ui.theme import COLORS, FONTS
+from ui.theme import COLORS, FONTS, CORNER_RADIUS, BORDER_WIDTH
+from ui.list_filter import reflow_rows
 
 SETTINGS_PATH = Path("config") / "settings.json"
 
 
-class _CollapsibleSection(tk.Frame):
+class _CollapsibleSection(ctk.CTkFrame):
     """Collapsible group row for grouping related sources."""
 
-    def __init__(self, parent, text, count, label="fuentes", bg=COLORS["card"], **kwargs):
-        super().__init__(parent, bg=bg, **kwargs)
-        self._bg = bg
+    def __init__(self, parent, text, count, label="fuentes", **kwargs):
+        super().__init__(parent, fg_color="transparent", **kwargs)
         self._expanded = False
 
-        # ── Header row ────────────────────────────────────────────────────────
-        hdr = tk.Frame(self, bg=bg, cursor="hand2")
+        hdr = ctk.CTkFrame(self, fg_color="transparent", cursor="hand2")
         hdr.pack(fill="x", pady=(6, 0))
 
-        self._arrow = tk.Label(
-            hdr, text="▶", bg=bg, fg=COLORS["accent"],
-            font=("Segoe UI", 8, "bold"), width=2, cursor="hand2",
+        self._arrow = ctk.CTkLabel(
+            hdr, text="▶", text_color=COLORS["accent"], fg_color="transparent",
+            font=("Segoe UI", 8, "bold"), width=16, cursor="hand2",
         )
         self._arrow.pack(side="left")
 
-        tk.Label(
-            hdr, text=text, bg=bg, fg=COLORS["text_secondary"],
+        ctk.CTkLabel(
+            hdr, text=text, text_color=COLORS["text_secondary"], fg_color="transparent",
             font=FONTS["body_bold"], anchor="w", cursor="hand2",
         ).pack(side="left")
 
-        tk.Label(
+        ctk.CTkLabel(
             hdr, text=f"{count} {label}",
-            bg=bg, fg=COLORS["text_muted"], font=FONTS["caption"],
+            text_color=COLORS["text_muted"], fg_color="transparent",
+            font=FONTS["caption"],
         ).pack(side="left", padx=(8, 0), pady=(1, 0))
 
-        # ── Content frame (hidden by default) ────────────────────────────────
-        self.content = tk.Frame(self, bg=bg)
+        self.content = ctk.CTkFrame(self, fg_color="transparent")
 
         for widget in (hdr, self._arrow):
             widget.bind("<Button-1>", self._toggle)
 
     def _toggle(self, _=None):
         if self._expanded:
-            self.content.pack_forget()
-            self._arrow.config(text="▶")
+            self._force_collapse()
         else:
+            self._force_expand()
+
+    def _force_expand(self):
+        if not self._expanded:
             self.content.pack(fill="x", padx=(16, 0), pady=(4, 0))
-            self._arrow.config(text="▼")
-        self._expanded = not self._expanded
+            self._arrow.configure(text="▼")
+            self._expanded = True
+
+    def _force_collapse(self):
+        if self._expanded:
+            self.content.pack_forget()
+            self._arrow.configure(text="▶")
+            self._expanded = False
 
 
-class SettingsView(tk.Frame):
+class SettingsView(ctk.CTkFrame):
     def __init__(self, parent, controller=None):
-        super().__init__(parent, bg=COLORS["bg"])
+        super().__init__(parent, fg_color=COLORS["bg"], corner_radius=0)
         self.controller = controller
         self.source_vars: dict[str, tk.BooleanVar] = {}
-        self._all_vars: list[tk.BooleanVar] = []        # flat list for select-all
+        self._all_vars: list[tk.BooleanVar] = []
+        self._sections: list[dict] = []
+        self._flat_rows: list[tuple[str, ctk.CTkFrame]] = []
         self._build()
         self.load_settings()
 
     # ------------------------------------------------------------------ build
 
     def _build(self):
-        # ── Sticky header ─────────────────────────────────────────────────────
-        header = tk.Frame(self, bg=COLORS["bg"])
+        header = ctk.CTkFrame(self, fg_color="transparent")
         header.pack(fill="x", padx=24, pady=(24, 0))
 
-        tk.Label(
+        ctk.CTkLabel(
             header, text="Configuración",
-            bg=COLORS["bg"], fg=COLORS["text"], font=FONTS["h1"],
+            text_color=COLORS["text"], fg_color="transparent", font=FONTS["h1"],
         ).pack(side="left")
 
-        tk.Label(
+        ctk.CTkLabel(
             header, text="Fuentes activas y opciones de descarga",
-            bg=COLORS["bg"], fg=COLORS["text_muted"], font=FONTS["small"],
+            text_color=COLORS["text_muted"], fg_color="transparent", font=FONTS["small"],
         ).pack(side="right", pady=(10, 0))
 
-        tk.Frame(self, bg=COLORS["card_border"], height=1).pack(
+        ctk.CTkFrame(self, fg_color=COLORS["card_border"], height=1, corner_radius=0).pack(
             fill="x", padx=24, pady=(14, 0)
         )
 
-        # ── Scrollable body ────────────────────────────────────────────────────
-        canvas = tk.Canvas(self, bg=COLORS["bg"], highlightthickness=0)
-        scrollbar = ttk.Scrollbar(self, orient="vertical", command=canvas.yview)
-        canvas.configure(yscrollcommand=scrollbar.set)
-        scrollbar.pack(side="right", fill="y")
-        canvas.pack(side="left", fill="both", expand=True)
+        body = ctk.CTkScrollableFrame(self, fg_color=COLORS["bg"])
+        body.pack(fill="both", expand=True, padx=0, pady=0)
 
-        body = tk.Frame(canvas, bg=COLORS["bg"])
-        win_id = canvas.create_window((0, 0), window=body, anchor="nw")
-
-        def _scroll(e):
-            canvas.yview_scroll(int(-1 * (e.delta / 120)), "units")
-
-        def _update(e=None):
-            canvas.configure(scrollregion=canvas.bbox("all"))
-            canvas.update_idletasks()
-            if body.winfo_reqheight() > canvas.winfo_height():
-                if not scrollbar.winfo_ismapped():
-                    scrollbar.pack(side="right", fill="y")
-            else:
-                scrollbar.pack_forget()
-
-        canvas.bind("<Configure>", lambda e: (canvas.itemconfig(win_id, width=e.width), _update()))
-        body.bind("<Configure>", lambda e: _update())
-        canvas.bind("<Enter>", lambda e: canvas.bind_all("<MouseWheel>", _scroll))
-        canvas.bind("<Leave>", lambda e: canvas.unbind_all("<MouseWheel>"))
-
-        # ── Scheduler card ────────────────────────────────────────────────────
         self._build_scheduler_card(body)
 
-        # ── Sources card ───────────────────────────────────────────────────────
         card = self._card(body)
         card.pack(fill="x", padx=24, pady=(0, 24))
 
-        # Card header
-        card_hdr = tk.Frame(card, bg=COLORS["card"])
+        card_hdr = ctk.CTkFrame(card, fg_color="transparent")
         card_hdr.pack(fill="x", padx=20, pady=(18, 0))
 
-        tk.Label(
+        ctk.CTkLabel(
             card_hdr, text="Fuentes a descargar",
-            bg=COLORS["card"], fg=COLORS["text"], font=FONTS["h3"],
+            text_color=COLORS["text"], fg_color="transparent", font=FONTS["h3"],
         ).pack(side="left")
 
-        # Select-all / none toggle link
-        self._sel_all_lbl = tk.Label(
+        self._sel_all_lbl = ctk.CTkLabel(
             card_hdr, text="Seleccionar todo",
-            bg=COLORS["card"], fg=COLORS["accent"],
+            text_color=COLORS["accent"], fg_color="transparent",
             font=FONTS["small"], cursor="hand2",
         )
         self._sel_all_lbl.pack(side="right", pady=(2, 0))
         self._sel_all_lbl.bind("<Button-1>", self._toggle_all)
 
-        tk.Frame(card, bg=COLORS["card_border"], height=1).pack(fill="x", padx=20, pady=(12, 0))
+        ctk.CTkFrame(card, fg_color=COLORS["card_border"], height=1, corner_radius=0).pack(
+            fill="x", padx=20, pady=(12, 0)
+        )
 
-        # Checkbox body
-        chk_body = tk.Frame(card, bg=COLORS["card"])
+        search_row = ctk.CTkFrame(card, fg_color="transparent")
+        search_row.pack(fill="x", padx=20, pady=(12, 0))
+
+        self._search_var = tk.StringVar()
+        self._search_var.trace_add("write", lambda *_: self._apply_filter(self._search_var.get()))
+        ctk.CTkEntry(
+            search_row, textvariable=self._search_var,
+            placeholder_text="Buscar fuente...",
+            fg_color=COLORS["bg"], border_color=COLORS["card_border"],
+            text_color=COLORS["text"], corner_radius=CORNER_RADIUS,
+        ).pack(fill="x")
+
+        chk_body = ctk.CTkFrame(card, fg_color="transparent")
         chk_body.pack(fill="both", expand=True, padx=20, pady=(12, 0))
-
 
         trib_adm = {}
         trib_sup = {}
@@ -158,93 +152,54 @@ class SettingsView(tk.Frame):
             else:
                 others[src] = SCRAPERS[src]
 
-        # Non-tribunal sources
         for src in others:
             var = tk.BooleanVar(value=True)
-            self._add_checkbox(chk_body, src, var)
+            row = self._add_checkbox(chk_body, src, var)
             self.source_vars[src] = var
             self._all_vars.append(var)
+            self._flat_rows.append((src, row))
 
-        # Tribunales Administrativos collapsible
-        if trib_adm:
-            tk.Frame(chk_body, bg=COLORS["card_border"], height=1).pack(
-                fill="x", pady=(10, 4)
-            )
-            section = _CollapsibleSection(
-                chk_body,
-                text="Tribunales Administrativos",
-                count=len(trib_adm),
-                label="tribunales",
-                bg=COLORS["card"],
-            )
-            section.pack(fill="x")
+        self._add_section(chk_body, "Tribunales Administrativos", trib_adm, "tribunales")
+        self._add_section(chk_body, "Tribunales Superiores", trib_sup, "tribunales")
+        self._add_section(chk_body, "Juzgados", juzgados, "juzgados")
 
-            for src in sorted(trib_adm):
-                var = tk.BooleanVar(value=True)
-                self._add_checkbox(section.content, src, var, indent=True)
-                self.source_vars[src] = var
-                self._all_vars.append(var)
-
-        # Tribunales Superiores collapsible
-        if trib_sup:
-            tk.Frame(chk_body, bg=COLORS["card_border"], height=1).pack(
-                fill="x", pady=(10, 4)
-            )
-            section = _CollapsibleSection(
-                chk_body,
-                text="Tribunales Superiores",
-                count=len(trib_sup),
-                label="tribunales",
-                bg=COLORS["card"],
-            )
-            section.pack(fill="x")
-
-            for src in sorted(trib_sup):
-                var = tk.BooleanVar(value=True)
-                self._add_checkbox(section.content, src, var, indent=True)
-                self.source_vars[src] = var
-                self._all_vars.append(var)
-
-        # Juzgados collapsible
-        if juzgados:
-            tk.Frame(chk_body, bg=COLORS["card_border"], height=1).pack(
-                fill="x", pady=(10, 4)
-            )
-            section = _CollapsibleSection(
-                chk_body,
-                text="Juzgados",
-                count=len(juzgados),
-                label="juzgados",
-                bg=COLORS["card"],
-            )
-            section.pack(fill="x")
-
-            for src in sorted(juzgados):
-                var = tk.BooleanVar(value=True)
-                self._add_checkbox(section.content, src, var, indent=True)
-                self.source_vars[src] = var
-                self._all_vars.append(var)
-
-        # Card footer: save button
-        tk.Frame(card, bg=COLORS["card_border"], height=1).pack(fill="x", padx=20, pady=(16, 0))
-        footer = tk.Frame(card, bg=COLORS["card"])
+        ctk.CTkFrame(card, fg_color=COLORS["card_border"], height=1, corner_radius=0).pack(
+            fill="x", padx=20, pady=(16, 0)
+        )
+        footer = ctk.CTkFrame(card, fg_color="transparent")
         footer.pack(fill="x", padx=20, pady=(10, 16))
 
-        tk.Label(
+        ctk.CTkLabel(
             footer, text="Los cambios se aplican en la próxima ejecución.",
-            bg=COLORS["card"], fg=COLORS["text_muted"], font=FONTS["caption"],
+            text_color=COLORS["text_muted"], fg_color="transparent", font=FONTS["caption"],
         ).pack(side="left", pady=(2, 0))
 
-        tk.Button(
+        ctk.CTkButton(
             footer, text="Guardar configuración",
             command=self._on_save,
-            bg=COLORS["btn_primary"], fg=COLORS["btn_text"],
-            activebackground=COLORS["btn_primary_hover"],
-            activeforeground=COLORS["btn_text"],
-            font=FONTS["body_bold"],
-            relief="flat", bd=0, cursor="hand2",
-            padx=14, pady=7,
+            fg_color=COLORS["btn_primary"], hover_color=COLORS["btn_primary_hover"],
+            text_color=COLORS["btn_text"], font=FONTS["body_bold"],
+            corner_radius=CORNER_RADIUS,
         ).pack(side="right")
+
+    def _add_section(self, parent, title, sources: dict, label: str):
+        if not sources:
+            return
+        ctk.CTkFrame(parent, fg_color=COLORS["card_border"], height=1, corner_radius=0).pack(
+            fill="x", pady=(10, 4)
+        )
+        section = _CollapsibleSection(parent, text=title, count=len(sources), label=label)
+        section.pack(fill="x")
+
+        rows = []
+        for src in sorted(sources):
+            var = tk.BooleanVar(value=True)
+            row = self._add_checkbox(section.content, src, var, indent=True)
+            self.source_vars[src] = var
+            self._all_vars.append(var)
+            rows.append((src, row))
+
+        self._sections.append({"frame": section, "rows": rows})
 
     # -------------------------------------------------------- scheduler card
 
@@ -252,21 +207,23 @@ class SettingsView(tk.Frame):
         card = self._card(parent)
         card.pack(fill="x", padx=24, pady=(24, 12))
 
-        hdr = tk.Frame(card, bg=COLORS["card"])
+        hdr = ctk.CTkFrame(card, fg_color="transparent")
         hdr.pack(fill="x", padx=20, pady=(18, 0))
-        tk.Label(
+        ctk.CTkLabel(
             hdr, text="Automatización",
-            bg=COLORS["card"], fg=COLORS["text"], font=FONTS["h3"],
+            text_color=COLORS["text"], fg_color="transparent", font=FONTS["h3"],
         ).pack(side="left")
 
-        tk.Frame(card, bg=COLORS["card_border"], height=1).pack(fill="x", padx=20, pady=(12, 0))
+        ctk.CTkFrame(card, fg_color=COLORS["card_border"], height=1, corner_radius=0).pack(
+            fill="x", padx=20, pady=(12, 0)
+        )
 
-        body = tk.Frame(card, bg=COLORS["card"])
+        body = ctk.CTkFrame(card, fg_color="transparent")
         body.pack(fill="x", padx=20, pady=(12, 0))
 
-        tk.Label(
+        ctk.CTkLabel(
             body, text="Hora de ejecución diaria:",
-            bg=COLORS["card"], fg=COLORS["text_secondary"], font=FONTS["body"],
+            text_color=COLORS["text_secondary"], fg_color="transparent", font=FONTS["body"],
         ).pack(side="left")
 
         hora_actual = self._get_hora_actual()
@@ -275,6 +232,8 @@ class SettingsView(tk.Frame):
         self._hora_hh = tk.StringVar(value=hh)
         self._hora_mm = tk.StringVar(value=mm)
 
+        # CustomTkinter no incluye un Spinbox nativo; se mantiene tk.Spinbox
+        # reskineado, igual que tkcalendar.DateEntry en ui/dashboard.py.
         tk.Spinbox(
             body, from_=0, to=23, textvariable=self._hora_hh,
             width=3, format="%02.0f", wrap=True,
@@ -283,7 +242,9 @@ class SettingsView(tk.Frame):
             buttonbackground=COLORS["bg"],
         ).pack(side="left", padx=(10, 2))
 
-        tk.Label(body, text=":", bg=COLORS["card"], fg=COLORS["text"], font=FONTS["body_bold"]).pack(side="left")
+        ctk.CTkLabel(
+            body, text=":", text_color=COLORS["text"], fg_color="transparent", font=FONTS["body_bold"],
+        ).pack(side="left")
 
         tk.Spinbox(
             body, from_=0, to=59, textvariable=self._hora_mm,
@@ -293,25 +254,24 @@ class SettingsView(tk.Frame):
             buttonbackground=COLORS["bg"],
         ).pack(side="left", padx=(2, 10))
 
-        tk.Button(
+        ctk.CTkButton(
             body, text="Programar",
             command=self._on_programar,
-            bg=COLORS["btn_primary"], fg=COLORS["btn_text"],
-            activebackground=COLORS["btn_primary_hover"],
-            activeforeground=COLORS["btn_text"],
-            font=FONTS["body_bold"],
-            relief="flat", bd=0, cursor="hand2",
-            padx=14, pady=5,
+            fg_color=COLORS["btn_primary"], hover_color=COLORS["btn_primary_hover"],
+            text_color=COLORS["btn_text"], font=FONTS["body_bold"],
+            corner_radius=CORNER_RADIUS,
         ).pack(side="left")
 
-        tk.Frame(card, bg=COLORS["card_border"], height=1).pack(fill="x", padx=20, pady=(12, 0))
+        ctk.CTkFrame(card, fg_color=COLORS["card_border"], height=1, corner_radius=0).pack(
+            fill="x", padx=20, pady=(12, 0)
+        )
 
-        footer = tk.Frame(card, bg=COLORS["card"])
+        footer = ctk.CTkFrame(card, fg_color="transparent")
         footer.pack(fill="x", padx=20, pady=(8, 14))
 
-        self._sched_status = tk.Label(
+        self._sched_status = ctk.CTkLabel(
             footer, text=self._estado_tarea(),
-            bg=COLORS["card"], fg=COLORS["text_muted"], font=FONTS["caption"],
+            text_color=COLORS["text_muted"], fg_color="transparent", font=FONTS["caption"],
         )
         self._sched_status.pack(side="left")
 
@@ -326,7 +286,6 @@ class SettingsView(tk.Frame):
                     partes = line.split(":", 1)
                     if len(partes) == 2:
                         raw = partes[1].strip()
-                        # "6:00:00 AM" → "06:00"
                         t = raw.split(" ")[0]
                         h, m = t.split(":")[:2]
                         return f"{int(h):02d}:{int(m):02d}"
@@ -351,51 +310,64 @@ class SettingsView(tk.Frame):
         try:
             hora = _validar_hora(f"{self._hora_hh.get()}:{self._hora_mm.get()}")
             registrar_tarea(hora)
-            self._sched_status.config(
+            self._sched_status.configure(
                 text=f"Tarea activa: {hora} diariamente",
-                fg=COLORS["success"],
+                text_color=COLORS["success"],
             )
             if self.controller:
                 self.controller.log(f"✓ Ejecución automática programada a las {hora}")
         except Exception as e:
-            self._sched_status.config(text=f"Error: {e}", fg=COLORS["error"])
+            self._sched_status.configure(text=f"Error: {e}", text_color=COLORS["error"])
             if self.controller:
                 self.controller.log(f"Error al programar tarea: {e}")
 
     # ----------------------------------------------------------------- helpers
 
     def _card(self, parent):
-        return tk.Frame(
-            parent, bg=COLORS["card"],
-            highlightbackground=COLORS["card_border"], highlightthickness=1,
+        return ctk.CTkFrame(
+            parent, fg_color=COLORS["card"],
+            border_color=COLORS["card_border"], border_width=BORDER_WIDTH,
+            corner_radius=CORNER_RADIUS,
         )
 
     def _add_checkbox(self, parent, text, var, indent=False):
-        row = tk.Frame(parent, bg=COLORS["card"])
+        row = ctk.CTkFrame(parent, fg_color="transparent")
         row.pack(fill="x", pady=2)
 
         if indent:
-            tk.Frame(row, bg=COLORS["card"], width=4).pack(side="left")
+            ctk.CTkFrame(row, fg_color="transparent", width=4).pack(side="left")
 
-        chk = tk.Checkbutton(
+        ctk.CTkCheckBox(
             row, text=text, variable=var,
-            bg=COLORS["card"], fg=COLORS["text"] if not indent else COLORS["text_secondary"],
-            activebackground=COLORS["card"],
-            selectcolor="#eaf0ff",
+            text_color=COLORS["text"] if not indent else COLORS["text_secondary"],
+            fg_color=COLORS["btn_primary"], hover_color=COLORS["btn_primary_hover"],
             font=FONTS["body"] if not indent else FONTS["small"],
-            anchor="w", cursor="hand2",
-            relief="flat", bd=0,
-        )
-        chk.pack(side="left", fill="x")
+            checkbox_width=18, checkbox_height=18,
+        ).pack(side="left", fill="x")
+
+        return row
 
     def _toggle_all(self, _=None):
         any_off = any(not v.get() for v in self._all_vars)
         new_val = True if any_off else False
         for v in self._all_vars:
             v.set(new_val)
-        self._sel_all_lbl.config(
+        self._sel_all_lbl.configure(
             text="Seleccionar todo" if not new_val else "Deseleccionar todo"
         )
+
+    # -------------------------------------------------------------- filtering
+
+    def _apply_filter(self, query: str):
+        reflow_rows(self._flat_rows, query)
+        q = query.strip().lower()
+        for section in self._sections:
+            has_match = any(q in name.lower() for name, _ in section["rows"])
+            reflow_rows(section["rows"], query)
+            if q and has_match:
+                section["frame"]._force_expand()
+            elif not q:
+                section["frame"]._force_collapse()
 
     # -------------------------------------------------------------------- API
 
@@ -441,6 +413,6 @@ class SettingsView(tk.Frame):
 
     def _update_sel_all_label(self):
         all_on = all(v.get() for v in self._all_vars)
-        self._sel_all_lbl.config(
+        self._sel_all_lbl.configure(
             text="Deseleccionar todo" if all_on else "Seleccionar todo"
         )
