@@ -2,6 +2,10 @@ import threading
 from ui.app import App
 from runner import run_scrapers
 from db.memory import Memory
+from drive_uploader import DriveUploader
+from sheets_reporter import SheetsReporter
+from file_watcher import FileWatcher
+from analytics.server import start_server
 
 
 def start_scrape_thread(app: App, stop_event: "threading.Event"):
@@ -38,7 +42,15 @@ def start_scrape_thread(app: App, stop_event: "threading.Event"):
 
 
 if __name__ == "__main__":
+    _stats_port = start_server()
+
+    _drive_watcher = DriveUploader()
+    _sheets_watcher = SheetsReporter()
+    _watcher = FileWatcher(_drive_watcher, _sheets_watcher)
+    _watcher.start()
+
     app = App()
+    app.set_stats_port(_stats_port)
 
     # Initial stats: fetch total documents before any run and update dashboard
     try:
@@ -64,4 +76,23 @@ if __name__ == "__main__":
 
     app.set_run_callback(start_ui_run)
 
+    def sync_desde_drive(on_progress=None):
+        count = _drive_watcher.sync_from_drive("downloads", on_progress=on_progress)
+        if on_progress:
+            on_progress(f"✓ Sincronización completada: {count} archivo(s) descargados desde Drive")
+
+    app.dashboard.set_sync_callback(sync_desde_drive)
+
+    def subir_pendientes(on_progress=None):
+        count = _drive_watcher.upload_pending_to_drive(
+            "downloads", on_progress=on_progress, sheets_reporter=_sheets_watcher
+        )
+        if on_progress:
+            on_progress(f"✓ Subida completada: {count} archivo(s) enviados a Drive")
+
+    app.dashboard.set_upload_pending_callback(subir_pendientes)
+
     app.mainloop()
+    _watcher.stop()
+    _drive_watcher.close()
+    _sheets_watcher.close()
